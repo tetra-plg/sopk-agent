@@ -3,7 +3,7 @@ import { useAuth } from '../../../core/auth/AuthContext';
 import { symptomsService } from '../../cycle/services/symptomsService';
 import DailyJournalView from '../../cycle/views/DailyJournalView';
 
-const DashboardView = () => {
+const DashboardView = ({ onNavigate }) => {
   const { user } = useAuth();
   const [currentView, setCurrentView] = useState('dashboard');
   const [todaySymptoms, setTodaySymptoms] = useState(null);
@@ -36,7 +36,7 @@ const DashboardView = () => {
     loadTodaySymptoms();
   }, [user?.id]);
 
-  // Vue journal quotidien
+  // Vue journal quotidien (seule vue locale conservée)
   if (currentView === 'journal') {
     return <DailyJournalView onBack={() => setCurrentView('dashboard')} />;
   }
@@ -175,32 +175,6 @@ const DashboardView = () => {
           "Les oméga-3 peuvent aider à réduire l'inflammation liée au SOPK.
           Pense à inclure du saumon, des noix ou des graines de lin dans tes repas !"
         </p>
-      </div>
-
-      {/* Actions rapides - Cachées sur mobile car déjà dans la bottom nav */}
-      <div className="hidden md:block mt-6 md:mt-8">
-        <h2 className="font-heading text-lg md:text-xl font-semibold mb-3 md:mb-4"
-            style={{ color: 'var(--color-text-principal)' }}>
-          ⚡ Actions rapides
-        </h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-          {[
-            { icon: '📝', label: 'Journal', style: 'btn-primary', action: () => setCurrentView('journal') },
-            { icon: '🧘', label: 'Respiration', style: 'btn-secondary', action: () => {} },
-            { icon: '🍽️', label: 'Nutrition', style: 'btn-accent-vert', action: () => {} },
-            { icon: '🏃', label: 'Activité', style: 'btn-accent-corail', action: () => {} },
-            { icon: '📊', label: 'Stats', style: 'btn-primary', action: () => {} }
-          ].map((action) => (
-            <button
-              key={action.label}
-              onClick={action.action}
-              className={`${action.style} p-4 flex flex-col items-center justify-center`}
-            >
-              <div className="text-2xl mb-1">{action.icon}</div>
-              <div className="text-sm font-medium">{action.label}</div>
-            </button>
-          ))}
-        </div>
       </div>
     </div>
   );

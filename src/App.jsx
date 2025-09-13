@@ -19,7 +19,7 @@ function App() {
   const renderCurrentView = () => {
     switch (currentRoute) {
       case '/dashboard':
-        return <DashboardView />;
+        return <DashboardView onNavigate={setCurrentRoute} />;
       case '/journal':
         return <CycleView />;
       case '/nutrition':
