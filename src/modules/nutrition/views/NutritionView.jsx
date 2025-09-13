@@ -1,10 +1,11 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useAuth } from '../../../core/auth/AuthContext';
 import { useMealSuggestions } from '../hooks/useMealSuggestions';
 import SuggestionCard from '../components/SuggestionCard';
 import MealDetailModal from '../components/MealDetailModal';
 import TrackingSuccess from '../components/TrackingSuccess';
 import MealSuggestionsView from './MealSuggestionsView';
+import trackingService from '../services/trackingService';
 
 const NutritionView = () => {
   const { user } = useAuth();
@@ -13,6 +14,8 @@ const NutritionView = () => {
   const [showModal, setShowModal] = useState(false);
   const [trackedMeal, setTrackedMeal] = useState(null);
   const [showTrackingSuccess, setShowTrackingSuccess] = useState(false);
+  const [todayMeals, setTodayMeals] = useState([]);
+  const [loadingTodayMeals, setLoadingTodayMeals] = useState(false);
 
   // Contexte utilisateur stable (mémorisé pour éviter les re-renders)
   const userContext = useMemo(() => ({
@@ -31,6 +34,65 @@ const NutritionView = () => {
   } = useMealSuggestions(userContext);
 
   const primarySuggestion = suggestions[0];
+
+  // Logique pour déterminer le prochain type de repas
+  const getNextMealType = () => {
+    const hour = new Date().getHours();
+    const takenMealTypes = todayMeals.map(meal => meal.meal_type);
+
+    if (hour < 10 && !takenMealTypes.includes('breakfast')) {
+      return 'breakfast';
+    } else if (hour < 15 && !takenMealTypes.includes('lunch')) {
+      return 'lunch';
+    } else if (hour < 20 && !takenMealTypes.includes('dinner')) {
+      return 'dinner';
+    } else if (!takenMealTypes.includes('snack')) {
+      return 'snack';
+    }
+    return null;
+  };
+
+  const getSmartMessage = () => {
+    const nextMealType = getNextMealType();
+    const hour = new Date().getHours();
+    const takenMealTypes = todayMeals.map(meal => meal.meal_type);
+
+    if (!nextMealType) {
+      if (takenMealTypes.length === 0) {
+        return "Il est peut-être temps de prendre un repas ou une collation 😊";
+      }
+      return "Tous tes repas principaux sont pris ! Tu peux consulter le catalogue pour des idées de collations.";
+    }
+
+    const mealTypeNames = {
+      breakfast: 'petit-déjeuner',
+      lunch: 'déjeuner',
+      dinner: 'dîner',
+      snack: 'collation'
+    };
+
+    return `Il est temps pour ton ${mealTypeNames[nextMealType]} ! 🍽️`;
+  };
+
+  // Charger les repas d'aujourd'hui
+  useEffect(() => {
+    if (!user?.id) return;
+
+    const loadTodayMeals = async () => {
+      setLoadingTodayMeals(true);
+      try {
+        const { data } = await trackingService.getTodayMeals(user.id);
+        setTodayMeals(data || []);
+      } catch (error) {
+        console.error('Erreur chargement repas du jour:', error);
+        setTodayMeals([]);
+      } finally {
+        setLoadingTodayMeals(false);
+      }
+    };
+
+    loadTodayMeals();
+  }, [user?.id]);
 
   const handleViewMealDetails = (meal) => {
     setSelectedMeal(meal);
@@ -51,6 +113,14 @@ const NutritionView = () => {
       if (meal) {
         setTrackedMeal(meal);
         setShowTrackingSuccess(true);
+      }
+
+      // Recharger les repas d'aujourd'hui
+      try {
+        const { data } = await trackingService.getTodayMeals(user.id);
+        setTodayMeals(data || []);
+      } catch (error) {
+        console.error('Erreur rechargement repas du jour:', error);
       }
     }
   };
@@ -103,6 +173,99 @@ const NutritionView = () => {
 
       {user && (
         <div className="space-y-6">
+          {/* Section repas consommés aujourd'hui */}
+          <section>
+            <h2 className="text-xl font-semibold mb-4" style={{ color: '#1F2937' }}>
+              🍽️ Mes repas d'aujourd'hui
+            </h2>
+
+            {loadingTodayMeals && (
+              <div className="bg-white rounded-xl p-6 animate-pulse" style={{ boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)' }}>
+                <div className="h-4 bg-gray-200 rounded w-32 mb-3"></div>
+                <div className="space-y-2">
+                  <div className="h-3 bg-gray-200 rounded w-48"></div>
+                  <div className="h-3 bg-gray-200 rounded w-40"></div>
+                </div>
+              </div>
+            )}
+
+{!loadingTodayMeals && (
+              <div className="bg-white rounded-xl p-6" style={{ boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)' }}>
+                {/* Organisation par catégories de repas */}
+                {(() => {
+                  const mealCategories = [
+                    { type: 'breakfast', name: 'Petit-déjeuner', icon: '🌅' },
+                    { type: 'lunch', name: 'Déjeuner', icon: '🍽️' },
+                    { type: 'dinner', name: 'Dîner', icon: '🌙' },
+                    { type: 'snack', name: 'Collation', icon: '🥨' }
+                  ];
+
+                  const mealsByType = todayMeals.reduce((acc, meal) => {
+                    if (!acc[meal.meal_type]) acc[meal.meal_type] = [];
+                    acc[meal.meal_type].push(meal);
+                    return acc;
+                  }, {});
+
+                  return (
+                    <div className="space-y-4">
+                      {mealCategories.map(category => {
+                        const meals = mealsByType[category.type] || [];
+                        const isEmpty = meals.length === 0;
+
+                        return (
+                          <div key={category.type} className="border-b border-gray-100 last:border-b-0 pb-3 last:pb-0">
+                            <div className="flex items-center gap-2 mb-2">
+                              <span className="text-lg">{category.icon}</span>
+                              <span className="font-medium" style={{ color: '#1F2937' }}>
+                                {category.name}
+                              </span>
+                            </div>
+
+                            {isEmpty ? (
+                              <div className="text-sm italic" style={{ color: '#6B7280' }}>
+                                Rien de pris encore
+                              </div>
+                            ) : (
+                              <div className="space-y-2">
+                                {meals.map((trackedMeal, index) => (
+                                  <div key={`${trackedMeal.id}-${index}`} className="flex items-center justify-between p-3 rounded-lg" style={{ backgroundColor: 'rgba(110, 231, 183, 0.1)' }}>
+                                    <div className="flex-1">
+                                      <div className="font-medium mb-1" style={{ color: '#1F2937' }}>
+                                        {trackedMeal.meal_suggestions?.name || 'Repas inconnu'}
+                                      </div>
+                                      <div className="flex gap-4 text-xs" style={{ color: '#6B7280' }}>
+                                        {trackedMeal.meal_suggestions?.prep_time_minutes && (
+                                          <span>⏱️ {trackedMeal.meal_suggestions.prep_time_minutes} min</span>
+                                        )}
+                                        {trackedMeal.meal_suggestions?.difficulty && (
+                                          <span>📊 {trackedMeal.meal_suggestions.difficulty}</span>
+                                        )}
+                                      </div>
+                                    </div>
+                                    <div className="text-right text-xs" style={{ color: '#6B7280' }}>
+                                      <div>{new Date(trackedMeal.created_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</div>
+                                      {trackedMeal.satisfaction_rating && (
+                                        <div className="flex items-center gap-1">
+                                          <span>😊</span>
+                                          <span>{trackedMeal.satisfaction_rating}/10</span>
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  );
+                })()}
+              </div>
+            )}
+
+          </section>
+
           {/* Suggestion principale */}
           {isReady && primarySuggestion && (
             <section>
@@ -110,7 +273,7 @@ const NutritionView = () => {
               <div className="text-center mb-4">
                 <span className="inline-block px-4 py-2 rounded-full text-sm font-medium"
                       style={{ backgroundColor: '#6EE7B7', color: '#1F2937' }}>
-                  ✨ Ma suggestion du moment
+                  ✨ {getSmartMessage()}
                 </span>
               </div>
 
@@ -176,10 +339,16 @@ const NutritionView = () => {
               <div className="bg-white rounded-xl p-8" style={{ boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)' }}>
                 <div className="text-4xl mb-4">🍽️</div>
                 <h3 className="text-lg font-semibold mb-2" style={{ color: '#1F2937' }}>
-                  Aucune suggestion disponible
+                  {getSmartMessage()}
                 </h3>
                 <p className="mb-4" style={{ color: '#6B7280' }}>
-                  Explorez le catalogue complet en attendant.
+                  {(() => {
+                    const nextMealType = getNextMealType();
+                    if (!nextMealType) {
+                      return "Tu peux explorer le catalogue pour des idées de collations ou de futurs repas.";
+                    }
+                    return "Explore le catalogue pour trouver le repas parfait !";
+                  })()}
                 </p>
                 <button
                   onClick={handleNavigateToSuggestions}

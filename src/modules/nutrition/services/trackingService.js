@@ -70,6 +70,37 @@ const trackingService = {
   },
 
   /**
+   * Récupérer les repas consommés aujourd'hui
+   */
+  async getTodayMeals(userId) {
+    const today = new Date().toISOString().split('T')[0];
+    const client = getSupabaseClient();
+    const { data, error } = await client
+      .from('user_meal_tracking')
+      .select(`
+        *,
+        meal_suggestions(
+          id,
+          name,
+          category,
+          main_nutrients,
+          difficulty,
+          prep_time_minutes
+        )
+      `)
+      .eq('user_id', userId)
+      .eq('date', today)
+      .order('created_at', { ascending: true });
+
+    if (error && error.code !== 'PGRST116') {
+      console.error('Erreur récupération repas du jour:', error);
+      return { data: [] };
+    }
+
+    return { data: data || [] };
+  },
+
+  /**
    * Obtenir l'historique complet des repas d'un utilisateur
    */
   async getMealHistory(userId, limit = 50) {
