@@ -10,7 +10,6 @@ const ProtectedRoute = ({ children }) => {
   const isDevelopment = import.meta.env.DEV;
 
   if (isDevelopment) {
-    console.log('🚧 Mode développement: Authentication bypass activé');
     return children;
   }
 

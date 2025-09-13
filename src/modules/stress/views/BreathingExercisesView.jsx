@@ -39,8 +39,6 @@ const BreathingExercisesView = ({ onBack }) => {
         if (error) {
           console.warn('Erreur sauvegarde session:', error);
           // Ne pas bloquer l'UX pour une erreur de sauvegarde
-        } else {
-          console.log('Session sauvegardée avec succès:', data);
         }
       }
 

@@ -43,7 +43,6 @@ export const AuthProvider = ({ children }) => {
 
     setUser(mockUser);
     setLoading(false);
-    console.log('🧪 Mode test: utilisateur fictif connecté');
 
     // Code réel commenté pour test
     /*
