@@ -40,6 +40,8 @@ const BreathingSession = ({
     }
 
     setShowPreparation(false);
+    setShowCompletionFeedback(false); // Réinitialiser l'état de complétion
+    setCompletionData(null);
     sessionStartTime.current = Date.now();
 
     // Son de début de session
@@ -102,17 +104,17 @@ const BreathingSession = ({
           <div
             className="w-20 h-20 mx-auto rounded-full flex items-center justify-center text-3xl mb-4"
             style={{
-              backgroundColor: `${session.technique.color}20`,
-              color: session.technique.color
+              backgroundColor: `${session.technique?.color || '#4FC3F7'}20`,
+              color: session.technique?.color || '#4FC3F7'
             }}
           >
-            {session.technique.icon}
+            {session.technique?.icon || '🫁'}
           </div>
           <h2 className="text-2xl font-heading font-bold text-gray-800 mb-2">
-            {session.technique.name}
+            {session.technique?.name || 'Technique de respiration'}
           </h2>
           <p className="text-gray-600 mb-1">
-            {session.technique.description}
+            {session.technique?.description || 'Exercice de respiration guidé'}
           </p>
           <p className="text-sm text-gray-500">
             ⏱️ {session.formattedTimeLeft} • 🔄 {session.totalCycles} cycles
@@ -139,7 +141,7 @@ const BreathingSession = ({
             }}
             className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider-thumb"
             style={{
-              background: `linear-gradient(to right, #6EE7B7 0%, ${session.technique.color} 50%, #FB7185 100%)`
+              background: `linear-gradient(to right, #6EE7B7 0%, ${session.technique?.color || '#4FC3F7'} 50%, #FB7185 100%)`
             }}
           />
           <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -230,13 +232,45 @@ const BreathingSession = ({
     );
   }
 
+  // Gestion du chargement
+  if (session.loading) {
+    return (
+      <div className={`breathing-session loading ${className}`}>
+        <div className="text-center py-8">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-lavande mx-auto mb-4"></div>
+          <p className="text-gray-600">Chargement de la technique...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Gestion des erreurs
+  if (session.error) {
+    return (
+      <div className={`breathing-session error ${className}`}>
+        <div className="text-center py-8">
+          <div className="mb-4">
+            <span className="text-4xl">❌</span>
+          </div>
+          <p className="text-red-600 mb-4">{session.error}</p>
+          <button
+            onClick={onExit}
+            className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
+          >
+            Retour
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   // Session active
   return (
     <div className={`max-w-md mx-auto p-6 text-center ${className}`}>
       {/* Header avec technique et temps */}
       <div className="mb-8">
         <h2 className="text-xl font-heading font-bold text-gray-800 mb-2">
-          {session.technique.name}
+          {session.technique?.name || 'Technique de respiration'}
         </h2>
         <div className="flex justify-center items-center gap-4 text-sm text-gray-600">
           <span>⏱️ {session.formattedTimeLeft}</span>
@@ -247,7 +281,7 @@ const BreathingSession = ({
             className="h-1.5 rounded-full transition-all duration-300"
             style={{
               width: `${session.progressPercent}%`,
-              backgroundColor: session.technique.color
+              backgroundColor: session.technique?.color || '#4FC3F7'
             }}
           />
         </div>

@@ -22,6 +22,7 @@ export const useTimer = (initialDuration = 0, options = {}) => {
   const [isRunning, setIsRunning] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [totalElapsed, setTotalElapsed] = useState(0);
+  const [currentDuration, setCurrentDuration] = useState(initialDuration);
 
   const intervalRef = useRef(null);
   const startTimeRef = useRef(null);
@@ -40,10 +41,10 @@ export const useTimer = (initialDuration = 0, options = {}) => {
       }
 
       setTotalElapsed(prev => prev + (tickInterval / 1000));
-      onTick(newTime, initialDuration - newTime);
+      onTick(newTime, currentDuration - newTime);
       return newTime;
     });
-  }, [tickInterval, onTick, onComplete, initialDuration]);
+  }, [tickInterval, onTick, onComplete, currentDuration]);
 
   // Démarrer le timer
   const start = useCallback(() => {
@@ -105,6 +106,7 @@ export const useTimer = (initialDuration = 0, options = {}) => {
     const wasRunning = isRunning;
     stop();
     setTimeLeft(newDuration);
+    setCurrentDuration(newDuration);
     setTotalElapsed(0);
     pausedTimeRef.current = 0;
     startTimeRef.current = null;
@@ -115,7 +117,7 @@ export const useTimer = (initialDuration = 0, options = {}) => {
   }, [isRunning, stop, autoStart, start]);
 
   // Calculer le progrès
-  const progress = initialDuration > 0 ? (initialDuration - timeLeft) / initialDuration : 0;
+  const progress = currentDuration > 0 ? (currentDuration - timeLeft) / currentDuration : 0;
   const progressPercent = Math.round(progress * 100);
 
   // Formater le temps
@@ -126,7 +128,7 @@ export const useTimer = (initialDuration = 0, options = {}) => {
   }, []);
 
   const formattedTimeLeft = formatTime(timeLeft);
-  const formattedTotalTime = formatTime(initialDuration);
+  const formattedTotalTime = formatTime(currentDuration);
   const formattedElapsed = formatTime(totalElapsed);
 
   // Nettoyage à la destruction

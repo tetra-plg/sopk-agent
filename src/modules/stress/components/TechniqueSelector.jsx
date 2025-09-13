@@ -6,11 +6,12 @@
  */
 
 import { useState } from 'react';
-import { getAllTechniques, formatTime } from '../utils/breathingTechniques';
+import { useBreathingTechniques } from '../hooks/useBreathingTechniques';
+import { formatTime } from '../utils/breathingTechniques';
 
 const TechniqueSelector = ({ onSelect, className = '' }) => {
   const [selectedTechnique, setSelectedTechnique] = useState(null);
-  const techniques = getAllTechniques();
+  const { techniques, loading, error } = useBreathingTechniques();
 
   const handleTechniqueSelect = (technique) => {
     setSelectedTechnique(technique.id);
@@ -36,6 +37,25 @@ const TechniqueSelector = ({ onSelect, className = '' }) => {
     };
     return texts[difficulty] || 'Débutant';
   };
+
+  // Gestion des états de chargement et d'erreur
+  if (loading) {
+    return (
+      <div className={`text-center py-8 ${className}`}>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-lavande mx-auto mb-4"></div>
+        <p className="text-gray-600">Chargement des techniques...</p>
+      </div>
+    );
+  }
+
+  if (error || techniques.length === 0) {
+    return (
+      <div className={`text-center py-8 ${className}`}>
+        <p className="text-gray-600 mb-4">Aucune technique disponible</p>
+        <p className="text-sm text-gray-500">Vérifiez votre connexion</p>
+      </div>
+    );
+  }
 
   return (
     <div className={`space-y-4 ${className}`}>
@@ -97,11 +117,16 @@ const TechniqueSelector = ({ onSelect, className = '' }) => {
                 <div className="flex flex-wrap gap-4 text-xs text-gray-500 mb-3">
                   <div className="flex items-center gap-1">
                     <span>⏱️</span>
-                    <span>{formatTime(technique.duration)}</span>
+                    <span>{formatTime(technique.duration_seconds)}</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <span>🔄</span>
-                    <span>{technique.pattern.join('-')}</span>
+                    <span>
+                      {technique.pattern
+                        ? technique.pattern.join('-')
+                        : 'N/A'
+                      }
+                    </span>
                   </div>
                 </div>
 
@@ -122,7 +147,7 @@ const TechniqueSelector = ({ onSelect, className = '' }) => {
                   </div>
 
                   {/* Bénéfices spécifiques SOPK */}
-                  {technique.sopkBenefits && (
+                  {technique.sopk_benefits && (
                     <div className="mt-3 p-3 bg-gradient-to-r from-primary-lavande/10 to-accent-vert-sauge/10 rounded-lg">
                       <div className="flex items-start gap-2">
                         <span className="text-primary-lavande text-xs">✨</span>
@@ -130,7 +155,7 @@ const TechniqueSelector = ({ onSelect, className = '' }) => {
                           <span className="font-medium text-primary-lavande">
                             Spécial SOPK:
                           </span>{' '}
-                          {technique.sopkBenefits}
+                          {technique.sopk_benefits}
                         </p>
                       </div>
                     </div>

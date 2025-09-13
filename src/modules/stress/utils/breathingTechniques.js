@@ -1,70 +1,9 @@
 /**
- * 🫁 SOPK Companion - Configuration des Techniques de Respiration
+ * 🫁 SOPK Companion - Utilitaires pour les Techniques de Respiration
  *
- * Techniques optimisées pour la gestion du stress et de l'anxiété
- * liés au SOPK avec validation scientifique.
+ * Fonctions utilitaires pour le calcul et la gestion des sessions de respiration.
+ * Les techniques sont maintenant stockées dans la base de données.
  */
-
-export const techniques = {
-  coherence: {
-    id: 'coherence',
-    name: 'Cohérence cardiaque',
-    duration: 300, // 5 minutes
-    pattern: [5, 0, 5, 0], // inspire, pause, expire, pause (en secondes)
-    description: 'Équilibre ton système nerveux',
-    benefits: ['Réduit le cortisol', 'Équilibre hormonal', 'Apaise le stress'],
-    icon: '🔵',
-    color: '#4FC3F7',
-    difficulty: 'beginner',
-    sopkBenefits: 'Idéal pour réguler les hormones et réduire l\'inflammation'
-  },
-
-  box: {
-    id: 'box',
-    name: 'Respiration 4-4-4-4',
-    duration: 180, // 3 minutes
-    pattern: [4, 4, 4, 4], // carré parfait
-    description: 'Focus et concentration',
-    benefits: ['Améliore la concentration', 'Calme l\'esprit', 'Réduit l\'anxiété'],
-    icon: '⏹️',
-    color: '#81C784',
-    difficulty: 'intermediate',
-    sopkBenefits: 'Parfait pour gérer l\'anxiété liée aux symptômes'
-  },
-
-  quick: {
-    id: 'quick',
-    name: 'Technique rapide',
-    duration: 120, // 2 minutes
-    pattern: [4, 2, 6, 1], // 4-7-8 adapté et raccourci
-    description: 'Anti-stress express',
-    benefits: ['Soulagement immédiat', 'Détente rapide', 'Calme instantané'],
-    icon: '⚡',
-    color: '#FFB74D',
-    difficulty: 'beginner',
-    sopkBenefits: 'Solution rapide pour les pics de stress hormonal'
-  }
-};
-
-/**
- * Obtient une technique par son ID
- * @param {string} techniqueId - L'ID de la technique
- * @returns {object|null} La technique ou null si introuvable
- */
-export const getTechnique = (techniqueId) => {
-  return techniques[techniqueId] || null;
-};
-
-/**
- * Obtient toutes les techniques triées par difficulté
- * @returns {Array} Liste des techniques
- */
-export const getAllTechniques = () => {
-  return Object.values(techniques).sort((a, b) => {
-    const difficultyOrder = { 'beginner': 1, 'intermediate': 2, 'advanced': 3 };
-    return difficultyOrder[a.difficulty] - difficultyOrder[b.difficulty];
-  });
-};
 
 /**
  * Calcule la durée totale d'un cycle de respiration
@@ -77,12 +16,13 @@ export const getCycleDuration = (pattern) => {
 
 /**
  * Calcule le nombre total de cycles pour une technique
- * @param {object} technique - Objet technique
+ * @param {object} technique - Objet technique (peut avoir duration ou duration_seconds)
  * @returns {number} Nombre de cycles
  */
 export const getTotalCycles = (technique) => {
   const cycleDuration = getCycleDuration(technique.pattern);
-  return Math.floor(technique.duration / cycleDuration);
+  const totalDuration = technique.duration_seconds || technique.duration || 0;
+  return Math.floor(totalDuration / cycleDuration);
 };
 
 /**
@@ -180,11 +120,11 @@ export const formatTime = (seconds) => {
 export const validateSessionData = (sessionData) => {
   const errors = [];
 
-  if (!sessionData.technique || !techniques[sessionData.technique]) {
+  if (!sessionData.technique || typeof sessionData.technique !== 'string') {
     errors.push('Technique invalide');
   }
 
-  if (typeof sessionData.duration_seconds !== 'number' || sessionData.duration_seconds < 0) {
+  if (typeof sessionData.duration_seconds !== 'number' || sessionData.duration_seconds <= 0) {
     errors.push('Durée invalide');
   }
 

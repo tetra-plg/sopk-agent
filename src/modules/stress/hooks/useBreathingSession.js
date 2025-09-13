@@ -8,13 +8,14 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useTimer } from '../../../shared/hooks/useTimer';
 import {
-  getTechnique,
   getCycleDuration,
   getTotalCycles,
   getCurrentPhase
 } from '../utils/breathingTechniques';
+import { useBreathingTechniques } from './useBreathingTechniques';
 
 export const useBreathingSession = (techniqueId, userId = null) => {
+  const { techniques, getTechnique, loading: techniquesLoading, isReady } = useBreathingTechniques();
   const technique = getTechnique(techniqueId);
 
   // États de la session
@@ -35,23 +36,37 @@ export const useBreathingSession = (techniqueId, userId = null) => {
   const sessionStartTimeRef = useRef(null);
   const cycleStartTimeRef = useRef(null);
 
-  if (!technique) {
-    throw new Error(`Technique "${techniqueId}" non trouvée`);
-  }
+  // Gérer l'état de chargement et les erreurs de manière plus gracieuse
+  const [error, setError] = useState(null);
 
-  const cycleDuration = getCycleDuration(technique.pattern);
-  const totalCycles = getTotalCycles(technique);
+  useEffect(() => {
+    if (isReady && !technique) {
+      setError(`Technique "${techniqueId}" non trouvée`);
+    } else if (technique) {
+      setError(null);
+    }
+  }, [technique, techniqueId, isReady]);
 
-  // Configuration du timer principal
-  const timer = useTimer(technique.duration, {
+  // Adapter les données de la technique BDD pour les fonctions utilitaires
+  const adaptedTechnique = technique ? {
+    duration: technique.duration_seconds,
+    pattern: technique.pattern || [4, 4, 4, 4] // fallback
+  } : null;
+
+  const cycleDuration = adaptedTechnique ? getCycleDuration(adaptedTechnique.pattern) : 0;
+  const totalCycles = adaptedTechnique ? getTotalCycles(adaptedTechnique) : 0;
+
+  // Configuration du timer principal - TOUJOURS appelé pour respecter les règles des hooks
+  const timer = useTimer(0, {
     onTick: (timeLeft, elapsedTime) => {
+      if (!adaptedTechnique) return;
+
       // Calculer dans quel cycle nous sommes
       const cycle = Math.floor(elapsedTime / cycleDuration);
       const timeInCurrentCycle = elapsedTime % cycleDuration;
 
       // Obtenir la phase actuelle
-      const phaseData = getCurrentPhase(technique.pattern, timeInCurrentCycle);
-
+      const phaseData = getCurrentPhase(adaptedTechnique.pattern, timeInCurrentCycle);
 
       setCurrentCycle(Math.min(cycle, totalCycles - 1));
       setCurrentPhase(phaseData.phase);
@@ -65,22 +80,39 @@ export const useBreathingSession = (techniqueId, userId = null) => {
     tickInterval: 100 // 100ms pour animations fluides
   });
 
+  // Mettre à jour la durée du timer quand la technique est chargée
+  // On utilise une ref pour éviter de re-déclencher setDuration après qu'elle ait été appelée
+  const lastSetDurationRef = useRef(0);
+
+  useEffect(() => {
+    if (technique?.duration_seconds && technique.duration_seconds !== lastSetDurationRef.current) {
+      timer.setDuration(technique.duration_seconds);
+      lastSetDurationRef.current = technique.duration_seconds;
+    }
+  }, [technique?.duration_seconds, timer]);
+
   // Démarrer la session
   const startSession = useCallback(async () => {
     if (!technique) return;
 
+    // S'assurer que le timer a bien la bonne durée avant de démarrer
+    // On vérifie aussi avec la ref pour éviter de re-définir la durée
+    if (technique.duration_seconds && lastSetDurationRef.current !== technique.duration_seconds) {
+      timer.setDuration(technique.duration_seconds);
+      lastSetDurationRef.current = technique.duration_seconds;
+    }
 
     setSessionStarted(true);
     setCurrentCycle(0);
     setCurrentPhase('inhale');
     setTimeInPhase(0);
     setPhaseProgress(0);
-    setPhaseDuration(technique.pattern[0]);
+    setPhaseDuration(adaptedTechnique?.pattern[0] || 4);
     sessionStartTimeRef.current = Date.now();
     cycleStartTimeRef.current = Date.now();
 
     timer.start();
-  }, [technique, timer, cycleDuration, totalCycles]);
+  }, [technique, adaptedTechnique, timer, cycleDuration, totalCycles]);
 
   // Mettre en pause
   const pauseSession = useCallback(() => {
@@ -106,25 +138,25 @@ export const useBreathingSession = (techniqueId, userId = null) => {
     setCurrentPhase('inhale');
     setTimeInPhase(0);
     setPhaseProgress(0);
-    setPhaseDuration(technique?.pattern[0] || 0);
+    setPhaseDuration(adaptedTechnique?.pattern[0] || 4);
     setStressBefore(null);
     setStressAfter(null);
     setFeelingAfter(null);
     setSessionNotes('');
     sessionStartTimeRef.current = null;
     cycleStartTimeRef.current = null;
-  }, [timer, technique]);
+  }, [timer, adaptedTechnique]);
 
   // Calculer les statistiques de session
   const getSessionData = useCallback(() => {
-    const actualDuration = technique.duration - timer.timeLeft;
+    const actualDuration = (technique?.duration_seconds || 0) - timer.timeLeft;
     const completedCycles = currentCycle + (timer.isCompleted ? 1 : 0);
 
     return {
       technique: techniqueId,
       duration_seconds: Math.round(actualDuration),
       completed: timer.isCompleted,
-      interruption_reason: !timer.isCompleted && timer.timeLeft < technique.duration
+      interruption_reason: !timer.isCompleted && timer.timeLeft < (technique?.duration_seconds || 0)
         ? 'user_stopped'
         : null,
       stress_before: stressBefore,
@@ -165,9 +197,60 @@ export const useBreathingSession = (techniqueId, userId = null) => {
 
   // Calculer le progrès global
   const getOverallProgress = useCallback(() => {
-    if (!technique) return 0;
-    return (technique.duration - timer.timeLeft) / technique.duration;
+    if (!technique || !technique.duration_seconds) return 0;
+    return (technique.duration_seconds - timer.timeLeft) / technique.duration_seconds;
   }, [technique, timer.timeLeft]);
+
+  // RETOURS CONDITIONNELS APRÈS TOUS LES HOOKS
+  // Si les techniques sont en cours de chargement, retourner un état de chargement
+  if (techniquesLoading) {
+    return {
+      loading: true,
+      error: null,
+      technique: null,
+      isActive: false,
+      isRunning: false,
+      isPaused: false,
+      isCompleted: false,
+      startSession: () => {},
+      pauseSession: () => {},
+      resumeSession: () => {},
+      stopSession: () => {},
+      resetSession: () => {},
+      setStressBefore: () => {},
+      setStressAfter: () => {},
+      setFeelingAfter: () => {},
+      setSessionNotes: () => {},
+      getSessionData: () => ({}),
+      getCurrentInstructions: () => ({}),
+      getOverallProgress: () => 0
+    };
+  }
+
+  // Si il y a une erreur, la retourner
+  if (error) {
+    return {
+      loading: false,
+      error,
+      technique: null,
+      isActive: false,
+      isRunning: false,
+      isPaused: false,
+      isCompleted: false,
+      startSession: () => {},
+      pauseSession: () => {},
+      resumeSession: () => {},
+      stopSession: () => {},
+      resetSession: () => {},
+      setStressBefore: () => {},
+      setStressAfter: () => {},
+      setFeelingAfter: () => {},
+      setSessionNotes: () => {},
+      getSessionData: () => ({}),
+      getCurrentInstructions: () => ({}),
+      getOverallProgress: () => 0
+    };
+  }
 
   // État de la session pour l'UI
   const sessionState = {
@@ -213,6 +296,10 @@ export const useBreathingSession = (techniqueId, userId = null) => {
   return {
     // État de la session
     ...sessionState,
+
+    // États de chargement et d'erreur
+    loading: false,
+    error: null,
 
     // Actions de contrôle
     startSession,
