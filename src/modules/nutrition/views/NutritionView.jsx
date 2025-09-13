@@ -4,13 +4,12 @@ import { useMealSuggestions } from '../hooks/useMealSuggestions';
 import SuggestionCard from '../components/SuggestionCard';
 import MealDetailModal from '../components/MealDetailModal';
 import TrackingSuccess from '../components/TrackingSuccess';
-import MealSuggestionsView from './MealSuggestionsView';
 import RecipeLibraryView from './RecipeLibraryView';
 import trackingService from '../services/trackingService';
 
 const NutritionView = () => {
   const { user } = useAuth();
-  const [currentView, setCurrentView] = useState('overview'); // 'overview', 'suggestions', 'library'
+  const [currentView, setCurrentView] = useState('overview'); // 'overview', 'library'
   const [selectedMeal, setSelectedMeal] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [trackedMeal, setTrackedMeal] = useState(null);
@@ -137,15 +136,6 @@ const NutritionView = () => {
       console.log('Rating meal:', trackedMeal.name, rating);
     }
   };
-
-  const handleNavigateToSuggestions = () => {
-    setCurrentView('suggestions');
-  };
-
-  // Vue suggestions complètes
-  if (currentView === 'suggestions') {
-    return <MealSuggestionsView onBack={() => setCurrentView('overview')} />;
-  }
 
   // Vue bibliothèque de recettes
   if (currentView === 'library') {
@@ -324,40 +314,21 @@ const NutritionView = () => {
           {/* Navigation claire */}
           {isReady && primarySuggestion && (
             <section className="text-center space-y-4">
-              <div className="space-y-3">
-                <button
-                  onClick={handleNavigateToSuggestions}
-                  className="px-8 py-3 rounded-xl font-medium transition-colors block w-full"
-                  style={{
-                    backgroundColor: '#6EE7B7',
-                    color: '#1F2937'
-                  }}
-                  onMouseEnter={(e) => e.target.style.backgroundColor = '#34D399'}
-                  onMouseLeave={(e) => e.target.style.backgroundColor = '#6EE7B7'}
-                >
-                  🎯 Suggestions Personnalisées
-                </button>
-                <p className="text-sm text-gray-600 mb-4">
-                  Recommandations adaptées à tes symptômes et cycle
-                </p>
-
-                <button
-                  onClick={() => setCurrentView('library')}
-                  className="px-8 py-3 rounded-xl font-medium transition-colors block w-full"
-                  style={{
-                    backgroundColor: 'rgba(110, 231, 183, 0.2)',
-                    color: '#1F2937',
-                    border: '2px solid #6EE7B7'
-                  }}
-                  onMouseEnter={(e) => e.target.style.backgroundColor = 'rgba(110, 231, 183, 0.3)'}
-                  onMouseLeave={(e) => e.target.style.backgroundColor = 'rgba(110, 231, 183, 0.2)'}
-                >
-                  📚 Catalogue Recettes IG Bas
-                </button>
-                <p className="text-sm text-gray-600">
-                  Explorer toutes nos recettes spéciales SOPK
-                </p>
-              </div>
+              <button
+                onClick={() => setCurrentView('library')}
+                className="px-8 py-3 rounded-xl font-medium transition-colors"
+                style={{
+                  backgroundColor: '#6EE7B7',
+                  color: '#1F2937'
+                }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#34D399'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = '#6EE7B7'}
+              >
+                📚 Découvrir plus de recettes IG bas →
+              </button>
+              <p className="text-sm text-gray-600">
+                Explorer toutes nos recettes spéciales SOPK
+              </p>
             </section>
           )}
 
@@ -378,29 +349,16 @@ const NutritionView = () => {
                     return "Explore le catalogue pour trouver le repas parfait !";
                   })()}
                 </p>
-                <div className="space-y-3">
-                  <button
-                    onClick={handleNavigateToSuggestions}
-                    className="px-6 py-2 rounded-xl font-medium transition-colors block"
-                    style={{
-                      backgroundColor: '#6EE7B7',
-                      color: '#1F2937'
-                    }}
-                  >
-                    🎯 Suggestions Personnalisées
-                  </button>
-                  <button
-                    onClick={() => setCurrentView('library')}
-                    className="px-6 py-2 rounded-xl font-medium transition-colors block"
-                    style={{
-                      backgroundColor: 'rgba(110, 231, 183, 0.2)',
-                      color: '#1F2937',
-                      border: '2px solid #6EE7B7'
-                    }}
-                  >
-                    📚 Catalogue Recettes IG Bas
-                  </button>
-                </div>
+                <button
+                  onClick={() => setCurrentView('library')}
+                  className="px-6 py-2 rounded-xl font-medium transition-colors"
+                  style={{
+                    backgroundColor: '#6EE7B7',
+                    color: '#1F2937'
+                  }}
+                >
+                  📚 Découvrir nos recettes IG bas →
+                </button>
               </div>
             </section>
           )}
