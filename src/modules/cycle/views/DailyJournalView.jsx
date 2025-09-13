@@ -15,7 +15,7 @@ import {
   ExclamationTriangleIcon
 } from '@heroicons/react/24/outline';
 
-export default function DailyJournalView() {
+export default function DailyJournalView({ onBack }) {
   const { user } = useAuth();
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [loadError, setLoadError] = useState(null);
@@ -136,6 +136,18 @@ export default function DailyJournalView() {
       {/* Header */}
       <div className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-2xl mx-auto px-4 py-6">
+          {onBack && (
+            <div className="flex items-center mb-4">
+              <button
+                onClick={onBack}
+                className="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors"
+              >
+                <span>←</span>
+                <span>Retour</span>
+              </button>
+            </div>
+          )}
+
           <DateNavigator
             currentDate={currentDate}
             onDateChange={handleDateChange}
