@@ -1,3 +1,263 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Raleway:ital,wght@0,300;0,400;0,500;1,400;1,500&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  :root {
+    /* 🌈 Palette SOPK Companion */
+
+    /* Couleurs principales */
+    --color-primary-lavande: #A78BFA;
+    --color-primary-bleu-ciel: #93C5FD;
+
+    /* Couleurs secondaires */
+    --color-accent-corail: #FB7185;
+    --color-accent-vert-sauge: #6EE7B7;
+
+    /* Neutres */
+    --color-fond-clair: #F9FAFB;
+    --color-text-principal: #1F2937;
+    --color-text-secondaire: #6B7280;
+
+    /* Variations pour états (hover, focus, etc.) */
+    --color-primary-lavande-hover: #9333EA;
+    --color-primary-bleu-ciel-hover: #3B82F6;
+    --color-accent-corail-hover: #F43F5E;
+    --color-accent-vert-sauge-hover: #10B981;
+  }
+
+  /* 🔤 Configuration des polices */
+  html {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+
+  /* Titres - Police Poppins */
+  h1, h2, h3, h4, h5, h6,
+  .font-heading {
+    font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+    font-weight: 600;
+  }
+
+  /* Éléments émotionnels - Police Raleway */
+  .font-emotional {
+    font-family: 'Raleway', system-ui, -apple-system, sans-serif;
+    font-style: italic;
+    font-weight: 400;
+  }
+}
+
+@layer components {
+  /* 🌸 Styles de base par module */
+
+  /* Boutons personnalisés avec border-radius généreux */
+  .btn-sopk {
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  }
+
+  .btn-sopk:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
+
+  .btn-primary {
+    background-color: var(--color-primary-lavande);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  }
+
+  .btn-primary:hover {
+    background-color: var(--color-primary-lavande-hover);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  }
+
+  .btn-secondary {
+    background-color: var(--color-primary-bleu-ciel);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  }
+
+  .btn-secondary:hover {
+    background-color: var(--color-primary-bleu-ciel-hover);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  }
+
+  .btn-accent-corail {
+    background-color: var(--color-accent-corail);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  }
+
+  .btn-accent-corail:hover {
+    background-color: var(--color-accent-corail-hover);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  }
+
+  .btn-accent-vert {
+    background-color: var(--color-accent-vert-sauge);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  }
+
+  .btn-accent-vert:hover {
+    background-color: var(--color-accent-vert-sauge-hover);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Cartes avec ombres douces */
+  .card-sopk {
+    background-color: white;
+    border-radius: 1rem;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    border: 1px solid #F3F4F6;
+    transition: box-shadow 0.2s ease;
+  }
+
+  .card-sopk:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Cartes par module avec couleurs d'accent */
+  .card-dashboard {
+    background: linear-gradient(135deg, var(--color-fond-clair) 0%, #EDE9FE 100%);
+    border-radius: 1rem;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    border: 1px solid #F3F4F6;
+    transition: box-shadow 0.2s ease;
+  }
+
+  .card-dashboard:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  }
+
+  .card-nutrition {
+    background: linear-gradient(135deg, var(--color-fond-clair) 0%, #ECFDF5 100%);
+    border-radius: 1rem;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    border: 1px solid #F3F4F6;
+    transition: box-shadow 0.2s ease;
+  }
+
+  .card-nutrition:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  }
+
+  .card-stress {
+    background: linear-gradient(135deg, var(--color-fond-clair) 0%, #EEF2FF 100%);
+    border-radius: 1rem;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    border: 1px solid #F3F4F6;
+    transition: box-shadow 0.2s ease;
+  }
+
+  .card-stress:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  }
+
+  .card-activite {
+    background: linear-gradient(135deg, var(--color-fond-clair) 0%, #FFF1F2 100%);
+    border-radius: 1rem;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    border: 1px solid #F3F4F6;
+    transition: box-shadow 0.2s ease;
+  }
+
+  .card-activite:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Badges et tags */
+  .badge-sopk {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  .badge-lavande {
+    background-color: #EDE9FE;
+    color: #7C3AED;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  .badge-bleu-ciel {
+    background-color: #DBEAFE;
+    color: #1D4ED8;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  .badge-corail {
+    background-color: #FCE7F3;
+    color: #BE185D;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  .badge-vert-sauge {
+    background-color: #DCFCE7;
+    color: #166534;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  /* Inputs avec style SOPK */
+  .input-sopk {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    border: 1px solid #D1D5DB;
+    background-color: white;
+    transition: all 0.2s ease;
+    outline: none;
+  }
+
+  .input-sopk:focus {
+    border-color: #A78BFA;
+    box-shadow: 0 0 0 2px rgba(167, 139, 250, 0.1);
+  }
+
+  /* Text styles émotionnels */
+  .text-emotional {
+    font-family: 'Raleway', system-ui, -apple-system, sans-serif;
+    font-style: italic;
+    font-weight: 400;
+    color: var(--color-text-secondaire);
+  }
+
+  .text-motivational {
+    font-family: 'Raleway', system-ui, -apple-system, sans-serif;
+    font-style: italic;
+    font-weight: 500;
+    color: var(--color-accent-corail);
+  }
+}
