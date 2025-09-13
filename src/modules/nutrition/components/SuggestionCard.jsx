@@ -35,14 +35,6 @@ const SuggestionCard = ({
         <h3 className={`font-semibold text-gray-800 ${compact ? 'text-base' : 'text-lg'}`}>
           {meal.name}
         </h3>
-        {!compact && (
-          <button
-            onClick={handleViewDetails}
-            className="text-blue-500 text-sm hover:text-blue-600 transition-colors"
-          >
-            Voir →
-          </button>
-        )}
       </div>
 
       {/* Indicateurs temps et difficulté */}

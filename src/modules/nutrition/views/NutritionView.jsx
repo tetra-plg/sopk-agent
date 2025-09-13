@@ -78,159 +78,140 @@ const NutritionView = () => {
 
   // Vue d'entrée du module
   const OverviewView = () => (
-    <div className="p-6">
-      <header className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">
+    <div className="p-6 max-w-4xl mx-auto" style={{ backgroundColor: '#F9FAFB', minHeight: '100vh' }}>
+      {/* En-tête avec accent vert sauge */}
+      <header className="text-center mb-8">
+        <h1 className="text-3xl font-bold mb-2" style={{ color: '#1F2937' }}>
           🍽️ Nutrition SOPK
         </h1>
-        <p className="text-gray-600">
-          Suggestions repas personnalisées pour gérer vos symptômes
+        <p style={{ color: '#6B7280' }}>
+          Suggestions repas adaptées à tes besoins
         </p>
       </header>
 
       {!user && (
-        <div className="text-center py-12">
+        <div className="bg-white rounded-xl p-8 text-center" style={{ boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)' }}>
           <div className="text-4xl mb-4">🔐</div>
-          <h3 className="text-xl font-semibold text-gray-800 mb-2">
+          <h3 className="text-xl font-semibold mb-2" style={{ color: '#1F2937' }}>
             Connexion requise
           </h3>
-          <p className="text-gray-600">
+          <p style={{ color: '#6B7280' }}>
             Connectez-vous pour accéder à vos suggestions nutritionnelles personnalisées.
           </p>
         </div>
       )}
 
       {user && (
-        <div className="space-y-8">
-          {/* Suggestion intelligente du moment */}
+        <div className="space-y-6">
+          {/* Suggestion principale */}
           {isReady && primarySuggestion && (
             <section>
-              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                💫 Suggestion pour vous
-              </h2>
-              <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-xl p-6 border border-green-100">
+              {/* Badge discret */}
+              <div className="text-center mb-4">
+                <span className="inline-block px-4 py-2 rounded-full text-sm font-medium"
+                      style={{ backgroundColor: '#6EE7B7', color: '#1F2937' }}>
+                  ✨ Ma suggestion du moment
+                </span>
+              </div>
+
+              {/* Carte suggestion avec couleurs SOPK */}
+              <div className="bg-white rounded-xl p-6" style={{
+                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)',
+                border: '2px solid #6EE7B7'
+              }}>
                 <SuggestionCard
                   meal={primarySuggestion}
                   onViewDetails={handleViewMealDetails}
                   onTrackMeal={handleTrackMeal}
-                  compact={true}
-                  className="bg-transparent border-0 p-0"
+                  compact={false}
+                  className="border-0 shadow-none bg-transparent"
                 />
               </div>
             </section>
           )}
 
-          {/* Loading state pour suggestion */}
+          {/* Loading state */}
           {loading && (
             <section>
-              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                💫 Suggestions pour vous
-              </h2>
-              <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-xl p-6 border animate-pulse">
-                <div className="h-6 bg-gray-200 rounded w-64 mb-4"></div>
-                <div className="flex gap-2 mb-4">
-                  <div className="h-4 bg-gray-200 rounded w-16"></div>
-                  <div className="h-4 bg-gray-200 rounded w-20"></div>
-                  <div className="h-4 bg-gray-200 rounded w-24"></div>
-                </div>
+              <div className="text-center mb-4">
+                <span className="inline-block px-4 py-2 rounded-full text-sm font-medium bg-gray-100 text-gray-500">
+                  ⏳ Recherche en cours...
+                </span>
+              </div>
+              <div className="bg-white rounded-xl p-6 animate-pulse" style={{
+                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)',
+                border: '2px solid #E5E7EB'
+              }}>
+                <div className="h-6 bg-gray-200 rounded w-48 mb-4"></div>
+                <div className="h-4 bg-gray-200 rounded w-32 mb-6"></div>
                 <div className="flex gap-3">
-                  <div className="h-8 bg-gray-200 rounded w-24"></div>
-                  <div className="h-8 bg-gray-200 rounded w-32"></div>
+                  <div className="h-10 bg-gray-200 rounded w-24"></div>
+                  <div className="h-10 bg-gray-200 rounded w-32"></div>
                 </div>
               </div>
             </section>
           )}
 
-          {/* Navigation rapide */}
-          <section>
-            <h2 className="text-xl font-semibold mb-4">🗂️ Explorer</h2>
-            <div className="grid gap-4 md:grid-cols-2">
+          {/* Navigation claire */}
+          {isReady && primarySuggestion && (
+            <section className="text-center">
               <button
                 onClick={handleNavigateToSuggestions}
-                className="bg-white p-6 rounded-xl shadow-sm border hover:shadow-md transition-shadow text-left"
+                className="px-8 py-3 rounded-xl font-medium transition-colors"
+                style={{
+                  backgroundColor: '#6EE7B7',
+                  color: '#1F2937'
+                }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#34D399'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = '#6EE7B7'}
               >
-                <div className="text-2xl mb-2">🥗</div>
-                <h3 className="font-semibold text-lg mb-1">Suggestions repas</h3>
-                <p className="text-sm text-gray-600">Idées adaptées à vos symptômes</p>
+                Voir toutes les suggestions →
               </button>
-
-              <div className="bg-white p-6 rounded-xl shadow-sm border opacity-60 text-left">
-                <div className="text-2xl mb-2">📚</div>
-                <h3 className="font-semibold text-lg mb-1">Recettes IG bas</h3>
-                <p className="text-sm text-gray-600">Bientôt disponible</p>
-              </div>
-            </div>
-          </section>
-
-          {/* Suggestions supplémentaires */}
-          {isReady && suggestions.length > 1 && (
-            <section>
-              <h2 className="text-xl font-semibold mb-4">✨ Autres suggestions</h2>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {suggestions.slice(1, 4).map((meal) => (
-                  <SuggestionCard
-                    key={meal.id}
-                    meal={meal}
-                    onViewDetails={handleViewMealDetails}
-                    onTrackMeal={handleTrackMeal}
-                    compact={true}
-                  />
-                ))}
-              </div>
             </section>
           )}
 
           {/* Empty state */}
           {!loading && (!suggestions || suggestions.length === 0) && (
-            <section className="text-center py-12">
-              <div className="text-6xl mb-4">🍽️</div>
-              <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                Aucune suggestion disponible
-              </h3>
-              <p className="text-gray-600">
-                Les suggestions nutritionnelles seront bientôt disponibles.
-              </p>
-            </section>
-          )}
-
-          {/* CTA vers suggestions complètes */}
-          {isReady && suggestions.length > 0 && (
             <section className="text-center py-8">
-              <button
-                onClick={handleNavigateToSuggestions}
-                className="bg-green-500 text-white px-8 py-3 rounded-xl font-semibold hover:bg-green-600 transition-colors"
-              >
-                Voir toutes mes suggestions personnalisées →
-              </button>
+              <div className="bg-white rounded-xl p-8" style={{ boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)' }}>
+                <div className="text-4xl mb-4">🍽️</div>
+                <h3 className="text-lg font-semibold mb-2" style={{ color: '#1F2937' }}>
+                  Aucune suggestion disponible
+                </h3>
+                <p className="mb-4" style={{ color: '#6B7280' }}>
+                  Explorez le catalogue complet en attendant.
+                </p>
+                <button
+                  onClick={handleNavigateToSuggestions}
+                  className="px-6 py-2 rounded-xl font-medium transition-colors"
+                  style={{
+                    backgroundColor: '#6EE7B7',
+                    color: '#1F2937'
+                  }}
+                >
+                  Voir le catalogue →
+                </button>
+              </div>
             </section>
           )}
-
-          {/* Conseils nutrition SOPK */}
-          <section className="bg-green-50 rounded-xl p-6 border border-green-100">
-            <h3 className="text-lg font-semibold text-green-800 mb-4">
-              🌱 Nutrition et SOPK
-            </h3>
-            <div className="grid gap-3 md:grid-cols-2">
-              <div className="flex items-center gap-3">
-                <span className="text-green-600">✓</span>
-                <span className="text-sm text-green-700">Index glycémique bas pour réguler l'insuline</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <span className="text-green-600">✓</span>
-                <span className="text-sm text-green-700">Anti-inflammatoires naturels</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <span className="text-green-600">✓</span>
-                <span className="text-sm text-green-700">Équilibre hormonal par l'alimentation</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <span className="text-green-600">✓</span>
-                <span className="text-sm text-green-700">Gestion du poids et de l'énergie</span>
-              </div>
-            </div>
-          </section>
         </div>
       )}
+
+      {/* Footer discret avec couleurs SOPK */}
+      <footer className="mt-12 pt-6 text-center" style={{ borderTop: '1px solid #E5E7EB' }}>
+        <div className="rounded-xl p-4" style={{ backgroundColor: 'rgba(110, 231, 183, 0.1)' }}>
+          <p className="text-sm font-medium mb-2" style={{ color: '#1F2937' }}>
+            🌱 Nutrition adaptée SOPK
+          </p>
+          <div className="flex flex-wrap justify-center gap-4 text-xs" style={{ color: '#6B7280' }}>
+            <span>Index glycémique bas</span>
+            <span>•</span>
+            <span>Anti-inflammatoire</span>
+            <span>•</span>
+            <span>Équilibre hormonal</span>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 
