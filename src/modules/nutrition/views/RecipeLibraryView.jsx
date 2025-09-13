@@ -108,9 +108,7 @@ const RecipeLibraryView = ({ onBack }) => {
     if (!user?.id) return;
 
     try {
-      await trackingService.trackMeal(user.id, {
-        meal_id: mealId,
-        meal_type: mealType,
+      await trackingService.trackMealConsumption(user.id, mealId, mealType, {
         satisfaction_rating: 5,
         will_remake: true
       });
