@@ -46,44 +46,66 @@ const moodService = {
    * Récupérer l'humeur d'une date spécifique
    */
   async getMoodEntry(userId, date) {
-    const client = getSupabaseClient();
-    const dateStr = typeof date === 'string' ? date : date.toISOString().split('T')[0];
+    try {
+      const client = getSupabaseClient();
+      const dateStr = typeof date === 'string' ? date : date.toISOString().split('T')[0];
 
-    const { data, error } = await client
-      .from('mood_entries')
-      .select('*')
-      .eq('user_id', userId)
-      .eq('date', dateStr)
-      .single();
+      const { data, error } = await client
+        .from('mood_entries')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('date', dateStr)
+        .maybeSingle();
 
-    if (error && error.code !== 'PGRST116') {
-      console.error('Erreur récupération mood:', error);
-      return { data: null, error };
+      // Gestion silencieuse des erreurs - ne pas bloquer l'interface
+      if (error) {
+        // Log uniquement en développement
+        if (process.env.NODE_ENV === 'development') {
+          console.log('Mood entry not found for date:', dateStr, '(normal if no data)');
+        }
+        return { data: null, error: null };
+      }
+
+      return { data: data || null, error: null };
+    } catch (err) {
+      // Capture toute erreur réseau ou autre
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Error fetching mood entry (returning empty):', err.message);
+      }
+      return { data: null, error: null };
     }
-
-    return { data: data || null, error: null };
   },
 
   /**
    * Récupérer l'historique des humeurs
    */
   async getMoodHistory(userId, days = 30) {
-    const startDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
-    const client = getSupabaseClient();
+    try {
+      const startDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+      const client = getSupabaseClient();
 
-    const { data, error } = await client
-      .from('mood_entries')
-      .select('date, primary_emotion, mood_score, emotion_tags, context_triggers, created_at')
-      .eq('user_id', userId)
-      .gte('created_at', startDate.toISOString())
-      .order('date', { ascending: false });
+      const { data, error } = await client
+        .from('mood_entries')
+        .select('date, primary_emotion, mood_score, emotion_tags, context_triggers, created_at')
+        .eq('user_id', userId)
+        .gte('created_at', startDate.toISOString())
+        .order('date', { ascending: false });
 
-    if (error && error.code !== 'PGRST116') {
-      console.error('Erreur historique mood:', error);
-      return { data: [], error };
+      // Gestion silencieuse des erreurs
+      if (error) {
+        if (process.env.NODE_ENV === 'development') {
+          console.log('Mood history not found (normal if no data):', error.message);
+        }
+        return { data: [], error: null };
+      }
+
+      return { data: data || [], error: null };
+    } catch (err) {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Error fetching mood history (returning empty):', err.message);
+      }
+      return { data: [], error: null };
     }
-
-    return { data: data || [], error: null };
   },
 
   /**

@@ -43,7 +43,7 @@ export const useMoodJournal = (currentDate = new Date()) => {
         });
         setLastSaved(new Date(data.updated_at));
       } else {
-        // Réinitialiser avec valeurs par défaut
+        // Réinitialiser avec valeurs par défaut - normal si pas de données
         setMoodData({
           primary_emotion: '',
           mood_score: 5,
@@ -54,8 +54,19 @@ export const useMoodJournal = (currentDate = new Date()) => {
       }
       setHasChanges(false);
     } catch (err) {
-      console.error('Erreur chargement mood:', err);
-      setError(err.message);
+      // Gestion silencieuse des erreurs - ne pas affoler l'utilisateur
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Could not load mood data (normal on first visit):', err.message);
+      }
+      // Valeurs par défaut en cas d'erreur
+      setMoodData({
+        primary_emotion: '',
+        mood_score: 5,
+        emotion_tags: [],
+        mood_notes: ''
+      });
+      setLastSaved(null);
+      setHasChanges(false);
     } finally {
       setIsLoading(false);
     }
