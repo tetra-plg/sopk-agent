@@ -34,37 +34,12 @@ function App() {
   return (
     <ConstantsProvider>
       <ProtectedRoute>
-        <AppNavigation>
-          <div className="min-h-screen">
-            {/* Navigation temporaire pour tester */}
-            <div className="bg-white border-b p-4 flex gap-4 overflow-x-auto">
-              {[
-                { path: '/dashboard', label: 'Dashboard', icon: '🏠' },
-                { path: '/journal', label: 'Journal', icon: '📝' },
-                { path: '/nutrition', label: 'Nutrition', icon: '🍽️' },
-                { path: '/stress', label: 'Bien-être', icon: '🧘' },
-                { path: '/activity', label: 'Activité', icon: '🏃' }
-              ].map((route) => (
-                <button
-                  key={route.path}
-                  onClick={() => setCurrentRoute(route.path)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg whitespace-nowrap transition-colors ${
-                    currentRoute === route.path
-                      ? 'bg-blue-100 text-blue-700 border-2 border-blue-300'
-                      : 'bg-gray-100 hover:bg-gray-200'
-                  }`}
-                >
-                  <span>{route.icon}</span>
-                  <span className="font-medium">{route.label}</span>
-                </button>
-              ))}
-            </div>
-
-            {/* Contenu de la vue active */}
-            <main>
-              {renderCurrentView()}
-            </main>
-          </div>
+        <AppNavigation
+          currentRoute={currentRoute}
+          onRouteChange={setCurrentRoute}
+        >
+          {/* Contenu de la vue active */}
+          {renderCurrentView()}
         </AppNavigation>
       </ProtectedRoute>
     </ConstantsProvider>

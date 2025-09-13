@@ -2,9 +2,20 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../../shared/services/supabase';
 
 const ProtectedRoute = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  // TODO: Temporairement désactivé pour le développement
+  // const [user, setUser] = useState(null);
+  // const [loading, setLoading] = useState(true);
 
+  // Mode développement - bypasser l'authentification
+  const isDevelopment = import.meta.env.DEV;
+
+  if (isDevelopment) {
+    console.log('🚧 Mode développement: Authentication bypass activé');
+    return children;
+  }
+
+  // Code d'authentification pour la production (commenté temporairement)
+  /*
   useEffect(() => {
     // Vérifier la session utilisateur
     const checkUser = async () => {
@@ -58,6 +69,7 @@ const ProtectedRoute = ({ children }) => {
       </div>
     );
   }
+  */
 
   return children;
 };

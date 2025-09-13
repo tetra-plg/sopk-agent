@@ -33,6 +33,13 @@
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
   }
 
+  /* Configuration globale du body */
+  body {
+    background-color: var(--color-fond-clair);
+    color: var(--color-text-principal);
+    min-height: 100vh;
+  }
+
   /* Titres - Police Poppins */
   h1, h2, h3, h4, h5, h6,
   .font-heading {
@@ -52,26 +59,36 @@
   /* 🌸 Styles de base par module */
 
   /* Boutons personnalisés avec border-radius généreux */
+  /* Taille minimale de 44px pour l'accessibilité mobile */
   .btn-sopk {
     padding: 0.75rem 1.5rem;
+    min-height: 44px;
     border-radius: 0.75rem;
     font-weight: 500;
     transition: all 0.2s ease;
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    -webkit-tap-highlight-color: transparent;
   }
 
   .btn-sopk:hover {
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   }
 
+  /* Active state pour mobile */
+  .btn-sopk:active {
+    transform: scale(0.98);
+  }
+
   .btn-primary {
     background-color: var(--color-primary-lavande);
     color: white;
     padding: 0.75rem 1.5rem;
+    min-height: 44px;
     border-radius: 0.75rem;
     font-weight: 500;
     transition: all 0.2s ease;
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    -webkit-tap-highlight-color: transparent;
   }
 
   .btn-primary:hover {
@@ -79,14 +96,20 @@
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
   }
 
+  .btn-primary:active {
+    transform: scale(0.98);
+  }
+
   .btn-secondary {
     background-color: var(--color-primary-bleu-ciel);
     color: white;
     padding: 0.75rem 1.5rem;
+    min-height: 44px;
     border-radius: 0.75rem;
     font-weight: 500;
     transition: all 0.2s ease;
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    -webkit-tap-highlight-color: transparent;
   }
 
   .btn-secondary:hover {
@@ -94,14 +117,20 @@
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
   }
 
+  .btn-secondary:active {
+    transform: scale(0.98);
+  }
+
   .btn-accent-corail {
     background-color: var(--color-accent-corail);
     color: white;
     padding: 0.75rem 1.5rem;
+    min-height: 44px;
     border-radius: 0.75rem;
     font-weight: 500;
     transition: all 0.2s ease;
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    -webkit-tap-highlight-color: transparent;
   }
 
   .btn-accent-corail:hover {
@@ -109,19 +138,29 @@
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
   }
 
+  .btn-accent-corail:active {
+    transform: scale(0.98);
+  }
+
   .btn-accent-vert {
     background-color: var(--color-accent-vert-sauge);
     color: white;
     padding: 0.75rem 1.5rem;
+    min-height: 44px;
     border-radius: 0.75rem;
     font-weight: 500;
     transition: all 0.2s ease;
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    -webkit-tap-highlight-color: transparent;
   }
 
   .btn-accent-vert:hover {
     background-color: var(--color-accent-vert-sauge-hover);
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  }
+
+  .btn-accent-vert:active {
+    transform: scale(0.98);
   }
 
   /* Cartes avec ombres douces */
