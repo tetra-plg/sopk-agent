@@ -9,40 +9,48 @@ const StressView = () => {
 
   // Vue d'ensemble simplifiée - focus sur exercices de respiration uniquement
   const OverviewView = () => (
-    <div className="p-6">
-      <header className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">
+    <div className="p-6 max-w-4xl mx-auto" style={{ backgroundColor: '#F9FAFB', minHeight: '100vh' }}>
+      <header className="text-center mb-8">
+        <h1 className="text-3xl font-bold mb-2" style={{ color: '#1F2937' }}>
           🌬️ Exercices de Respiration
         </h1>
-        <p className="text-gray-600">
+        <p style={{ color: '#6B7280' }}>
           Techniques de respiration guidée pour gérer le stress lié au SOPK
         </p>
       </header>
 
-      <div className="space-y-8">
+      <div className="space-y-6">
         {/* Call-to-action principal */}
-        <section className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-6 border">
-          <h2 className="text-xl font-semibold mb-3">🧘 Prête pour une pause respiration ?</h2>
-          <p className="text-gray-600 mb-4">
-            Quelques minutes d'exercices de respiration peuvent réduire le stress
-            et améliorer l'équilibre hormonal lié au SOPK.
-          </p>
-          <button
-            onClick={() => setCurrentView('breathing')}
-            className="bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-600 transition-colors"
-          >
-            🫁 Commencer un exercice
-          </button>
+        <section className="bg-white rounded-xl p-6" style={{
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)',
+          border: '2px solid #93C5FD'
+        }}>
+          <div className="text-center">
+            <h2 className="text-xl font-semibold mb-3" style={{ color: '#1F2937' }}>🧘 Prête pour une pause respiration ?</h2>
+            <p className="mb-4" style={{ color: '#6B7280' }}>
+              Quelques minutes d'exercices de respiration peuvent réduire le stress
+              et améliorer l'équilibre hormonal lié au SOPK.
+            </p>
+            <button
+              onClick={() => setCurrentView('breathing')}
+              className="px-8 py-3 rounded-xl font-semibold transition-colors"
+              style={{ backgroundColor: '#93C5FD', color: 'white' }}
+              onMouseEnter={(e) => e.target.style.backgroundColor = '#60A5FA'}
+              onMouseLeave={(e) => e.target.style.backgroundColor = '#93C5FD'}
+            >
+              🫁 Commencer un exercice
+            </button>
+          </div>
         </section>
 
         {/* Exercices disponibles */}
         <section>
-          <h2 className="text-xl font-semibold mb-6">✨ Techniques disponibles</h2>
+          <h2 className="text-xl font-semibold mb-6" style={{ color: '#1F2937' }}>✨ Techniques disponibles</h2>
 
           {loading && (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {[...Array(3)].map((_, i) => (
-                <div key={i} className="bg-white rounded-xl p-6 shadow-sm border animate-pulse">
+                <div key={i} className="bg-white rounded-xl p-6 animate-pulse" style={{ boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)' }}>
                   <div className="text-center mb-4">
                     <div className="w-16 h-16 mx-auto rounded-full bg-gray-200 mb-3"></div>
                     <div className="h-4 bg-gray-200 rounded w-32 mx-auto mb-2"></div>
@@ -71,7 +79,7 @@ const StressView = () => {
           {isReady && (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {techniques.map((technique) => (
-                <div key={technique.id} className="bg-white rounded-xl p-6 shadow-sm border hover:shadow-md transition-all">
+                <div key={technique.id} className="bg-white rounded-xl p-6 hover:shadow-md transition-all" style={{ boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)' }}>
                   <div className="text-center mb-4">
                     <div
                       className="w-16 h-16 mx-auto rounded-full flex items-center justify-center text-2xl mb-3"
@@ -82,18 +90,18 @@ const StressView = () => {
                     >
                       {technique.icon}
                     </div>
-                    <h3 className="font-semibold text-lg mb-1">{technique.name}</h3>
-                    <div className="flex justify-center gap-2 text-sm text-gray-600 mb-2">
+                    <h3 className="font-semibold text-lg mb-1" style={{ color: '#1F2937' }}>{technique.name}</h3>
+                    <div className="flex justify-center gap-2 text-sm mb-2" style={{ color: '#6B7280' }}>
                       <span>⏱️ {Math.floor(technique.duration_seconds / 60)} min</span>
                       <span>•</span>
                       <span className="capitalize">{technique.difficulty === 'beginner' ? 'Débutant' : technique.difficulty === 'intermediate' ? 'Intermédiaire' : 'Avancé'}</span>
                     </div>
                   </div>
-                  <p className="text-sm text-gray-600 text-center mb-4 leading-relaxed">
+                  <p className="text-sm text-center mb-4 leading-relaxed" style={{ color: '#6B7280' }}>
                     {technique.description}
                   </p>
                   <div className="mb-4">
-                    <p className="text-xs text-green-700 text-center italic">
+                    <p className="text-xs text-center italic" style={{ color: '#6EE7B7' }}>
                       💚 {technique.sopk_benefits}
                     </p>
                   </div>
@@ -102,7 +110,10 @@ const StressView = () => {
                       setSelectedTechniqueId(technique.id);
                       setCurrentView('breathing');
                     }}
-                    className="w-full bg-gray-100 text-gray-700 py-2 rounded-lg hover:bg-gray-200 transition-colors font-medium"
+                    className="w-full py-2 rounded-xl font-medium transition-colors"
+                    style={{ backgroundColor: '#A78BFA', color: 'white' }}
+                    onMouseEnter={(e) => e.target.style.backgroundColor = '#9333EA'}
+                    onMouseLeave={(e) => e.target.style.backgroundColor = '#A78BFA'}
                   >
                     ▶️ Essayer
                   </button>
@@ -114,10 +125,10 @@ const StressView = () => {
           {!loading && !error && techniques.length === 0 && (
             <div className="text-center py-12">
               <div className="text-6xl mb-4">🌬️</div>
-              <h3 className="text-xl font-semibold text-gray-800 mb-2">
+              <h3 className="text-xl font-semibold mb-2" style={{ color: '#1F2937' }}>
                 Aucune technique disponible
               </h3>
-              <p className="text-gray-600">
+              <p style={{ color: '#6B7280' }}>
                 Les techniques de respiration seront bientôt disponibles.
               </p>
             </div>
@@ -125,26 +136,26 @@ const StressView = () => {
         </section>
 
         {/* Bénéfices pour le SOPK */}
-        <section className="bg-green-50 rounded-xl p-6 border border-green-100">
-          <h3 className="text-lg font-semibold text-green-800 mb-4">
+        <section className="rounded-xl p-6" style={{ backgroundColor: 'rgba(167, 139, 250, 0.1)' }}>
+          <h3 className="text-lg font-semibold mb-4" style={{ color: '#1F2937' }}>
             🌱 Bénéfices pour le SOPK
           </h3>
           <div className="grid gap-3 md:grid-cols-2">
             <div className="flex items-center gap-3">
-              <span className="text-green-600">✓</span>
-              <span className="text-sm text-green-700">Réduction du cortisol (hormone du stress)</span>
+              <span style={{ color: '#A78BFA' }}>✓</span>
+              <span className="text-sm" style={{ color: '#6B7280' }}>Réduction du cortisol (hormone du stress)</span>
             </div>
             <div className="flex items-center gap-3">
-              <span className="text-green-600">✓</span>
-              <span className="text-sm text-green-700">Amélioration de la sensibilité à l'insuline</span>
+              <span style={{ color: '#A78BFA' }}>✓</span>
+              <span className="text-sm" style={{ color: '#6B7280' }}>Amélioration de la sensibilité à l'insuline</span>
             </div>
             <div className="flex items-center gap-3">
-              <span className="text-green-600">✓</span>
-              <span className="text-sm text-green-700">Équilibrage du système nerveux</span>
+              <span style={{ color: '#A78BFA' }}>✓</span>
+              <span className="text-sm" style={{ color: '#6B7280' }}>Équilibrage du système nerveux</span>
             </div>
             <div className="flex items-center gap-3">
-              <span className="text-green-600">✓</span>
-              <span className="text-sm text-green-700">Amélioration de la qualité du sommeil</span>
+              <span style={{ color: '#A78BFA' }}>✓</span>
+              <span className="text-sm" style={{ color: '#6B7280' }}>Amélioration de la qualité du sommeil</span>
             </div>
           </div>
         </section>

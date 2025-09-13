@@ -61,20 +61,20 @@ const CycleView = () => {
 
   // Vue d'entrée du module
   const OverviewView = () => (
-    <div className="p-6">
-      <header className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">
+    <div className="p-6 max-w-4xl mx-auto" style={{ backgroundColor: '#F9FAFB', minHeight: '100vh' }}>
+      <header className="text-center mb-8">
+        <h1 className="text-3xl font-bold mb-2" style={{ color: '#1F2937' }}>
           📅 Mon Journal Cycle
         </h1>
-        <p className="text-gray-600">
+        <p style={{ color: '#6B7280' }}>
           Suivez votre cycle et vos symptômes quotidiens pour mieux comprendre votre SOPK
         </p>
       </header>
 
       {loading && (
         <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Chargement de vos données...</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto mb-4" style={{ borderColor: '#A78BFA' }}></div>
+          <p style={{ color: '#6B7280' }}>Chargement de vos données...</p>
         </div>
       )}
 
@@ -93,13 +93,16 @@ const CycleView = () => {
       {!loading && !error && (
         <div className="space-y-6">
           {/* État du journal d'aujourd'hui */}
-          <section className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-6 border">
+          <section className="bg-white rounded-xl p-6" style={{
+            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)',
+            border: `2px solid ${isTodayComplete ? '#A78BFA' : '#93C5FD'}`
+          }}>
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-xl font-semibold mb-2">
+                <h2 className="text-xl font-semibold mb-2" style={{ color: '#1F2937' }}>
                   {isTodayComplete ? '✅ Journal complété aujourd\'hui' : '📝 Compléter votre journal'}
                 </h2>
-                <p className="text-gray-600">
+                <p style={{ color: '#6B7280' }}>
                   {isTodayComplete
                     ? 'Merci d\'avoir pris le temps de noter vos ressentis aujourd\'hui.'
                     : 'Prenez quelques minutes pour enregistrer comment vous vous sentez aujourd\'hui.'
@@ -108,11 +111,17 @@ const CycleView = () => {
               </div>
               <button
                 onClick={() => setCurrentView('journal')}
-                className={`px-6 py-3 rounded-lg font-semibold transition-colors ${
-                  isTodayComplete
-                    ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    : 'bg-purple-500 text-white hover:bg-purple-600'
-                }`}
+                className="px-6 py-3 rounded-xl font-semibold transition-colors"
+                style={{
+                  backgroundColor: isTodayComplete ? '#F3F4F6' : '#A78BFA',
+                  color: isTodayComplete ? '#6B7280' : 'white'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = isTodayComplete ? '#E5E7EB' : '#9333EA';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = isTodayComplete ? '#F3F4F6' : '#A78BFA';
+                }}
               >
                 {isTodayComplete ? '✏️ Modifier' : '📝 Commencer'}
               </button>
@@ -121,44 +130,44 @@ const CycleView = () => {
 
           {/* Résumé de la semaine */}
           <section>
-            <h2 className="text-xl font-semibold mb-4">📊 Cette semaine</h2>
+            <h2 className="text-xl font-semibold mb-4" style={{ color: '#1F2937' }}>📊 Cette semaine</h2>
 
             {weeklyEntries.length === 0 ? (
-              <div className="bg-white rounded-xl p-6 shadow-sm border text-center">
+              <div className="bg-white rounded-xl p-6 text-center" style={{ boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)' }}>
                 <div className="text-4xl mb-3">📊</div>
-                <h3 className="font-medium text-gray-800 mb-2">Commencez votre suivi</h3>
-                <p className="text-gray-600 text-sm">
+                <h3 className="font-medium mb-2" style={{ color: '#1F2937' }}>Commencez votre suivi</h3>
+                <p className="text-sm" style={{ color: '#6B7280' }}>
                   Remplissez votre journal quotidien pour voir apparaître vos statistiques hebdomadaires.
                 </p>
               </div>
             ) : (
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <div className="bg-white rounded-xl p-4 shadow-sm border text-center">
-                  <div className="text-2xl font-bold text-purple-600 mb-1">
+                <div className="bg-white rounded-xl p-4 text-center" style={{ boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)' }}>
+                  <div className="text-2xl font-bold mb-1" style={{ color: '#A78BFA' }}>
                     {weeklyEntries.length}
                   </div>
-                  <div className="text-sm text-gray-600">Jours renseignés</div>
+                  <div className="text-sm" style={{ color: '#6B7280' }}>Jours renseignés</div>
                 </div>
 
-                <div className="bg-white rounded-xl p-4 shadow-sm border text-center">
-                  <div className="text-2xl font-bold text-pink-600 mb-1">
+                <div className="bg-white rounded-xl p-4 text-center" style={{ boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)' }}>
+                  <div className="text-2xl font-bold mb-1" style={{ color: '#FB7185' }}>
                     {weeklyEntries.filter(e => e.period_flow && e.period_flow > 0).length}
                   </div>
-                  <div className="text-sm text-gray-600">Jours de règles</div>
+                  <div className="text-sm" style={{ color: '#6B7280' }}>Jours de règles</div>
                 </div>
 
-                <div className="bg-white rounded-xl p-4 shadow-sm border text-center">
-                  <div className="text-2xl font-bold text-orange-600 mb-1">
+                <div className="bg-white rounded-xl p-4 text-center" style={{ boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)' }}>
+                  <div className="text-2xl font-bold mb-1" style={{ color: '#93C5FD' }}>
                     {calculateWeeklyAverage(weeklyEntries, 'fatigue_level')}
                   </div>
-                  <div className="text-sm text-gray-600">Fatigue moy. /10</div>
+                  <div className="text-sm" style={{ color: '#6B7280' }}>Fatigue moy. /10</div>
                 </div>
 
-                <div className="bg-white rounded-xl p-4 shadow-sm border text-center">
-                  <div className="text-2xl font-bold text-green-600 mb-1">
+                <div className="bg-white rounded-xl p-4 text-center" style={{ boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)' }}>
+                  <div className="text-2xl font-bold mb-1" style={{ color: '#6EE7B7' }}>
                     {calculateWeeklyAverage(weeklyEntries, 'mood_score')}
                   </div>
-                  <div className="text-sm text-gray-600">Humeur moy. /10</div>
+                  <div className="text-sm" style={{ color: '#6B7280' }}>Humeur moy. /10</div>
                 </div>
               </div>
             )}
@@ -167,17 +176,17 @@ const CycleView = () => {
           {/* Historique récent */}
           {weeklyEntries.length > 0 && (
             <section>
-              <h2 className="text-xl font-semibold mb-4">📋 Dernières entrées</h2>
+              <h2 className="text-xl font-semibold mb-4" style={{ color: '#1F2937' }}>📋 Dernières entrées</h2>
               <div className="space-y-3">
                 {weeklyEntries.slice(0, 5).map((entry, index) => {
                   const entryDate = new Date(entry.date);
                   const isToday = entry.date === new Date().toISOString().split('T')[0];
 
                   return (
-                    <div key={entry.date} className="bg-white rounded-lg p-4 shadow-sm border">
+                    <div key={entry.date} className="bg-white rounded-xl p-4" style={{ boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)' }}>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <div className={`text-sm font-medium ${isToday ? 'text-purple-600' : 'text-gray-700'}`}>
+                          <div className={`text-sm font-medium`} style={{ color: isToday ? '#A78BFA' : '#1F2937' }}>
                             {isToday ? "Aujourd'hui" : entryDate.toLocaleDateString('fr-FR', {
                               weekday: 'long',
                               day: 'numeric',
@@ -185,12 +194,12 @@ const CycleView = () => {
                             })}
                           </div>
                           {entry.period_flow && entry.period_flow > 0 && (
-                            <span className="text-xs bg-pink-100 text-pink-800 px-2 py-1 rounded">
+                            <span className="text-xs px-2 py-1 rounded" style={{ backgroundColor: 'rgba(251, 113, 133, 0.1)', color: '#FB7185' }}>
                               🔴 Règles
                             </span>
                           )}
                         </div>
-                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <div className="flex items-center gap-2 text-sm" style={{ color: '#6B7280' }}>
                           {entry.mood_score && (
                             <span>😊 {entry.mood_score}/10</span>
                           )}
@@ -203,7 +212,7 @@ const CycleView = () => {
                         </div>
                       </div>
                       {entry.notes && (
-                        <p className="text-sm text-gray-600 mt-2 italic">"{entry.notes}"</p>
+                        <p className="text-sm mt-2 italic" style={{ color: '#6B7280' }}>"{entry.notes}"</p>
                       )}
                     </div>
                   );
@@ -213,26 +222,26 @@ const CycleView = () => {
           )}
 
           {/* Conseils */}
-          <section className="bg-blue-50 rounded-xl p-6 border border-blue-100">
-            <h3 className="text-lg font-semibold text-blue-800 mb-4">
+          <section className="rounded-xl p-6" style={{ backgroundColor: 'rgba(167, 139, 250, 0.1)' }}>
+            <h3 className="text-lg font-semibold mb-4" style={{ color: '#1F2937' }}>
               💡 Pourquoi tenir un journal ?
             </h3>
             <div className="grid gap-3 md:grid-cols-2">
               <div className="flex items-center gap-3">
-                <span className="text-blue-600">✓</span>
-                <span className="text-sm text-blue-700">Identifier vos cycles et patterns</span>
+                <span style={{ color: '#A78BFA' }}>✓</span>
+                <span className="text-sm" style={{ color: '#6B7280' }}>Identifier vos cycles et patterns</span>
               </div>
               <div className="flex items-center gap-3">
-                <span className="text-blue-600">✓</span>
-                <span className="text-sm text-blue-700">Mieux communiquer avec votre médecin</span>
+                <span style={{ color: '#A78BFA' }}>✓</span>
+                <span className="text-sm" style={{ color: '#6B7280' }}>Mieux communiquer avec votre médecin</span>
               </div>
               <div className="flex items-center gap-3">
-                <span className="text-blue-600">✓</span>
-                <span className="text-sm text-blue-700">Anticiper et gérer vos symptômes</span>
+                <span style={{ color: '#A78BFA' }}>✓</span>
+                <span className="text-sm" style={{ color: '#6B7280' }}>Anticiper et gérer vos symptômes</span>
               </div>
               <div className="flex items-center gap-3">
-                <span className="text-blue-600">✓</span>
-                <span className="text-sm text-blue-700">Suivre l'efficacité de vos traitements</span>
+                <span style={{ color: '#A78BFA' }}>✓</span>
+                <span className="text-sm" style={{ color: '#6B7280' }}>Suivre l'efficacité de vos traitements</span>
               </div>
             </div>
           </section>
