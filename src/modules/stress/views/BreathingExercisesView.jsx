@@ -79,41 +79,41 @@ const BreathingExercisesView = ({ onBack, initialTechnique = null }) => {
     <div className="max-w-md mx-auto p-6 text-center">
       {/* Message de succès */}
       <div className="mb-8">
-        <div className="w-20 h-20 mx-auto bg-green-100 rounded-full flex items-center justify-center text-3xl mb-4">
+        <div className="w-20 h-20 mx-auto rounded-full flex items-center justify-center text-3xl mb-4" style={{ backgroundColor: 'rgba(110, 231, 183, 0.2)' }}>
           🎉
         </div>
-        <h2 className="text-2xl font-heading font-bold text-gray-800 mb-2">
+        <h2 className="text-2xl font-bold mb-2" style={{ color: '#1F2937' }}>
           Session terminée !
         </h2>
-        <p className="text-gray-600 mb-4">
+        <p className="mb-4" style={{ color: '#6B7280' }}>
           Bravo pour avoir pris ce moment pour toi
         </p>
 
         {/* Résumé de la session */}
         {sessionResult && (
-          <div className="bg-gradient-to-r from-primary-lavande/10 to-accent-vert-sauge/10 rounded-lg p-4 mb-6">
+          <div className="rounded-xl p-4 mb-6" style={{ backgroundColor: 'rgba(167, 139, 250, 0.1)' }}>
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
-                <div className="font-medium text-gray-700">Durée</div>
-                <div className="text-gray-600">
+                <div className="font-medium" style={{ color: '#1F2937' }}>Durée</div>
+                <div style={{ color: '#6B7280' }}>
                   {Math.round(sessionResult.duration_seconds / 60)} min
                 </div>
               </div>
               <div>
-                <div className="font-medium text-gray-700">Technique</div>
-                <div className="text-gray-600 capitalize">
+                <div className="font-medium" style={{ color: '#1F2937' }}>Technique</div>
+                <div className="capitalize" style={{ color: '#6B7280' }}>
                   {sessionResult.technique}
                 </div>
               </div>
               {sessionResult.stress_before && sessionResult.stress_after && (
                 <>
                   <div>
-                    <div className="font-medium text-gray-700">Stress avant</div>
-                    <div className="text-gray-600">{sessionResult.stress_before}/10</div>
+                    <div className="font-medium" style={{ color: '#1F2937' }}>Stress avant</div>
+                    <div style={{ color: '#6B7280' }}>{sessionResult.stress_before}/10</div>
                   </div>
                   <div>
-                    <div className="font-medium text-gray-700">Stress après</div>
-                    <div className="text-green-600 font-medium">
+                    <div className="font-medium" style={{ color: '#1F2937' }}>Stress après</div>
+                    <div className="font-medium" style={{ color: '#6EE7B7' }}>
                       {sessionResult.stress_after}/10
                       {sessionResult.stress_before - sessionResult.stress_after > 0 && (
                         <span className="text-xs ml-1">
@@ -130,14 +130,14 @@ const BreathingExercisesView = ({ onBack, initialTechnique = null }) => {
 
         {/* Afficher l'erreur si présente */}
         {error && (
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4 text-sm text-yellow-800">
+          <div className="rounded-xl p-3 mb-4 text-sm" style={{ backgroundColor: 'rgba(251, 191, 36, 0.1)', border: '1px solid #FBB036', color: '#F59E0B' }}>
             ⚠️ {error}
           </div>
         )}
 
         {/* Message d'encouragement */}
-        <div className="bg-accent-vert-sauge/10 rounded-lg p-4 mb-6">
-          <p className="text-sm text-gray-700">
+        <div className="rounded-xl p-4 mb-6" style={{ backgroundColor: 'rgba(110, 231, 183, 0.1)' }}>
+          <p className="text-sm" style={{ color: '#1F2937' }}>
             💚 <span className="font-medium">Prendre soin de sa santé mentale</span> est
             essentiel pour gérer les symptômes du SOPK. Continue comme ça !
           </p>
@@ -149,14 +149,20 @@ const BreathingExercisesView = ({ onBack, initialTechnique = null }) => {
         <button
           onClick={handleNewSessionSameTechnique}
           disabled={isLoading}
-          className="w-full px-6 py-3 btn-secondary disabled:opacity-50"
+          className="w-full px-6 py-3 rounded-xl font-medium disabled:opacity-50 transition-colors"
+          style={{ backgroundColor: '#93C5FD', color: 'white' }}
+          onMouseEnter={(e) => !e.target.disabled && (e.target.style.backgroundColor = '#60A5FA')}
+          onMouseLeave={(e) => !e.target.disabled && (e.target.style.backgroundColor = '#93C5FD')}
         >
           🔄 Refaire une session
         </button>
         <button
           onClick={handleBackToSelector}
           disabled={isLoading}
-          className="w-full px-6 py-3 btn-primary disabled:opacity-50"
+          className="w-full px-6 py-3 rounded-xl font-medium disabled:opacity-50 transition-colors"
+          style={{ backgroundColor: '#A78BFA', color: 'white' }}
+          onMouseEnter={(e) => !e.target.disabled && (e.target.style.backgroundColor = '#9333EA')}
+          onMouseLeave={(e) => !e.target.disabled && (e.target.style.backgroundColor = '#A78BFA')}
         >
           🧘‍♀️ Choisir autre technique
         </button>
@@ -166,7 +172,7 @@ const BreathingExercisesView = ({ onBack, initialTechnique = null }) => {
 
   // Affichage selon la vue actuelle
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-lavande/5 to-accent-vert-sauge/5">
+    <div className="min-h-screen" style={{ backgroundColor: '#F9FAFB' }}>
       <div className="container mx-auto px-4 py-8">
         {/* Header global avec navigation */}
         <div className="text-center mb-8">
@@ -174,17 +180,20 @@ const BreathingExercisesView = ({ onBack, initialTechnique = null }) => {
             <div className="flex items-center mb-4">
               <button
                 onClick={handleBackToSelector}
-                className="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors"
+                className="flex items-center gap-2 transition-colors"
+                style={{ color: '#6B7280' }}
+                onMouseEnter={(e) => e.target.style.color = '#1F2937'}
+                onMouseLeave={(e) => e.target.style.color = '#6B7280'}
               >
                 <span>←</span>
                 <span>Retour</span>
               </button>
             </div>
           )}
-          <h1 className="text-3xl font-heading font-bold text-gray-800 mb-2">
+          <h1 className="text-3xl font-bold mb-2" style={{ color: '#1F2937' }}>
             🫁 Respiration Guidée
           </h1>
-          <p className="text-gray-600">
+          <p style={{ color: '#6B7280' }}>
             Exercices adaptés pour gérer le stress lié au SOPK
           </p>
         </div>
@@ -192,9 +201,9 @@ const BreathingExercisesView = ({ onBack, initialTechnique = null }) => {
         {/* Indicateur de loading global */}
         {isLoading && (
           <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 flex items-center gap-3">
-              <div className="animate-spin w-5 h-5 border-2 border-primary-lavande border-t-transparent rounded-full" />
-              <span>Sauvegarde en cours...</span>
+            <div className="bg-white rounded-xl p-6 flex items-center gap-3">
+              <div className="animate-spin w-5 h-5 border-2 border-t-transparent rounded-full" style={{ borderColor: '#A78BFA' }} />
+              <span style={{ color: '#1F2937' }}>Sauvegarde en cours...</span>
             </div>
           </div>
         )}
@@ -221,8 +230,8 @@ const BreathingExercisesView = ({ onBack, initialTechnique = null }) => {
 
         {/* Footer avec conseils */}
         {currentView === 'selector' && (
-          <div className="max-w-2xl mx-auto mt-8 p-4 bg-white/50 rounded-lg text-center">
-            <p className="text-xs text-gray-500">
+          <div className="max-w-2xl mx-auto mt-8 p-4 rounded-xl text-center" style={{ backgroundColor: 'rgba(255, 255, 255, 0.8)' }}>
+            <p className="text-xs" style={{ color: '#6B7280' }}>
               💡 <span className="font-medium">Conseil :</span> Pratique ces exercices
               régulièrement, idéalement 2-3 fois par jour pour un maximum de bénéfices
               sur tes symptômes SOPK.

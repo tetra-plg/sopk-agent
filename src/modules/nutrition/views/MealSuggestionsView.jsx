@@ -130,7 +130,7 @@ const MealSuggestionsView = ({ onBack }) => {
 
   if (!isReady) {
     return (
-      <div className="p-6">
+      <div className="p-6" style={{ backgroundColor: '#F9FAFB', minHeight: '100vh' }}>
         <div className="animate-pulse">
           <div className="h-8 bg-gray-200 rounded w-64 mb-4"></div>
           <div className="h-4 bg-gray-200 rounded w-96 mb-8"></div>
@@ -145,32 +145,35 @@ const MealSuggestionsView = ({ onBack }) => {
   }
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    <div className="p-6 max-w-7xl mx-auto" style={{ backgroundColor: '#F9FAFB', minHeight: '100vh' }}>
       {/* En-tête */}
       <header className="mb-8">
         {onBack && (
           <div className="flex items-center mb-4">
             <button
               onClick={onBack}
-              className="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors"
+              className="flex items-center gap-2 transition-colors"
+              style={{ color: '#6B7280' }}
+              onMouseEnter={(e) => e.target.style.color = '#1F2937'}
+              onMouseLeave={(e) => e.target.style.color = '#6B7280'}
             >
               <span>←</span>
               <span>Retour</span>
             </button>
           </div>
         )}
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">
+        <h1 className="text-3xl font-bold mb-2" style={{ color: '#1F2937' }}>
           🍽️ Suggestions Repas
         </h1>
-        <p className="text-gray-600">
+        <p style={{ color: '#6B7280' }}>
           Idées personnalisées selon vos symptômes et besoins SOPK
         </p>
       </header>
 
       {/* Message contextuel */}
       <div className="mb-6">
-        <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-xl p-4 border border-green-100">
-          <p className="text-gray-700">
+        <div className="rounded-xl p-4" style={{ backgroundColor: 'rgba(110, 231, 183, 0.1)', border: '1px solid #6EE7B7' }}>
+          <p style={{ color: '#1F2937' }}>
             😊 {getContextMessage()}
           </p>
         </div>
@@ -179,27 +182,38 @@ const MealSuggestionsView = ({ onBack }) => {
       {/* Filtres rapides */}
       <div className="mb-8">
         <div className="flex flex-wrap gap-3 items-center">
-          <label className="text-sm font-medium text-gray-700">
+          <label className="text-sm font-medium" style={{ color: '#1F2937' }}>
             Type de repas :
           </label>
           {['any', 'breakfast', 'lunch', 'snack', 'dinner'].map(type => (
             <button
               key={type}
               onClick={() => setFilters(prev => ({ ...prev, mealType: type }))}
-              className={`
-                px-4 py-2 rounded-lg text-sm font-medium transition-colors
-                ${filters.mealType === type
-                  ? 'bg-green-500 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              className="px-4 py-2 rounded-xl text-sm font-medium transition-colors"
+              style={{
+                backgroundColor: filters.mealType === type ? '#6EE7B7' : '#F3F4F6',
+                color: filters.mealType === type ? 'white' : '#6B7280'
+              }}
+              onMouseEnter={(e) => {
+                if (filters.mealType !== type) {
+                  e.target.style.backgroundColor = '#E5E7EB';
                 }
-              `}
+              }}
+              onMouseLeave={(e) => {
+                if (filters.mealType !== type) {
+                  e.target.style.backgroundColor = '#F3F4F6';
+                }
+              }}
             >
               {getMealTypeLabel(type)}
             </button>
           ))}
           <button
             onClick={handleRefreshSuggestions}
-            className="ml-4 px-4 py-2 bg-blue-100 text-blue-700 rounded-lg text-sm font-medium hover:bg-blue-200 transition-colors"
+            className="ml-4 px-4 py-2 rounded-xl text-sm font-medium transition-colors"
+            style={{ backgroundColor: 'rgba(110, 231, 183, 0.2)', color: '#1F2937' }}
+            onMouseEnter={(e) => e.target.style.backgroundColor = 'rgba(110, 231, 183, 0.3)'}
+            onMouseLeave={(e) => e.target.style.backgroundColor = 'rgba(110, 231, 183, 0.2)'}
           >
             🔄 Rafraîchir
           </button>
@@ -209,14 +223,14 @@ const MealSuggestionsView = ({ onBack }) => {
       {/* Suggestions */}
       {loading && (
         <div className="text-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500 mx-auto mb-4"></div>
-          <p className="text-gray-600">Génération de tes suggestions...</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto mb-4" style={{ borderColor: '#6EE7B7' }}></div>
+          <p style={{ color: '#6B7280' }}>Génération de tes suggestions...</p>
         </div>
       )}
 
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-          <p className="text-red-700">
+        <div className="rounded-xl p-4 mb-6" style={{ backgroundColor: 'rgba(251, 113, 133, 0.1)', border: '1px solid #FB7185' }}>
+          <p style={{ color: '#FB7185' }}>
             Erreur lors du chargement des suggestions. Essaie de rafraîchir.
           </p>
         </div>
@@ -225,15 +239,18 @@ const MealSuggestionsView = ({ onBack }) => {
       {!loading && filteredSuggestions.length === 0 && !error && (
         <div className="text-center py-12">
           <div className="text-6xl mb-4">🤔</div>
-          <h3 className="text-xl font-semibold text-gray-800 mb-2">
+          <h3 className="text-xl font-semibold mb-2" style={{ color: '#1F2937' }}>
             Aucune suggestion trouvée
           </h3>
-          <p className="text-gray-600 mb-4">
+          <p className="mb-4" style={{ color: '#6B7280' }}>
             Essaie de modifier tes filtres ou de rafraîchir les suggestions.
           </p>
           <button
             onClick={handleRefreshSuggestions}
-            className="bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600 transition-colors"
+            className="text-white px-6 py-2 rounded-xl transition-colors"
+            style={{ backgroundColor: '#6EE7B7' }}
+            onMouseEnter={(e) => e.target.style.backgroundColor = '#34D399'}
+            onMouseLeave={(e) => e.target.style.backgroundColor = '#6EE7B7'}
           >
             Rafraîchir les suggestions
           </button>
@@ -243,7 +260,7 @@ const MealSuggestionsView = ({ onBack }) => {
       {!loading && filteredSuggestions.length > 0 && (
         <div>
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-semibold text-gray-800">
+            <h2 className="text-xl font-semibold" style={{ color: '#1F2937' }}>
               📋 Suggestions pour toi ({filteredSuggestions.length})
             </h2>
           </div>
@@ -271,20 +288,20 @@ const MealSuggestionsView = ({ onBack }) => {
 
       {/* Section aide */}
       {!loading && filteredSuggestions.length > 0 && (
-        <div className="mt-12 bg-gray-50 rounded-xl p-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-3">
+        <div className="mt-12 rounded-xl p-6" style={{ backgroundColor: 'rgba(110, 231, 183, 0.1)' }}>
+          <h3 className="text-lg font-semibold mb-3" style={{ color: '#1F2937' }}>
             💡 Comment ça marche ?
           </h3>
           <div className="grid gap-4 md:grid-cols-2">
             <div>
-              <h4 className="font-medium text-gray-800 mb-1">Suggestions personnalisées</h4>
-              <p className="text-sm text-gray-600">
+              <h4 className="font-medium mb-1" style={{ color: '#1F2937' }}>Suggestions personnalisées</h4>
+              <p className="text-sm" style={{ color: '#6B7280' }}>
                 Nos suggestions sont adaptées à tes symptômes actuels et à ta phase de cycle.
               </p>
             </div>
             <div>
-              <h4 className="font-medium text-gray-800 mb-1">Index glycémique bas</h4>
-              <p className="text-sm text-gray-600">
+              <h4 className="font-medium mb-1" style={{ color: '#1F2937' }}>Index glycémique bas</h4>
+              <p className="text-sm" style={{ color: '#6B7280' }}>
                 Priorité aux repas à IG bas pour aider à réguler l'insuline et le SOPK.
               </p>
             </div>

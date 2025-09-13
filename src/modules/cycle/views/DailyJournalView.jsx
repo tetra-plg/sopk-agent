@@ -112,9 +112,9 @@ export default function DailyJournalView({ onBack }) {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: '#F9FAFB' }}>
         <div className="text-center">
-          <p className="text-gray-600 mb-4">Veuillez vous connecter pour accéder au journal</p>
+          <p className="mb-4" style={{ color: '#6B7280' }}>Veuillez vous connecter pour accéder au journal</p>
         </div>
       </div>
     );
@@ -122,25 +122,28 @@ export default function DailyJournalView({ onBack }) {
 
   if (isInitialLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: '#F9FAFB' }}>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Chargement de votre journal...</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto mb-4" style={{ borderColor: '#A78BFA' }}></div>
+          <p style={{ color: '#6B7280' }}>Chargement de votre journal...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen" style={{ backgroundColor: '#F9FAFB' }}>
       {/* Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200">
+      <div className="bg-white shadow-sm" style={{ borderBottom: '1px solid #E5E7EB' }}>
         <div className="max-w-2xl mx-auto px-4 py-6">
           {onBack && (
             <div className="flex items-center mb-4">
               <button
                 onClick={onBack}
-                className="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors"
+                className="flex items-center gap-2 transition-colors"
+                style={{ color: '#6B7280' }}
+                onMouseEnter={(e) => e.target.style.color = '#1F2937'}
+                onMouseLeave={(e) => e.target.style.color = '#6B7280'}
               >
                 <span>←</span>
                 <span>Retour</span>
@@ -157,26 +160,26 @@ export default function DailyJournalView({ onBack }) {
           <div className="flex items-center justify-between mt-4 text-sm">
             <div className="flex items-center gap-2">
               {isLoading && (
-                <div className="flex items-center gap-2 text-blue-600">
+                <div className="flex items-center gap-2" style={{ color: '#93C5FD' }}>
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
                   <span>Sauvegarde en cours...</span>
                 </div>
               )}
 
               {!isLoading && hasChanges && (
-                <div className="text-orange-600">
+                <div style={{ color: '#FB7185' }}>
                   <span>• Modifications non sauvegardées</span>
                 </div>
               )}
 
               {!isLoading && !hasChanges && lastSaved && (
-                <div className="text-green-600">
+                <div style={{ color: '#6EE7B7' }}>
                   <span>✓ Sauvegardé à {lastSaved.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</span>
                 </div>
               )}
 
               {isAutoSaveScheduled && (
-                <div className="text-blue-500 text-xs">
+                <div className="text-xs" style={{ color: '#93C5FD' }}>
                   <span>Auto-save dans 2s...</span>
                 </div>
               )}
@@ -186,7 +189,10 @@ export default function DailyJournalView({ onBack }) {
               <button
                 onClick={handleManualSave}
                 disabled={isLoading}
-                className="px-3 py-1 bg-purple-600 text-white text-xs rounded-lg hover:bg-purple-700 disabled:opacity-50 transition-colors"
+                className="px-3 py-1 text-white text-xs rounded-xl disabled:opacity-50 transition-colors"
+                style={{ backgroundColor: '#A78BFA' }}
+                onMouseEnter={(e) => !e.target.disabled && (e.target.style.backgroundColor = '#9333EA')}
+                onMouseLeave={(e) => !e.target.disabled && (e.target.style.backgroundColor = '#A78BFA')}
               >
                 Sauvegarder
               </button>
@@ -198,8 +204,8 @@ export default function DailyJournalView({ onBack }) {
       {/* Content */}
       <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
         {loadError && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-            <p className="text-red-800 text-sm">
+          <div className="rounded-xl p-4" style={{ backgroundColor: 'rgba(251, 113, 133, 0.1)', border: '1px solid #FB7185' }}>
+            <p className="text-sm" style={{ color: '#FB7185' }}>
               Erreur lors du chargement des données. Veuillez rafraîchir la page.
             </p>
           </div>
@@ -253,10 +259,10 @@ export default function DailyJournalView({ onBack }) {
         {isEmpty && !hasChanges && (
           <div className="text-center py-8">
             <div className="text-6xl mb-4">📝</div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
+            <h3 className="text-lg font-medium mb-2" style={{ color: '#1F2937' }}>
               Commencez votre journal quotidien
             </h3>
-            <p className="text-gray-600 max-w-md mx-auto">
+            <p className="max-w-md mx-auto" style={{ color: '#6B7280' }}>
               Prenez quelques minutes pour enregistrer comment vous vous sentez aujourd'hui.
               Vos données vous aideront à mieux comprendre vos cycles.
             </p>
