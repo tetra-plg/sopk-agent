@@ -10,11 +10,11 @@ import TechniqueSelector from '../components/TechniqueSelector';
 import BreathingSession from '../components/BreathingSession';
 import { breathingService } from '../services/breathingService';
 
-const BreathingExercisesView = ({ onBack }) => {
+const BreathingExercisesView = ({ onBack, initialTechnique = null }) => {
   // TODO: Intégrer l'authentification plus tard
   const user = null;
-  const [currentView, setCurrentView] = useState('selector'); // 'selector', 'session', 'success'
-  const [selectedTechnique, setSelectedTechnique] = useState(null);
+  const [currentView, setCurrentView] = useState(initialTechnique ? 'session' : 'selector'); // 'selector', 'session', 'success'
+  const [selectedTechnique, setSelectedTechnique] = useState(initialTechnique);
   const [sessionResult, setSessionResult] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
