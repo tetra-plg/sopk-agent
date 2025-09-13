@@ -38,14 +38,14 @@ export function useAutoSave({
       if (!isMountedRef.current) return { success: false };
 
       if (error) {
-        console.error('❌ Erreur auto-save:', error);
+
         return { success: false, error };
       }
 
       markAsSaved();
       return { success: true };
     } catch (error) {
-      console.error('❌ Erreur auto-save:', error);
+
       return { success: false, error };
     } finally {
       if (isMountedRef.current) {
@@ -80,7 +80,7 @@ export function useAutoSave({
       const result = await performSave(dateKey, dataToSave);
       if (result.success) {
         lastSaveRef.current = currentDataKey;
-        console.log('💾 Auto-save réussi pour', dateKey);
+
       }
     }, debounceDelay);
   }, [hasChanges, userId, debounceDelay, getFormattedDate, getValidatedData, performSave]);
@@ -100,7 +100,7 @@ export function useAutoSave({
     const result = await performSave(dateKey, dataToSave);
     if (result.success) {
       lastSaveRef.current = JSON.stringify({ dateKey, data: dataToSave });
-      console.log('💾 Sauvegarde forcée réussie pour', dateKey);
+
     }
 
     return result;

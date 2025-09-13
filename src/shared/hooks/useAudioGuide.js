@@ -173,7 +173,7 @@ export const useAudioGuide = () => {
       oscillator.stop(audioContext.currentTime + 0.3);
     } catch (error) {
       // Fallback silencieux si Web Audio API n'est pas supportée
-      console.log('Audio notification not supported');
+
     }
   }, [isEnabled]);
 

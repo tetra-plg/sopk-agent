@@ -22,10 +22,10 @@ const moodService = {
       .upsert({
         user_id: userId,
         date: typeof date === 'string' ? date : date.toISOString().split('T')[0],
-        primary_emotion: moodData.primary_emotion,
+        mood_emoji: moodData.mood_emoji,
         mood_score: moodData.mood_score,
-        emotion_tags: moodData.emotion_tags || [],
-        mood_notes: moodData.mood_notes || '',
+        mood_tags: moodData.mood_tags || [],
+        notes: moodData.notes || '',
         context_triggers: moodData.context_triggers || [],
         updated_at: new Date().toISOString()
       }, {
@@ -35,7 +35,7 @@ const moodService = {
       .single();
 
     if (error) {
-      console.error('Erreur sauvegarde mood:', error);
+
       throw error;
     }
 
@@ -61,7 +61,7 @@ const moodService = {
       if (error) {
         // Log uniquement en développement
         if (process.env.NODE_ENV === 'development') {
-          console.log('Mood entry not found for date:', dateStr, '(normal if no data)');
+          // Mood entry not found - normal if no data
         }
         return { data: null, error: null };
       }
@@ -70,7 +70,7 @@ const moodService = {
     } catch (err) {
       // Capture toute erreur réseau ou autre
       if (process.env.NODE_ENV === 'development') {
-        console.log('Error fetching mood entry (returning empty):', err.message);
+        // Error fetching mood entry - returning empty
       }
       return { data: null, error: null };
     }
@@ -86,7 +86,7 @@ const moodService = {
 
       const { data, error } = await client
         .from('mood_entries')
-        .select('date, primary_emotion, mood_score, emotion_tags, context_triggers, created_at')
+        .select('date, mood_emoji, mood_score, mood_tags, context_triggers, created_at')
         .eq('user_id', userId)
         .gte('created_at', startDate.toISOString())
         .order('date', { ascending: false });
@@ -94,7 +94,7 @@ const moodService = {
       // Gestion silencieuse des erreurs
       if (error) {
         if (process.env.NODE_ENV === 'development') {
-          console.log('Mood history not found (normal if no data):', error.message);
+          // Mood history not found - normal if no data
         }
         return { data: [], error: null };
       }
@@ -102,7 +102,7 @@ const moodService = {
       return { data: data || [], error: null };
     } catch (err) {
       if (process.env.NODE_ENV === 'development') {
-        console.log('Error fetching mood history (returning empty):', err.message);
+        // Error fetching mood history - returning empty
       }
       return { data: [], error: null };
     }
@@ -146,8 +146,8 @@ const moodService = {
     // Émotions les plus fréquentes
     const emotionCounts = {};
     history.forEach(entry => {
-      if (entry.primary_emotion) {
-        emotionCounts[entry.primary_emotion] = (emotionCounts[entry.primary_emotion] || 0) + 1;
+      if (entry.mood_emoji) {
+        emotionCounts[entry.mood_emoji] = (emotionCounts[entry.mood_emoji] || 0) + 1;
       }
     });
 
@@ -178,7 +178,7 @@ const moodService = {
       .eq('date', dateStr);
 
     if (error) {
-      console.error('Erreur suppression mood:', error);
+
       throw error;
     }
 
@@ -200,7 +200,7 @@ const moodService = {
 
     // Pattern de stress récurrent
     const stressedDays = history.filter(entry =>
-      entry.emotion_tags?.includes('stressed') ||
+      entry.mood_tags?.includes('stressed') ||
       (entry.mood_score && entry.mood_score <= 3)
     );
 

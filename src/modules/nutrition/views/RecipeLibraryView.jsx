@@ -55,7 +55,7 @@ const RecipeLibraryView = ({ onBack }) => {
         );
         setRecipes(lowGIRecipes);
       } catch (error) {
-        console.error('Erreur chargement recettes:', error);
+
         setRecipes([]);
       } finally {
         setLoading(false);
@@ -123,7 +123,7 @@ const RecipeLibraryView = ({ onBack }) => {
         setShowTrackingSuccess(true);
       }
     } catch (error) {
-      console.error('Erreur tracking repas:', error);
+
     }
   };
 
@@ -136,13 +136,13 @@ const RecipeLibraryView = ({ onBack }) => {
 
   const handleViewHistory = () => {
     // TODO: Implémenter navigation vers historique nutrition
-    console.log('Navigation vers historique nutrition');
+
   };
 
   const handleRateMeal = async (rating) => {
     if (trackedMeal) {
       // Ici on pourrait mettre à jour la note du repas
-      console.log('Rating meal:', trackedMeal.name, rating);
+
     }
   };
 

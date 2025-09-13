@@ -21,7 +21,7 @@ export const useBreathingTechniques = () => {
       const { data } = await breathingTechniquesService.getAllTechniques();
       setTechniques(data || []);
     } catch (err) {
-      console.error('Erreur chargement techniques:', err);
+
       setError(err);
       setTechniques([]);
     } finally {

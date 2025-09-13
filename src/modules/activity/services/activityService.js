@@ -15,7 +15,7 @@ const activityService = {
   async getSessions(filters = {}) {
     try {
       let query = supabase
-        .from('activity_sessions')
+        .from('activity_sessions_complete')
         .select('*')
         .eq('is_active', true)
         .order('created_at', { ascending: false });
@@ -40,13 +40,13 @@ const activityService = {
       const { data, error } = await query;
 
       if (error) {
-        console.error('Erreur récupération sessions:', error);
+
         throw error;
       }
 
       return data || [];
     } catch (error) {
-      console.error('Erreur dans getSessions:', error);
+
       throw error;
     }
   },
@@ -57,20 +57,20 @@ const activityService = {
   async getSessionById(sessionId) {
     try {
       const { data, error } = await supabase
-        .from('activity_sessions')
+        .from('activity_sessions_complete')
         .select('*')
         .eq('id', sessionId)
         .eq('is_active', true)
         .single();
 
       if (error) {
-        console.error('Erreur récupération session:', error);
+
         throw error;
       }
 
       return data;
     } catch (error) {
-      console.error('Erreur dans getSessionById:', error);
+
       throw error;
     }
   },
@@ -94,23 +94,22 @@ const activityService = {
         .insert({
           user_id: userId,
           session_id: sessionId,
-          status: 'started',
+          date_completed: new Date().toISOString().split('T')[0],
           pre_energy_level: preSessionData.energyLevel,
           pre_pain_level: preSessionData.painLevel,
-          pre_mood_score: preSessionData.moodScore,
-          started_at: new Date().toISOString()
+          pre_mood_score: preSessionData.moodScore
         })
         .select()
         .single();
 
       if (error) {
-        console.error('Erreur démarrage session:', error);
+
         throw error;
       }
 
       return data;
     } catch (error) {
-      console.error('Erreur dans startSession:', error);
+
       throw error;
     }
   },
@@ -123,21 +122,20 @@ const activityService = {
       const { data, error } = await supabase
         .from('user_activity_tracking')
         .update({
-          ...updateData,
-          updated_at: new Date().toISOString()
+          ...updateData
         })
         .eq('id', trackingId)
         .select()
         .single();
 
       if (error) {
-        console.error('Erreur mise à jour session:', error);
+
         throw error;
       }
 
       return data;
     } catch (error) {
-      console.error('Erreur dans updateSession:', error);
+
       throw error;
     }
   },
@@ -148,20 +146,19 @@ const activityService = {
   async completeSession(trackingId, postSessionData = {}) {
     try {
       const updateData = {
-        status: 'completed',
-        completed_at: new Date().toISOString(),
         duration_seconds: postSessionData.durationSeconds,
         completion_percentage: postSessionData.completionPercentage || 100,
         post_energy_level: postSessionData.energyLevel,
         post_pain_level: postSessionData.painLevel,
         post_mood_score: postSessionData.moodScore,
         session_notes: postSessionData.notes,
-        difficulty_felt: postSessionData.difficultyFelt
+        difficulty_felt: postSessionData.difficultyFelt,
+        difficulty_felt_rating: postSessionData.enjoymentRating
       };
 
       return await this.updateSession(trackingId, updateData);
     } catch (error) {
-      console.error('Erreur dans completeSession:', error);
+
       throw error;
     }
   },
@@ -172,14 +169,13 @@ const activityService = {
   async abandonSession(trackingId, reason = '') {
     try {
       const updateData = {
-        status: 'abandoned',
         session_notes: reason,
         completion_percentage: 0
       };
 
       return await this.updateSession(trackingId, updateData);
     } catch (error) {
-      console.error('Erreur dans abandonSession:', error);
+
       throw error;
     }
   },
@@ -195,7 +191,7 @@ const activityService = {
         .from('user_activity_tracking')
         .select(`
           *,
-          activity_sessions (
+          activity_sessions_complete (
             title,
             category,
             duration_minutes,
@@ -203,35 +199,31 @@ const activityService = {
           )
         `)
         .eq('user_id', userId)
-        .order('started_at', { ascending: false });
+        .order('created_at', { ascending: false });
 
       // Filtres optionnels
-      if (filters.status) {
-        query = query.eq('status', filters.status);
-      }
-
       if (filters.limit) {
         query = query.limit(filters.limit);
       }
 
       if (filters.dateFrom) {
-        query = query.gte('started_at', filters.dateFrom);
+        query = query.gte('created_at', filters.dateFrom);
       }
 
       if (filters.dateTo) {
-        query = query.lte('started_at', filters.dateTo);
+        query = query.lte('created_at', filters.dateTo);
       }
 
       const { data, error } = await query;
 
       if (error) {
-        console.error('Erreur récupération historique:', error);
+
         throw error;
       }
 
       return data || [];
     } catch (error) {
-      console.error('Erreur dans getUserHistory:', error);
+
       throw error;
     }
   },
@@ -263,11 +255,10 @@ const activityService = {
         .from('user_activity_tracking')
         .select('*')
         .eq('user_id', userId)
-        .eq('status', 'completed')
-        .gte('completed_at', startDate.toISOString());
+        .gte('created_at', startDate.toISOString());
 
       if (error) {
-        console.error('Erreur récupération stats:', error);
+
         throw error;
       }
 
@@ -276,7 +267,7 @@ const activityService = {
       // Calculer les statistiques
       const stats = {
         totalSessions: sessions.length,
-        totalMinutes: sessions.reduce((sum, session) => sum + (session.duration_seconds / 60), 0),
+        totalMinutes: Math.round(sessions.reduce((sum, session) => sum + ((session.duration_seconds || 0) / 60), 0)),
         avgEnergyImprovement: 0,
         avgPainReduction: 0,
         avgMoodImprovement: 0,
@@ -294,20 +285,24 @@ const activityService = {
         );
 
         if (sessionsWithFeedback.length > 0) {
-          stats.avgEnergyImprovement = sessionsWithFeedback.reduce((sum, s) =>
-            sum + (s.post_energy_level - s.pre_energy_level), 0) / sessionsWithFeedback.length;
+          stats.avgEnergyImprovement = Math.round((sessionsWithFeedback.reduce((sum, s) =>
+            sum + (s.post_energy_level - s.pre_energy_level), 0) / sessionsWithFeedback.length) * 10) / 10;
 
-          stats.avgPainReduction = sessionsWithFeedback.reduce((sum, s) =>
-            sum + (s.pre_pain_level - s.post_pain_level), 0) / sessionsWithFeedback.length;
+          stats.avgPainReduction = Math.round((sessionsWithFeedback.reduce((sum, s) =>
+            sum + (s.pre_pain_level - s.post_pain_level), 0) / sessionsWithFeedback.length) * 10) / 10;
 
-          stats.avgMoodImprovement = sessionsWithFeedback.reduce((sum, s) =>
-            sum + (s.post_mood_score - s.pre_mood_score), 0) / sessionsWithFeedback.length;
+          stats.avgMoodImprovement = Math.round((sessionsWithFeedback.reduce((sum, s) =>
+            sum + (s.post_mood_score - s.pre_mood_score), 0) / sessionsWithFeedback.length) * 10) / 10;
         }
+
+        // Taux de complétion basé sur completion_percentage
+        const completedSessions = sessions.filter(s => s.completion_percentage >= 100);
+        stats.completionRate = Math.round((completedSessions.length / sessions.length) * 100);
       }
 
       return stats;
     } catch (error) {
-      console.error('Erreur dans getUserStats:', error);
+
       throw error;
     }
   },
@@ -319,8 +314,7 @@ const activityService = {
     try {
       // Récupérer l'historique récent pour analyser les préférences
       const recentHistory = await this.getUserHistory(userId, {
-        limit: 10,
-        status: 'completed'
+        limit: 10
       });
 
       // Logique de recommandation basée sur l'historique
@@ -336,7 +330,7 @@ const activityService = {
         recommendations.push(...beginnerSessions.slice(0, 3));
       } else {
         // Recommandations basées sur les préférences
-        const completedCategories = [...new Set(recentHistory.map(h => h.activity_sessions?.category).filter(Boolean))];
+        const completedCategories = [...new Set(recentHistory.map(h => h.activity_sessions_complete?.category).filter(Boolean))];
 
         for (const category of completedCategories) {
           const sessions = await this.getSessionsByCategory(category);
@@ -352,7 +346,7 @@ const activityService = {
 
       return recommendations.slice(0, 5); // Max 5 recommandations
     } catch (error) {
-      console.error('Erreur dans getPersonalizedRecommendations:', error);
+
       throw error;
     }
   }

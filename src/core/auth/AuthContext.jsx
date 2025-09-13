@@ -51,12 +51,12 @@ export const AuthProvider = ({ children }) => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
         if (error) {
-          console.error('Erreur récupération session:', error);
+
         } else {
           setUser(session?.user ?? null);
         }
       } catch (error) {
-        console.error('Erreur auth:', error);
+
       } finally {
         setLoading(false);
       }
@@ -68,7 +68,7 @@ export const AuthProvider = ({ children }) => {
     const {
       data: { subscription }
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Auth state change:', event, session?.user?.id);
+
       setUser(session?.user ?? null);
       setLoading(false);
     });
@@ -92,7 +92,7 @@ export const AuthProvider = ({ children }) => {
 
       return { user: data.user, error: null };
     } catch (error) {
-      console.error('Erreur connexion:', error);
+
       return { user: null, error };
     } finally {
       setLoading(false);
@@ -115,7 +115,7 @@ export const AuthProvider = ({ children }) => {
 
       return { user: data.user, error: null };
     } catch (error) {
-      console.error('Erreur inscription:', error);
+
       return { user: null, error };
     } finally {
       setLoading(false);
@@ -129,7 +129,7 @@ export const AuthProvider = ({ children }) => {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
     } catch (error) {
-      console.error('Erreur déconnexion:', error);
+
     } finally {
       setLoading(false);
     }

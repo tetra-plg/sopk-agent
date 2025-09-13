@@ -25,7 +25,7 @@ const breathingTechniquesService = {
       .order('display_order', { ascending: true });
 
     if (error && error.code !== 'PGRST116') {
-      console.error('Erreur récupération techniques:', error);
+
       throw error;
     }
 
@@ -45,7 +45,7 @@ const breathingTechniquesService = {
       .limit(1);
 
     if (error && error.code !== 'PGRST116') {
-      console.error('Erreur récupération technique:', error);
+
       throw error;
     }
 
@@ -65,7 +65,7 @@ const breathingTechniquesService = {
       .order('display_order', { ascending: true });
 
     if (error && error.code !== 'PGRST116') {
-      console.error('Erreur récupération techniques par difficulté:', error);
+
       throw error;
     }
 

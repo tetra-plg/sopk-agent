@@ -28,7 +28,7 @@ const NutritionHistoryView = () => {
       const { data } = await trackingService.getMealHistory(MOCK_USER_ID, 20);
       setHistory(data || []);
     } catch (error) {
-      console.error('Erreur chargement historique:', error);
+
       setHistory([]);
     } finally {
       setLoading(false);
@@ -40,7 +40,7 @@ const NutritionHistoryView = () => {
       const { data } = await trackingService.getNutritionStats(MOCK_USER_ID, selectedPeriod);
       calculateStats(data || []);
     } catch (error) {
-      console.error('Erreur chargement stats:', error);
+
       setStats(null);
     }
   };

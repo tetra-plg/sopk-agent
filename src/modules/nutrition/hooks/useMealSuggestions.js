@@ -31,7 +31,7 @@ export const useMealSuggestions = (context = {}) => {
       const { data } = await nutritionService.getAllMealSuggestions();
       setAllMeals(data || []);
     } catch (err) {
-      console.error('Erreur chargement repas:', err);
+
       setAllMeals([]);
     }
   }, []);
@@ -73,7 +73,7 @@ export const useMealSuggestions = (context = {}) => {
       setSuggestions(newSuggestions);
 
     } catch (err) {
-      console.error('Erreur génération suggestions:', err);
+
       setError(err);
       setSuggestions([]);
     } finally {
@@ -89,7 +89,7 @@ export const useMealSuggestions = (context = {}) => {
   // Tracker un repas choisi
   const trackMealChosen = useCallback(async (mealId, mealType, feedback = {}) => {
     if (!stableContext.userId) {
-      console.warn('Impossible de tracker sans userId');
+
       return;
     }
 
@@ -106,7 +106,7 @@ export const useMealSuggestions = (context = {}) => {
 
       return { success: true };
     } catch (err) {
-      console.error('Erreur tracking repas:', err);
+
       return { success: false, error: err };
     }
   }, [stableContext.userId, generateSuggestions]);
@@ -126,7 +126,7 @@ export const useMealSuggestions = (context = {}) => {
       const { data } = await nutritionService.searchMeals(filters);
       return { data: data || [] };
     } catch (err) {
-      console.error('Erreur recherche repas:', err);
+
       setError(err);
       return { data: [] };
     } finally {
@@ -140,7 +140,7 @@ export const useMealSuggestions = (context = {}) => {
       const { data } = await nutritionService.getMealsByCategory(category);
       return { data: data || [] };
     } catch (err) {
-      console.error('Erreur repas par catégorie:', err);
+
       return { data: [] };
     }
   }, []);

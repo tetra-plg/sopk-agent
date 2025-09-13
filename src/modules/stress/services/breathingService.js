@@ -43,10 +43,9 @@ export const breathingService = {
 
       if (error) throw error;
 
-      console.log('✅ Session de respiration sauvegardée:', data);
       return { data, error: null };
     } catch (error) {
-      console.error('❌ Erreur sauvegarde session:', error);
+
       return { data: null, error };
     }
   },
@@ -71,7 +70,7 @@ export const breathingService = {
 
       return { data, error: null };
     } catch (error) {
-      console.error('❌ Erreur récupération sessions du jour:', error);
+
       return { data: null, error };
     }
   },
@@ -108,7 +107,7 @@ export const breathingService = {
 
       return { data: stats, error: null };
     } catch (error) {
-      console.error('❌ Erreur récupération statistiques:', error);
+
       return { data: null, error };
     }
   },
@@ -146,7 +145,7 @@ export const breathingService = {
 
       return { data: stats, error: null };
     } catch (error) {
-      console.error('❌ Erreur récupération statistiques globales:', error);
+
       return { data: null, error };
     }
   },
@@ -170,7 +169,7 @@ export const breathingService = {
 
       return { data, error: null };
     } catch (error) {
-      console.error('❌ Erreur mise à jour session:', error);
+
       return { data: null, error };
     }
   }

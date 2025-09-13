@@ -45,7 +45,7 @@ const ActivityHistory = ({ onBack }) => {
         setHistory(historyData);
         setStats(statsData);
       } catch (error) {
-        console.error('Erreur chargement historique:', error);
+
       } finally {
         setIsLoading(false);
       }

@@ -37,7 +37,7 @@ const BreathingExercisesView = ({ onBack, initialTechnique = null }) => {
         const { data, error } = await breathingService.saveSession(user.id, sessionData);
 
         if (error) {
-          console.warn('Erreur sauvegarde session:', error);
+
           // Ne pas bloquer l'UX pour une erreur de sauvegarde
         }
       }
@@ -45,7 +45,7 @@ const BreathingExercisesView = ({ onBack, initialTechnique = null }) => {
       setSessionResult(sessionData);
       setCurrentView('success');
     } catch (error) {
-      console.error('Erreur lors de la complétion:', error);
+
       setError('Erreur lors de la sauvegarde. Vos données locales sont conservées.');
       // Permettre quand même de voir les résultats
       setSessionResult(sessionData);

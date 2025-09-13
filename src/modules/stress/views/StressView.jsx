@@ -18,7 +18,7 @@ const StressView = () => {
   const [_, setStatsLoading] = useState(false);
 
   // Vérifier si une humeur existe pour aujourd'hui
-  const hasTodayMood = moodData && moodData.primary_emotion;
+  const hasTodayMood = moodData && moodData.mood_emoji;
 
   // Charger les statistiques hebdomadaires
   useEffect(() => {
@@ -30,7 +30,7 @@ const StressView = () => {
         const stats = await moodService.getMoodStats(user.id, 'week');
         setWeeklyStats(stats);
       } catch (error) {
-        console.error('Erreur chargement stats hebdomadaires:', error);
+
       } finally {
         setStatsLoading(false);
       }
@@ -92,10 +92,10 @@ const StressView = () => {
               {/* En-tête principal */}
               <div className="text-center mb-6">
                 <div className="flex items-center justify-center gap-4 mb-3">
-                  <span className="text-5xl">{getEmotionEmoji(moodData.primary_emotion)}</span>
+                  <span className="text-5xl">{getEmotionEmoji(moodData.mood_emoji)}</span>
                   <div className="text-left">
                     <h3 className="text-2xl font-bold" style={{ color: '#1F2937' }}>
-                      {getEmotionText(moodData.primary_emotion)}
+                      {getEmotionText(moodData.mood_emoji)}
                     </h3>
                     <div className="flex items-center gap-3 mt-1">
                       <span className="text-lg font-semibold" style={{ color: '#A78BFA' }}>
@@ -162,13 +162,13 @@ const StressView = () => {
               )}
 
               {/* Tags émotionnels si présents */}
-              {moodData.emotion_tags && moodData.emotion_tags.length > 0 && (
+              {moodData.mood_tags && moodData.mood_tags.length > 0 && (
                 <div className="mb-4">
                   <h4 className="text-sm font-medium mb-2" style={{ color: '#1F2937' }}>
                     🏷️ Ressentis du moment
                   </h4>
                   <div className="flex flex-wrap gap-2">
-                    {moodData.emotion_tags.map((tag, index) => (
+                    {moodData.mood_tags.map((tag, index) => (
                       <span
                         key={index}
                         className="px-3 py-1 rounded-full text-xs font-medium"
@@ -186,7 +186,7 @@ const StressView = () => {
               )}
 
               {/* Notes si présentes */}
-              {moodData.mood_notes && (
+              {moodData.notes && (
                 <div className="mb-4">
                   <h4 className="text-sm font-medium mb-2" style={{ color: '#1F2937' }}>
                     💭 Ma note personnelle
@@ -196,7 +196,7 @@ const StressView = () => {
                     border: '1px solid rgba(167, 139, 250, 0.1)'
                   }}>
                     <p className="text-sm italic" style={{ color: '#6B7280' }}>
-                      "{moodData.mood_notes}"
+                      "{moodData.notes}"
                     </p>
                   </div>
                 </div>

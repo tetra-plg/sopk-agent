@@ -80,7 +80,7 @@ export default function DailyJournalView({ onBack }) {
 
         // Ne pas afficher d'erreur pour l'absence de données (comportement normal)
         if (error.status !== 406 && error.code !== 'PGRST116') {
-          console.error('❌ Erreur chargement données jour:', error);
+
           setLoadError(error);
         }
         resetForm(); // Reset avec valeurs par défaut
@@ -109,9 +109,9 @@ export default function DailyJournalView({ onBack }) {
   const handleManualSave = async () => {
     const result = await forceSave();
     if (result.success) {
-      console.log('✅ Sauvegarde manuelle réussie');
+
     } else {
-      console.error('❌ Erreur sauvegarde manuelle:', result.error);
+
     }
   };
 

@@ -28,7 +28,7 @@ const MoodJournalView = ({ onBack, onNavigateToBreathing }) => {
         const stats = await moodService.getMoodStats(user.id, 'week');
         setMoodStats(stats);
       } catch (error) {
-        console.error('Erreur chargement stats mood:', error);
+
       }
     };
 
@@ -50,7 +50,7 @@ const MoodJournalView = ({ onBack, onNavigateToBreathing }) => {
       });
     }
 
-    if (moodJournal.moodData.emotion_tags?.includes('stressed')) {
+    if (moodJournal.moodData.mood_tags?.includes('stressed')) {
       contextualSuggestions.push({
         type: 'stress_management',
         title: 'Tu sembles stressée',

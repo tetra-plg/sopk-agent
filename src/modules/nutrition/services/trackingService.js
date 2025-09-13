@@ -32,7 +32,7 @@ const trackingService = {
       .limit(1);
 
     if (error) {
-      console.error('Erreur tracking repas:', error);
+
       throw error;
     }
 
@@ -62,7 +62,7 @@ const trackingService = {
       .order('created_at', { ascending: false });
 
     if (error && error.code !== 'PGRST116') {
-      console.error('Erreur récupération repas récents:', error);
+
       return { data: [] };
     }
 
@@ -93,7 +93,7 @@ const trackingService = {
       .order('created_at', { ascending: true });
 
     if (error && error.code !== 'PGRST116') {
-      console.error('Erreur récupération repas du jour:', error);
+
       return { data: [] };
     }
 
@@ -123,7 +123,7 @@ const trackingService = {
       .limit(limit);
 
     if (error && error.code !== 'PGRST116') {
-      console.error('Erreur récupération historique:', error);
+
       return { data: [] };
     }
 
@@ -153,7 +153,7 @@ const trackingService = {
       .gte('created_at', startDate.toISOString());
 
     if (error && error.code !== 'PGRST116') {
-      console.error('Erreur récupération stats:', error);
+
       return { data: [] };
     }
 
@@ -177,7 +177,7 @@ const trackingService = {
       .limit(1);
 
     if (error) {
-      console.error('Erreur update feedback:', error);
+
       throw error;
     }
 
@@ -195,7 +195,7 @@ const trackingService = {
       .eq('id', trackingId);
 
     if (error) {
-      console.error('Erreur suppression tracking:', error);
+
       throw error;
     }
 
@@ -225,7 +225,7 @@ const trackingService = {
       .order('created_at', { ascending: false });
 
     if (error && error.code !== 'PGRST116') {
-      console.error('Erreur récupération favoris:', error);
+
       return { data: [] };
     }
 

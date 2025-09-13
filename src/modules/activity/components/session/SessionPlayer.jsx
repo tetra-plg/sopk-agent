@@ -40,7 +40,7 @@ const SessionPlayer = ({ session, onBack, onComplete }) => {
           : JSON.parse(session.instructions);
         setSessionInstructions(instructions);
       } catch (error) {
-        console.error('Erreur parsing instructions:', error);
+
         setSessionInstructions([]);
       }
     }
@@ -81,7 +81,7 @@ const SessionPlayer = ({ session, onBack, onComplete }) => {
       setCurrentPhase('active');
       timer.start();
     } catch (error) {
-      console.error('Erreur démarrage session:', error);
+
       setError('Impossible de démarrer la session. Veuillez réessayer.');
     } finally {
       setIsLoading(false);
@@ -111,7 +111,7 @@ const SessionPlayer = ({ session, onBack, onComplete }) => {
         }
       }, 3000);
     } catch (error) {
-      console.error('Erreur finalisation session:', error);
+
       setError('Impossible de sauvegarder votre session. Veuillez réessayer.');
     } finally {
       setIsLoading(false);
@@ -124,7 +124,7 @@ const SessionPlayer = ({ session, onBack, onComplete }) => {
       try {
         await activityService.abandonSession(trackingId, reason);
       } catch (error) {
-        console.error('Erreur abandon session:', error);
+
       }
     }
 

@@ -42,10 +42,9 @@ export const symptomsService = {
 
       if (error) throw error;
 
-      console.log('✅ Symptômes sauvegardés:', data);
       return { data, error: null };
     } catch (error) {
-      console.error('❌ Erreur sauvegarde symptômes:', error);
+
       return { data: null, error };
     }
   },
@@ -69,7 +68,7 @@ export const symptomsService = {
         .limit(1);
 
       if (error) {
-        console.error('❌ Erreur récupération symptômes:', error);
+
         throw error;
       }
 
@@ -92,7 +91,7 @@ export const symptomsService = {
       return { data: data[0], error: null };
 
     } catch (error) {
-      console.error('❌ Erreur récupération symptômes:', error);
+
       return {
         data: {
           period_flow: null,
@@ -131,7 +130,7 @@ export const symptomsService = {
 
       return { data, error: null };
     } catch (error) {
-      console.error('❌ Erreur récupération données récentes:', error);
+
       return { data: null, error };
     }
   },
@@ -170,7 +169,7 @@ export const symptomsService = {
 
       return { data: stats, error: null };
     } catch (error) {
-      console.error('❌ Erreur récupération statistiques:', error);
+
       return { data: null, error };
     }
   },
@@ -194,7 +193,7 @@ export const symptomsService = {
 
       return { error: null };
     } catch (error) {
-      console.error('❌ Erreur suppression entrée:', error);
+
       return { error };
     }
   }

@@ -20,10 +20,10 @@ const MoodPicker = ({
 }) => {
   // Utiliser directement la valeur du parent sans état local conflictuel
   const moodData = value || {
-    primary_emotion: '',
+    mood_emoji: '',
     mood_score: 5,
-    emotion_tags: [],
-    mood_notes: ''
+    mood_tags: [],
+    notes: ''
   };
 
   const [isExpanded, setIsExpanded] = useState(!compact);
@@ -36,7 +36,7 @@ const MoodPicker = ({
   };
 
   const handleEmotionSelect = (emotion) => {
-    updateMoodData('primary_emotion', emotion);
+    updateMoodData('mood_emoji', emotion);
 
     // Si en mode compact et pas encore étendu, étendre automatiquement
     if (compact && !isExpanded) {
@@ -49,11 +49,11 @@ const MoodPicker = ({
   };
 
   const handleTagsChange = (tags) => {
-    updateMoodData('emotion_tags', tags);
+    updateMoodData('mood_tags', tags);
   };
 
   const handleNotesChange = (notes) => {
-    updateMoodData('mood_notes', notes);
+    updateMoodData('notes', notes);
   };
 
   const handleToggleExpand = () => {
@@ -69,7 +69,7 @@ const MoodPicker = ({
             <h3 className="text-lg font-medium flex items-center gap-2" style={{ color: '#1F2937' }}>
               😊 Mon humeur
             </h3>
-            {moodData.primary_emotion && (
+            {moodData.mood_emoji && (
               <button
                 type="button"
                 onClick={handleToggleExpand}
@@ -86,13 +86,13 @@ const MoodPicker = ({
         )}
 
         <EmojiSelector
-          selected={moodData.primary_emotion}
+          selected={moodData.mood_emoji}
           onSelect={handleEmotionSelect}
           size="small"
           disabled={disabled}
         />
 
-        {moodData.primary_emotion && (
+        {moodData.mood_emoji && (
           <div className="mt-3 flex items-center justify-between">
             <span className="text-sm" style={{ color: '#6B7280' }}>
               Note: {moodData.mood_score}/10
@@ -141,7 +141,7 @@ const MoodPicker = ({
           Choisis ton émotion principale :
         </h4>
         <EmojiSelector
-          selected={moodData.primary_emotion}
+          selected={moodData.mood_emoji}
           onSelect={handleEmotionSelect}
           size="normal"
           disabled={disabled}
@@ -149,7 +149,7 @@ const MoodPicker = ({
       </div>
 
       {/* Note d'humeur (visible si émotion sélectionnée) */}
-      {moodData.primary_emotion && (
+      {moodData.mood_emoji && (
         <div className="mb-6">
           <h4 className="text-sm font-medium mb-3" style={{ color: '#1F2937' }}>
             Note ton humeur :
@@ -165,10 +165,10 @@ const MoodPicker = ({
       )}
 
       {/* Tags émotionnels (optionnel) */}
-      {moodData.primary_emotion && (
+      {moodData.mood_emoji && (
         <div className="mb-6">
           <MoodTags
-            selected={moodData.emotion_tags}
+            selected={moodData.mood_tags}
             onSelectionChange={handleTagsChange}
             disabled={disabled}
             size="normal"
@@ -178,13 +178,13 @@ const MoodPicker = ({
       )}
 
       {/* Notes optionnelles */}
-      {moodData.primary_emotion && moodData.mood_score && (
+      {moodData.mood_emoji && moodData.mood_score && (
         <div className="mb-4">
           <h4 className="text-sm font-medium mb-3" style={{ color: '#1F2937' }}>
             Une note ? (optionnel)
           </h4>
           <textarea
-            value={moodData.mood_notes}
+            value={moodData.notes}
             onChange={(e) => handleNotesChange(e.target.value)}
             disabled={disabled}
             placeholder="Décris ce que tu ressens aujourd'hui..."
@@ -201,14 +201,14 @@ const MoodPicker = ({
               Partagée uniquement avec toi
             </span>
             <span className="text-xs" style={{ color: '#6B7280' }}>
-              {moodData.mood_notes.length}/300
+              {(moodData.notes || '').length}/300
             </span>
           </div>
         </div>
       )}
 
       {/* Message d'encouragement */}
-      {moodData.primary_emotion && (
+      {moodData.mood_emoji && (
         <div className="text-center py-3">
           <div
             className="inline-block px-4 py-2 rounded-full text-sm"
@@ -223,7 +223,7 @@ const MoodPicker = ({
       )}
 
       {/* Message d'aide pour première utilisation */}
-      {!moodData.primary_emotion && (
+      {!moodData.mood_emoji && (
         <div className="text-center py-4">
           <p className="text-sm" style={{ color: '#6B7280' }}>
             💡 <span className="font-medium">Prendre quelques secondes</span> pour identifier tes émotions

@@ -11,10 +11,10 @@ import { useAuth } from '../../../core/auth/AuthContext';
 export const useMoodJournal = (currentDate = new Date()) => {
   const { user } = useAuth();
   const [moodData, setMoodData] = useState({
-    primary_emotion: '',
+    mood_emoji: '',
     mood_score: 5,
-    emotion_tags: [],
-    mood_notes: ''
+    mood_tags: [],
+    notes: ''
   });
 
   const [isLoading, setIsLoading] = useState(false);
@@ -36,19 +36,19 @@ export const useMoodJournal = (currentDate = new Date()) => {
 
       if (data) {
         setMoodData({
-          primary_emotion: data.primary_emotion || '',
+          mood_emoji: data.mood_emoji || '',
           mood_score: data.mood_score || 5,
-          emotion_tags: data.emotion_tags || [],
-          mood_notes: data.mood_notes || ''
+          mood_tags: data.mood_tags || [],
+          notes: data.notes || ''
         });
         setLastSaved(new Date(data.updated_at));
       } else {
         // Réinitialiser avec valeurs par défaut - normal si pas de données
         setMoodData({
-          primary_emotion: '',
+          mood_emoji: '',
           mood_score: 5,
-          emotion_tags: [],
-          mood_notes: ''
+          mood_tags: [],
+          notes: ''
         });
         setLastSaved(null);
       }
@@ -56,14 +56,14 @@ export const useMoodJournal = (currentDate = new Date()) => {
     } catch (err) {
       // Gestion silencieuse des erreurs - ne pas affoler l'utilisateur
       if (process.env.NODE_ENV === 'development') {
-        console.log('Could not load mood data (normal on first visit):', err.message);
+        // Silent error - normal on first visit
       }
       // Valeurs par défaut en cas d'erreur
       setMoodData({
-        primary_emotion: '',
+        mood_emoji: '',
         mood_score: 5,
-        emotion_tags: [],
-        mood_notes: ''
+        mood_tags: [],
+        notes: ''
       });
       setLastSaved(null);
       setHasChanges(false);
@@ -79,7 +79,7 @@ export const useMoodJournal = (currentDate = new Date()) => {
 
   // Sauvegarder les données
   const saveMoodData = useCallback(async (dataToSave = moodData) => {
-    if (!user?.id || !dataToSave.primary_emotion) return { success: false, error: 'Données incomplètes' };
+    if (!user?.id || !dataToSave.mood_emoji) return { success: false, error: 'Données incomplètes' };
 
     setIsLoading(true);
     setError(null);
@@ -90,7 +90,7 @@ export const useMoodJournal = (currentDate = new Date()) => {
       setHasChanges(false);
       return { success: true };
     } catch (err) {
-      console.error('Erreur sauvegarde mood:', err);
+
       setError(err.message);
       return { success: false, error: err.message };
     } finally {
@@ -100,7 +100,7 @@ export const useMoodJournal = (currentDate = new Date()) => {
 
   // Auto-save avec debounce
   useEffect(() => {
-    if (!hasChanges || !moodData.primary_emotion) return;
+    if (!hasChanges || !moodData.mood_emoji) return;
 
     const timeoutId = setTimeout(() => {
       saveMoodData();
@@ -122,10 +122,10 @@ export const useMoodJournal = (currentDate = new Date()) => {
   // Réinitialiser le formulaire
   const resetForm = useCallback(() => {
     setMoodData({
-      primary_emotion: '',
+      mood_emoji: '',
       mood_score: 5,
-      emotion_tags: [],
-      mood_notes: ''
+      mood_tags: [],
+      notes: ''
     });
     setHasChanges(false);
     setError(null);
@@ -138,10 +138,10 @@ export const useMoodJournal = (currentDate = new Date()) => {
   }, [saveMoodData]);
 
   // Vérifier si le formulaire est vide
-  const isEmpty = !moodData.primary_emotion &&
+  const isEmpty = !moodData.mood_emoji &&
                   moodData.mood_score === 5 &&
-                  moodData.emotion_tags.length === 0 &&
-                  !moodData.mood_notes;
+                  moodData.mood_tags.length === 0 &&
+                  !moodData.notes;
 
   return {
     // Données

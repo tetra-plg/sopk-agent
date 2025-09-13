@@ -23,7 +23,7 @@ const nutritionService = {
       .order('name');
 
     if (error && error.code !== 'PGRST116') {
-      console.error('Erreur récupération suggestions:', error);
+
       throw error;
     }
 
@@ -64,7 +64,7 @@ const nutritionService = {
     const { data, error } = await query.order('name');
 
     if (error && error.code !== 'PGRST116') {
-      console.error('Erreur recherche repas:', error);
+
       throw error;
     }
 
@@ -83,7 +83,7 @@ const nutritionService = {
       .limit(1);
 
     if (error && error.code !== 'PGRST116') {
-      console.error('Erreur récupération repas:', error);
+
       throw error;
     }
 
@@ -102,7 +102,7 @@ const nutritionService = {
       .order('prep_time_minutes');
 
     if (error && error.code !== 'PGRST116') {
-      console.error('Erreur récupération par catégorie:', error);
+
       throw error;
     }
 
@@ -125,7 +125,7 @@ const nutritionService = {
       .order('prep_time_minutes');
 
     if (error && error.code !== 'PGRST116') {
-      console.error('Erreur récupération par symptômes:', error);
+
       throw error;
     }
 
@@ -144,7 +144,7 @@ const nutritionService = {
       .limit(1);
 
     if (error && error.code !== 'PGRST116') {
-      console.error('Erreur récupération préférences:', error);
+
       return { data: null };
     }
 
@@ -168,7 +168,7 @@ const nutritionService = {
       .limit(1);
 
     if (error) {
-      console.error('Erreur sauvegarde préférences:', error);
+
       throw error;
     }
 

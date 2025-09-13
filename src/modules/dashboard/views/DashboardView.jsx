@@ -5,11 +5,12 @@ import { useMealSuggestions } from '../../nutrition/hooks/useMealSuggestions';
 import MealDetailModal from '../../nutrition/components/MealDetailModal';
 import TrackingSuccess from '../../nutrition/components/TrackingSuccess';
 import BreathingSession from '../../stress/components/BreathingSession';
-import { techniques } from '../../stress/utils/breathingTechniques';
+import { useBreathingTechniques } from '../../stress/hooks/useBreathingTechniques';
 import DailyJournalView from '../../cycle/views/DailyJournalView';
 
 const DashboardView = ({ onNavigate }) => {
   const { user } = useAuth();
+  const { techniques } = useBreathingTechniques();
   const [currentView, setCurrentView] = useState('dashboard');
   const [todaySymptoms, setTodaySymptoms] = useState(null);
   const [loadingSymptoms, setLoadingSymptoms] = useState(true);
@@ -48,12 +49,12 @@ const DashboardView = ({ onNavigate }) => {
         const { data, error } = await symptomsService.getDailyEntry(user.id, today);
 
         if (error && error.status !== 406 && error.code !== 'PGRST116') {
-          console.error('Erreur chargement symptômes:', error);
+
         } else {
           setTodaySymptoms(data);
         }
       } catch (error) {
-        console.error('Erreur chargement symptômes:', error);
+
       } finally {
         setLoadingSymptoms(false);
       }
@@ -110,7 +111,7 @@ const DashboardView = ({ onNavigate }) => {
         setShowMealModal(false);
       }
     } catch (error) {
-      console.error('Erreur lors du tracking du repas:', error);
+
     }
   };
 
@@ -285,12 +286,19 @@ const DashboardView = ({ onNavigate }) => {
           </h3>
           <div className="mb-4">
             <div className="mb-3">
-              <h4 className="font-medium mb-1" style={{ color: 'var(--color-text-principal)' }}>
-                {techniques.quick.name}
-              </h4>
-              <p className="text-sm" style={{ color: 'var(--color-text-secondaire)' }}>
-                {techniques.quick.description} • {Math.floor(techniques.quick.duration / 60)} min
-              </p>
+              {techniques.length > 0 && (() => {
+                const quickTechnique = techniques.find(t => t.id === 'quick') || techniques[0];
+                return (
+                  <>
+                    <h4 className="font-medium mb-1" style={{ color: 'var(--color-text-principal)' }}>
+                      {quickTechnique.name}
+                    </h4>
+                    <p className="text-sm" style={{ color: 'var(--color-text-secondaire)' }}>
+                      {quickTechnique.description} • {Math.floor(quickTechnique.duration_seconds / 60)} min
+                    </p>
+                  </>
+                );
+              })()}
             </div>
             <div className="flex gap-2 text-xs">
               <span className="badge-bleu-ciel">⚡ Express</span>
@@ -302,7 +310,7 @@ const DashboardView = ({ onNavigate }) => {
             onClick={handleStartBreathingExercise}
             className="w-full btn-secondary"
           >
-            {techniques.quick.icon} Commencer maintenant
+            {techniques.length > 0 && (techniques.find(t => t.id === 'quick') || techniques[0])?.icon} Commencer maintenant
           </button>
         </div>
       </div>
@@ -347,7 +355,7 @@ const DashboardView = ({ onNavigate }) => {
             setTrackedMeal(null);
           }}
           onRateMeal={(rating) => {
-            console.log('Meal rated:', rating);
+
             setShowTrackingSuccess(false);
             setTrackedMeal(null);
           }}

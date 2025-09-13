@@ -35,7 +35,7 @@ const CycleView = () => {
         setTodayEntry(todayResult.data);
         setWeeklyEntries(weekResult.data || []);
       } catch (err) {
-        console.error('Erreur chargement données cycle:', err);
+
         setError(err);
       } finally {
         setLoading(false);

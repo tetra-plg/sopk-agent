@@ -84,7 +84,7 @@ const NutritionView = () => {
         const { data } = await trackingService.getTodayMeals(user.id);
         setTodayMeals(data || []);
       } catch (error) {
-        console.error('Erreur chargement repas du jour:', error);
+
         setTodayMeals([]);
       } finally {
         setLoadingTodayMeals(false);
@@ -120,20 +120,20 @@ const NutritionView = () => {
         const { data } = await trackingService.getTodayMeals(user.id);
         setTodayMeals(data || []);
       } catch (error) {
-        console.error('Erreur rechargement repas du jour:', error);
+
       }
     }
   };
 
   const handleViewHistory = () => {
     // TODO: Implémenter historique nutrition quand disponible
-    console.log('Navigation vers historique nutrition');
+
   };
 
   const handleRateMeal = async (rating) => {
     if (trackedMeal) {
       // Ici on pourrait mettre à jour la note du repas
-      console.log('Rating meal:', trackedMeal.name, rating);
+
     }
   };
 

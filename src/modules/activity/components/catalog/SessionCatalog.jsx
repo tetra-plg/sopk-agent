@@ -42,7 +42,7 @@ const SessionCatalog = ({ onSessionSelect, onViewHistory }) => {
         setRecommendations(recommendationsData);
         setUserStats(statsData);
       } catch (error) {
-        console.error('Erreur chargement catalogue:', error);
+
       } finally {
         setIsLoading(false);
       }

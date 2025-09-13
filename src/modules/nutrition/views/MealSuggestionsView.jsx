@@ -88,7 +88,7 @@ const MealSuggestionsView = ({ onBack }) => {
       // Feedback visuel de succès
       alert('Super ! Repas ajouté à ton suivi 🍽️');
     } else {
-      console.error('Erreur tracking:', result.error);
+
     }
   };
 
