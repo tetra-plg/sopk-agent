@@ -5,40 +5,71 @@
  * nutritionnelles personnalisées selon les symptômes SOPK.
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import { useAuth } from '../../../core/auth/AuthContext';
 import { useMealSuggestions } from '../hooks/useMealSuggestions';
 import SuggestionCard from '../components/SuggestionCard';
 import MealDetailModal from '../components/MealDetailModal';
 
-const MOCK_USER_ID = '550e8400-e29b-41d4-a716-446655440000';
+const MealSuggestionsView = ({ onBack }) => {
+  const { user } = useAuth();
 
-// Simulation contexte utilisateur (à remplacer par vraies données)
-const getMockUserContext = () => ({
-  userId: MOCK_USER_ID,
-  symptoms: ['fatigue', 'cravings'], // Exemple : fatigue et envies
-  cyclePhase: 'luteal', // Phase lutéale
-  timeOfDay: new Date().getHours(),
-  maxPrepTime: 30
-});
-
-const MealSuggestionsView = () => {
-  const [userContext, setUserContext] = useState(getMockUserContext());
+  // Contexte utilisateur stable (mémorisé pour éviter les re-renders)
+  const userContext = useMemo(() => ({
+    userId: user?.id,
+    symptoms: [], // À connecter avec le journal quotidien
+    cyclePhase: null, // À connecter avec le suivi de cycle
+    timeOfDay: new Date().getHours(),
+    maxPrepTime: 30
+  }), [user?.id]);
   const [selectedMeal, setSelectedMeal] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [filters, setFilters] = useState({
-    mealType: 'auto',
-    maxPrepTime: 30,
+    mealType: 'any',
+    maxPrepTime: 60,
     difficulty: 'any'
   });
 
   const {
-    suggestions,
+    allMeals,
     loading,
     error,
-    refreshSuggestions,
     trackMealChosen,
     isReady
   } = useMealSuggestions(userContext);
+
+  // Dans cette vue, on affiche tous les repas avec filtrage manuel
+  const [filteredSuggestions, setFilteredSuggestions] = useState([]);
+
+  // Appliquer les filtres manuels
+  useEffect(() => {
+    if (!allMeals || allMeals.length === 0) {
+      setFilteredSuggestions([]);
+      return;
+    }
+
+    let filtered = [...allMeals];
+
+    // Filtrer par type de repas
+    if (filters.mealType !== 'auto' && filters.mealType !== 'any') {
+      filtered = filtered.filter(meal => meal.category === filters.mealType);
+    }
+
+    // Filtrer par temps de préparation
+    if (filters.maxPrepTime && filters.maxPrepTime < 60) {
+      filtered = filtered.filter(meal => meal.prep_time_minutes <= filters.maxPrepTime);
+    }
+
+    // Filtrer par difficulté
+    if (filters.difficulty !== 'any') {
+      filtered = filtered.filter(meal => meal.difficulty === filters.difficulty);
+    }
+
+    // Trier par nom pour être cohérent
+    filtered = filtered.sort((a, b) => a.name.localeCompare(b.name));
+
+    setFilteredSuggestions(filtered);
+  }, [allMeals, filters]);
 
   const handleViewMealDetails = (meal) => {
     setSelectedMeal(meal);
@@ -60,7 +91,8 @@ const MealSuggestionsView = () => {
   };
 
   const handleRefreshSuggestions = () => {
-    refreshSuggestions();
+    // Forcer le rechargement en réappliquant les filtres
+    setFilteredSuggestions([...allMeals]);
   };
 
   const getContextMessage = () => {
@@ -91,7 +123,6 @@ const MealSuggestionsView = () => {
       lunch: '🍽️ Déjeuner',
       dinner: '🌙 Dîner',
       snack: '🥨 Collation',
-      auto: '⏰ Maintenant',
       any: '🔄 Tous types'
     };
     return labels[type] || type;
@@ -117,11 +148,22 @@ const MealSuggestionsView = () => {
     <div className="p-6 max-w-7xl mx-auto">
       {/* En-tête */}
       <header className="mb-8">
+        {onBack && (
+          <div className="flex items-center mb-4">
+            <button
+              onClick={onBack}
+              className="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors"
+            >
+              <span>←</span>
+              <span>Retour</span>
+            </button>
+          </div>
+        )}
         <h1 className="text-3xl font-bold text-gray-800 mb-2">
           🍽️ Suggestions Repas
         </h1>
         <p className="text-gray-600">
-          Idées personnalisées selon tes symptômes et besoins SOPK
+          Idées personnalisées selon vos symptômes et besoins SOPK
         </p>
       </header>
 
@@ -138,9 +180,9 @@ const MealSuggestionsView = () => {
       <div className="mb-8">
         <div className="flex flex-wrap gap-3 items-center">
           <label className="text-sm font-medium text-gray-700">
-            Pour quand ?
+            Type de repas :
           </label>
-          {['auto', 'breakfast', 'lunch', 'snack', 'dinner'].map(type => (
+          {['any', 'breakfast', 'lunch', 'snack', 'dinner'].map(type => (
             <button
               key={type}
               onClick={() => setFilters(prev => ({ ...prev, mealType: type }))}
@@ -180,7 +222,7 @@ const MealSuggestionsView = () => {
         </div>
       )}
 
-      {!loading && suggestions.length === 0 && !error && (
+      {!loading && filteredSuggestions.length === 0 && !error && (
         <div className="text-center py-12">
           <div className="text-6xl mb-4">🤔</div>
           <h3 className="text-xl font-semibold text-gray-800 mb-2">
@@ -198,16 +240,16 @@ const MealSuggestionsView = () => {
         </div>
       )}
 
-      {!loading && suggestions.length > 0 && (
+      {!loading && filteredSuggestions.length > 0 && (
         <div>
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-semibold text-gray-800">
-              📋 Suggestions pour toi ({suggestions.length})
+              📋 Suggestions pour toi ({filteredSuggestions.length})
             </h2>
           </div>
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {suggestions.map((meal) => (
+            {filteredSuggestions.map((meal) => (
               <SuggestionCard
                 key={meal.id}
                 meal={meal}
@@ -228,7 +270,7 @@ const MealSuggestionsView = () => {
       />
 
       {/* Section aide */}
-      {!loading && suggestions.length > 0 && (
+      {!loading && filteredSuggestions.length > 0 && (
         <div className="mt-12 bg-gray-50 rounded-xl p-6">
           <h3 className="text-lg font-semibold text-gray-800 mb-3">
             💡 Comment ça marche ?

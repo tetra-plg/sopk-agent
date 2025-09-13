@@ -5,7 +5,7 @@
  * personnalisées selon le contexte SOPK et les préférences utilisateur.
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import nutritionService from '../services/nutritionService';
 import trackingService from '../services/trackingService';
 import SuggestionEngine from '../utils/suggestionLogic';
@@ -15,6 +15,15 @@ export const useMealSuggestions = (context = {}) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [allMeals, setAllMeals] = useState([]);
+
+  // Mémoriser les valeurs du contexte pour éviter les re-renders
+  const stableContext = useMemo(() => ({
+    userId: context.userId,
+    symptoms: context.symptoms || [],
+    cyclePhase: context.cyclePhase,
+    timeOfDay: context.timeOfDay,
+    maxPrepTime: context.maxPrepTime || 30
+  }), [context.userId, JSON.stringify(context.symptoms || []), context.cyclePhase, context.timeOfDay, context.maxPrepTime]);
 
   // Chargement initial de tous les repas
   const loadAllMeals = useCallback(async () => {
@@ -37,7 +46,7 @@ export const useMealSuggestions = (context = {}) => {
     try {
       // Enrichir le contexte avec les données utilisateur
       const enrichedContext = {
-        ...context,
+        ...stableContext,
         ...customContext,
         allMeals
       };
@@ -70,7 +79,7 @@ export const useMealSuggestions = (context = {}) => {
     } finally {
       setLoading(false);
     }
-  }, [allMeals, context]);
+  }, [allMeals, stableContext]);
 
   // Rafraîchir les suggestions
   const refreshSuggestions = useCallback(() => {
@@ -79,14 +88,14 @@ export const useMealSuggestions = (context = {}) => {
 
   // Tracker un repas choisi
   const trackMealChosen = useCallback(async (mealId, mealType, feedback = {}) => {
-    if (!context.userId) {
+    if (!stableContext.userId) {
       console.warn('Impossible de tracker sans userId');
       return;
     }
 
     try {
       await trackingService.trackMealConsumption(
-        context.userId,
+        stableContext.userId,
         mealId,
         mealType,
         feedback
@@ -100,7 +109,7 @@ export const useMealSuggestions = (context = {}) => {
       console.error('Erreur tracking repas:', err);
       return { success: false, error: err };
     }
-  }, [context.userId, generateSuggestions]);
+  }, [stableContext.userId, generateSuggestions]);
 
   // Obtenir une suggestion rapide (pour dashboard)
   const getQuickSuggestion = useCallback(() => {
@@ -146,7 +155,7 @@ export const useMealSuggestions = (context = {}) => {
     if (allMeals.length > 0) {
       generateSuggestions();
     }
-  }, [allMeals, context.symptoms, context.cyclePhase, generateSuggestions]);
+  }, [allMeals, stableContext.symptoms, stableContext.cyclePhase, generateSuggestions]);
 
   return {
     // Données
