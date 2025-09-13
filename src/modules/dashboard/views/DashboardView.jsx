@@ -1,4 +1,46 @@
+import { useState, useEffect } from 'react';
+import { useAuth } from '../../../core/auth/AuthContext';
+import { symptomsService } from '../../cycle/services/symptomsService';
+import DailyJournalView from '../../cycle/views/DailyJournalView';
+
 const DashboardView = () => {
+  const { user } = useAuth();
+  const [currentView, setCurrentView] = useState('dashboard');
+  const [todaySymptoms, setTodaySymptoms] = useState(null);
+  const [loadingSymptoms, setLoadingSymptoms] = useState(true);
+
+  // Charger les symptômes du jour
+  useEffect(() => {
+    const loadTodaySymptoms = async () => {
+      if (!user?.id) {
+        setLoadingSymptoms(false);
+        return;
+      }
+
+      try {
+        const today = new Date().toISOString().split('T')[0];
+        const { data, error } = await symptomsService.getDailyEntry(user.id, today);
+
+        if (error && error.status !== 406 && error.code !== 'PGRST116') {
+          console.error('Erreur chargement symptômes:', error);
+        } else {
+          setTodaySymptoms(data);
+        }
+      } catch (error) {
+        console.error('Erreur chargement symptômes:', error);
+      } finally {
+        setLoadingSymptoms(false);
+      }
+    };
+
+    loadTodaySymptoms();
+  }, [user?.id]);
+
+  // Vue journal quotidien
+  if (currentView === 'journal') {
+    return <DailyJournalView onBack={() => setCurrentView('dashboard')} />;
+  }
+
   return (
     <div className="p-4 md:p-6 lg:p-8">
       <header className="mb-6 md:mb-8 lg:mb-10 text-center">
@@ -24,22 +66,55 @@ const DashboardView = () => {
               style={{ color: 'var(--color-primary-lavande)' }}>
             ✨ État du jour
           </h3>
-          <div className="space-y-3">
-            <div className="flex justify-between items-center">
-              <span style={{ color: 'var(--color-text-secondaire)' }}>Humeur</span>
-              <span className="font-medium badge-lavande">7/10 😊</span>
+
+          {loadingSymptoms ? (
+            <div className="space-y-3">
+              <div className="animate-pulse flex justify-between items-center">
+                <div className="h-4 bg-gray-200 rounded w-16"></div>
+                <div className="h-6 bg-gray-200 rounded w-20"></div>
+              </div>
+              <div className="animate-pulse flex justify-between items-center">
+                <div className="h-4 bg-gray-200 rounded w-16"></div>
+                <div className="h-6 bg-gray-200 rounded w-20"></div>
+              </div>
+              <div className="animate-pulse flex justify-between items-center">
+                <div className="h-4 bg-gray-200 rounded w-16"></div>
+                <div className="h-6 bg-gray-200 rounded w-20"></div>
+              </div>
             </div>
-            <div className="flex justify-between items-center">
-              <span style={{ color: 'var(--color-text-secondaire)' }}>Fatigue</span>
-              <span className="font-medium badge-bleu-ciel">3/5 😴</span>
+          ) : (
+            <div className="space-y-3">
+              {/* Fatigue */}
+              <div className="flex justify-between items-center">
+                <span style={{ color: 'var(--color-text-secondaire)' }}>Fatigue</span>
+                <span className="font-medium badge-bleu-ciel">
+                  {todaySymptoms?.fatigue_level ? `${todaySymptoms.fatigue_level}/5 ${todaySymptoms.fatigue_level <= 2 ? '🌟' : todaySymptoms.fatigue_level <= 3 ? '😴' : '😵'}` : 'Non renseigné'}
+                </span>
+              </div>
+
+              {/* Douleurs */}
+              <div className="flex justify-between items-center">
+                <span style={{ color: 'var(--color-text-secondaire)' }}>Douleurs</span>
+                <span className="font-medium badge-vert-sauge">
+                  {todaySymptoms?.pain_level ? `${todaySymptoms.pain_level}/5 ${todaySymptoms.pain_level <= 2 ? '✨' : todaySymptoms.pain_level <= 3 ? '😐' : '😣'}` : 'Non renseigné'}
+                </span>
+              </div>
+
+              {/* Flux menstruel */}
+              <div className="flex justify-between items-center">
+                <span style={{ color: 'var(--color-text-secondaire)' }}>Règles</span>
+                <span className="font-medium badge-lavande">
+                  {todaySymptoms?.period_flow ? `${todaySymptoms.period_flow}/5 🩸` : 'Aucun flux'}
+                </span>
+              </div>
             </div>
-            <div className="flex justify-between items-center">
-              <span style={{ color: 'var(--color-text-secondaire)' }}>Douleurs</span>
-              <span className="font-medium badge-vert-sauge">1/5 ✨</span>
-            </div>
-          </div>
-          <button className="w-full mt-4 btn-primary">
-            📝 Compléter journal
+          )}
+
+          <button
+            onClick={() => setCurrentView('journal')}
+            className="w-full mt-4 btn-primary"
+          >
+            📝 {todaySymptoms ? 'Modifier journal' : 'Compléter journal'}
           </button>
         </div>
 
@@ -110,14 +185,15 @@ const DashboardView = () => {
         </h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
           {[
-            { icon: '📝', label: 'Journal', style: 'btn-primary' },
-            { icon: '🧘', label: 'Respiration', style: 'btn-secondary' },
-            { icon: '🍽️', label: 'Nutrition', style: 'btn-accent-vert' },
-            { icon: '🏃', label: 'Activité', style: 'btn-accent-corail' },
-            { icon: '📊', label: 'Stats', style: 'btn-primary' }
+            { icon: '📝', label: 'Journal', style: 'btn-primary', action: () => setCurrentView('journal') },
+            { icon: '🧘', label: 'Respiration', style: 'btn-secondary', action: () => {} },
+            { icon: '🍽️', label: 'Nutrition', style: 'btn-accent-vert', action: () => {} },
+            { icon: '🏃', label: 'Activité', style: 'btn-accent-corail', action: () => {} },
+            { icon: '📊', label: 'Stats', style: 'btn-primary', action: () => {} }
           ].map((action) => (
             <button
               key={action.label}
+              onClick={action.action}
               className={`${action.style} p-4 flex flex-col items-center justify-center`}
             >
               <div className="text-2xl mb-1">{action.icon}</div>
