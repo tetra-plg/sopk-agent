@@ -1,6 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../../core/auth/AuthContext';
 import { symptomsService } from '../../cycle/services/symptomsService';
+import { useMealSuggestions } from '../../nutrition/hooks/useMealSuggestions';
+import MealDetailModal from '../../nutrition/components/MealDetailModal';
+import TrackingSuccess from '../../nutrition/components/TrackingSuccess';
+import BreathingSession from '../../stress/components/BreathingSession';
+import { techniques } from '../../stress/utils/breathingTechniques';
 import DailyJournalView from '../../cycle/views/DailyJournalView';
 
 const DashboardView = ({ onNavigate }) => {
@@ -8,6 +13,27 @@ const DashboardView = ({ onNavigate }) => {
   const [currentView, setCurrentView] = useState('dashboard');
   const [todaySymptoms, setTodaySymptoms] = useState(null);
   const [loadingSymptoms, setLoadingSymptoms] = useState(true);
+
+  // États pour les modales nutrition
+  const [selectedMeal, setSelectedMeal] = useState(null);
+  const [showMealModal, setShowMealModal] = useState(false);
+  const [trackedMeal, setTrackedMeal] = useState(null);
+  const [showTrackingSuccess, setShowTrackingSuccess] = useState(false);
+
+  // État pour la session de respiration
+  const [showBreathingSession, setShowBreathingSession] = useState(false);
+
+  // Hook pour les suggestions de repas
+  const mealSuggestions = useMealSuggestions({
+    userId: user?.id,
+    symptoms: todaySymptoms ? [
+      ...(todaySymptoms.fatigue_level >= 4 ? ['fatigue'] : []),
+      ...(todaySymptoms.pain_level >= 3 ? ['pain'] : [])
+    ] : [],
+    timeOfDay: new Date().getHours() < 12 ? 'breakfast' :
+               new Date().getHours() < 15 ? 'lunch' : 'dinner',
+    maxPrepTime: 30
+  });
 
   // Charger les symptômes du jour
   useEffect(() => {
@@ -36,10 +62,71 @@ const DashboardView = ({ onNavigate }) => {
     loadTodaySymptoms();
   }, [user?.id]);
 
-  // Vue journal quotidien (seule vue locale conservée)
+  // Vue journal quotidien
   if (currentView === 'journal') {
     return <DailyJournalView onBack={() => setCurrentView('dashboard')} />;
   }
+
+  // Session de respiration
+  if (showBreathingSession) {
+    return (
+      <div className="min-h-screen" style={{ backgroundColor: '#F9FAFB' }}>
+        <div className="max-w-4xl mx-auto px-4 py-6">
+          <BreathingSession
+            techniqueId="quick"
+            userId={user?.id}
+            onComplete={() => {
+              setShowBreathingSession(false);
+            }}
+            onExit={() => {
+              setShowBreathingSession(false);
+            }}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // Fonctions pour la gestion des repas
+  const handleShowMealDetails = () => {
+    const quickSuggestion = mealSuggestions.getQuickSuggestion();
+    if (quickSuggestion) {
+      setSelectedMeal(quickSuggestion);
+      setShowMealModal(true);
+    }
+  };
+
+  const handleTrackMeal = async (mealId, mealType) => {
+    try {
+      const result = await mealSuggestions.trackMealChosen(mealId, mealType, {
+        satisfaction: 5,
+        portion_size: 'normal'
+      });
+
+      if (result.success) {
+        const meal = mealSuggestions.allMeals.find(m => m.id === mealId);
+        setTrackedMeal(meal);
+        setShowTrackingSuccess(true);
+        setShowMealModal(false);
+      }
+    } catch (error) {
+      console.error('Erreur lors du tracking du repas:', error);
+    }
+  };
+
+  const handleQuickTrackMeal = async () => {
+    const quickSuggestion = mealSuggestions.getQuickSuggestion();
+    if (quickSuggestion) {
+      await handleTrackMeal(quickSuggestion.id, quickSuggestion.category);
+    }
+  };
+
+  const handleStartBreathingExercise = () => {
+    setShowBreathingSession(true);
+  };
+
+  // Obtenir la suggestion du jour
+  const todaySuggestion = mealSuggestions.getQuickSuggestion();
 
   return (
     <div className="p-4 md:p-6 lg:p-8">
@@ -61,7 +148,7 @@ const DashboardView = ({ onNavigate }) => {
       {/* Grid responsive mobile-first */}
       <div className="grid gap-4 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         {/* Widget État du jour - Prend toute la largeur sur mobile */}
-        <div className="card-dashboard p-4 md:p-6 col-span-1 sm:col-span-2 lg:col-span-1 transform hover:scale-105 transition-transform duration-200">
+        <div className="card-dashboard p-4 md:p-6 col-span-1 sm:col-span-2 lg:col-span-1 transform hover:scale-105 transition-transform duration-200 flex flex-col">
           <h3 className="font-heading text-lg font-semibold mb-4 flex items-center gap-2"
               style={{ color: 'var(--color-primary-lavande)' }}>
             ✨ État du jour
@@ -110,6 +197,7 @@ const DashboardView = ({ onNavigate }) => {
             </div>
           )}
 
+          <div className="flex-grow"></div>
           <button
             onClick={() => setCurrentView('journal')}
             className="w-full mt-4 btn-primary"
@@ -119,47 +207,102 @@ const DashboardView = ({ onNavigate }) => {
         </div>
 
         {/* Widget Nutrition */}
-        <div className="card-nutrition p-4 md:p-6 transform hover:scale-105 transition-transform duration-200">
+        <div className="card-nutrition p-4 md:p-6 transform hover:scale-105 transition-transform duration-200 flex flex-col">
           <h3 className="font-heading text-lg font-semibold mb-4 flex items-center gap-2"
               style={{ color: 'var(--color-accent-vert-sauge)' }}>
             🥗 Idée repas
           </h3>
-          <div className="mb-4">
-            <h4 className="font-medium mb-2" style={{ color: 'var(--color-text-principal)' }}>Bowl Quinoa-Avocat</h4>
-            <div className="flex gap-2 text-sm">
-              <span className="badge-vert-sauge">⏱️ 15min</span>
-              <span className="badge-vert-sauge">🟢 IG bas</span>
+
+          {mealSuggestions.loading ? (
+            <div className="space-y-3">
+              <div className="animate-pulse">
+                <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                <div className="flex gap-2">
+                  <div className="h-6 bg-gray-200 rounded w-16"></div>
+                  <div className="h-6 bg-gray-200 rounded w-16"></div>
+                </div>
+              </div>
             </div>
-          </div>
-          <p className="text-sm font-emotional italic mb-4" style={{ color: 'var(--color-text-secondaire)' }}>
-            💚 Parfait contre la fatigue
-          </p>
-          <div className="flex gap-2">
-            <button className="flex-1 btn-accent-vert text-sm">
-              Voir recette
-            </button>
-            <button className="btn-accent-vert px-3">
-              ✅
-            </button>
-          </div>
+          ) : todaySuggestion ? (
+            <>
+              <div className="mb-4">
+                <h4 className="font-medium mb-2" style={{ color: 'var(--color-text-principal)' }}>
+                  {todaySuggestion.name}
+                </h4>
+                <div className="flex gap-2 text-sm">
+                  <span className="badge-vert-sauge">⏱️ {todaySuggestion.prep_time_minutes}min</span>
+                  {todaySuggestion.glycemic_index_category === 'low' && (
+                    <span className="badge-vert-sauge">🟢 IG bas</span>
+                  )}
+                </div>
+              </div>
+              <p className="text-sm font-emotional italic mb-4" style={{ color: 'var(--color-text-secondaire)' }}>
+                💚 {todaySuggestion.tips || 'Parfait pour votre bien-être'}
+              </p>
+              <div className="flex-grow"></div>
+              <div className="flex gap-2">
+                <button
+                  onClick={handleShowMealDetails}
+                  className="flex-1 btn-accent-vert text-sm"
+                >
+                  Voir recette
+                </button>
+                <button
+                  onClick={handleQuickTrackMeal}
+                  className="btn-accent-vert px-3"
+                  title="Marquer comme consommé"
+                >
+                  ✅
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="mb-4">
+                <h4 className="font-medium mb-2" style={{ color: 'var(--color-text-principal)' }}>
+                  Aucune suggestion
+                </h4>
+                <p className="text-sm" style={{ color: 'var(--color-text-secondaire)' }}>
+                  Complétez votre journal pour des suggestions personnalisées
+                </p>
+              </div>
+              <div className="flex-grow"></div>
+              <button
+                onClick={() => onNavigate ? onNavigate('/nutrition') : {}}
+                className="w-full btn-accent-vert text-sm"
+              >
+                Explorer les repas
+              </button>
+            </>
+          )}
         </div>
 
         {/* Widget Bien-être */}
-        <div className="card-stress p-4 md:p-6 transform hover:scale-105 transition-transform duration-200">
+        <div className="card-stress p-4 md:p-6 transform hover:scale-105 transition-transform duration-200 flex flex-col">
           <h3 className="font-heading text-lg font-semibold mb-4 flex items-center gap-2"
               style={{ color: 'var(--color-primary-bleu-ciel)' }}>
             🧘 Pause bien-être
           </h3>
           <div className="mb-4">
-            <p className="text-sm mb-2" style={{ color: 'var(--color-text-secondaire)' }}>
-              🌟 3 sessions cette semaine
-            </p>
-            <p className="text-sm font-medium text-motivational">
-              Belle régularité !
-            </p>
+            <div className="mb-3">
+              <h4 className="font-medium mb-1" style={{ color: 'var(--color-text-principal)' }}>
+                {techniques.quick.name}
+              </h4>
+              <p className="text-sm" style={{ color: 'var(--color-text-secondaire)' }}>
+                {techniques.quick.description} • {Math.floor(techniques.quick.duration / 60)} min
+              </p>
+            </div>
+            <div className="flex gap-2 text-xs">
+              <span className="badge-bleu-ciel">⚡ Express</span>
+              <span className="badge-bleu-ciel">🫁 Anti-stress</span>
+            </div>
           </div>
-          <button className="w-full btn-secondary">
-            🧘 Respiration 5min
+          <div className="flex-grow"></div>
+          <button
+            onClick={handleStartBreathingExercise}
+            className="w-full btn-secondary"
+          >
+            {techniques.quick.icon} Commencer maintenant
           </button>
         </div>
       </div>
@@ -176,6 +319,40 @@ const DashboardView = ({ onNavigate }) => {
           Pense à inclure du saumon, des noix ou des graines de lin dans tes repas !"
         </p>
       </div>
+
+      {/* Modales et composants overlay */}
+      {showMealModal && selectedMeal && (
+        <MealDetailModal
+          meal={selectedMeal}
+          isOpen={showMealModal}
+          onClose={() => {
+            setShowMealModal(false);
+            setSelectedMeal(null);
+          }}
+          onTrackMeal={handleTrackMeal}
+        />
+      )}
+
+      {showTrackingSuccess && trackedMeal && (
+        <TrackingSuccess
+          meal={trackedMeal}
+          isVisible={showTrackingSuccess}
+          onClose={() => {
+            setShowTrackingSuccess(false);
+            setTrackedMeal(null);
+          }}
+          onViewHistory={() => {
+            onNavigate && onNavigate('/nutrition/history');
+            setShowTrackingSuccess(false);
+            setTrackedMeal(null);
+          }}
+          onRateMeal={(rating) => {
+            console.log('Meal rated:', rating);
+            setShowTrackingSuccess(false);
+            setTrackedMeal(null);
+          }}
+        />
+      )}
     </div>
   );
 };

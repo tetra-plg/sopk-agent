@@ -29,7 +29,7 @@ const AppNavigation = ({ children, currentRoute = '/dashboard', onRouteChange })
               SOPK
             </h1>
           </div>
-          <button
+          {/* <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="p-2 rounded-lg"
             style={{ color: 'var(--color-primary-lavande)' }}
@@ -41,7 +41,7 @@ const AppNavigation = ({ children, currentRoute = '/dashboard', onRouteChange })
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               )}
             </svg>
-          </button>
+          </button> */}
         </div>
       </header>
 
