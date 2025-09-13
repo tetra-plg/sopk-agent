@@ -10,6 +10,7 @@ import { useAuth } from '../../../core/auth/AuthContext';
 import nutritionService from '../services/nutritionService';
 import SuggestionCard from '../components/SuggestionCard';
 import MealDetailModal from '../components/MealDetailModal';
+import TrackingSuccess from '../components/TrackingSuccess';
 import trackingService from '../services/trackingService';
 
 const RecipeLibraryView = ({ onBack }) => {
@@ -22,6 +23,8 @@ const RecipeLibraryView = ({ onBack }) => {
   const [maxPrepTime, setMaxPrepTime] = useState('');
   const [selectedMeal, setSelectedMeal] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [trackedMeal, setTrackedMeal] = useState(null);
+  const [showTrackingSuccess, setShowTrackingSuccess] = useState(false);
 
   // Catégories de repas
   const categories = [
@@ -112,6 +115,13 @@ const RecipeLibraryView = ({ onBack }) => {
         satisfaction_rating: 5,
         will_remake: true
       });
+
+      // Trouver la recette trackée pour l'affichage
+      const meal = filteredRecipes.find(r => r.id === mealId);
+      if (meal) {
+        setTrackedMeal(meal);
+        setShowTrackingSuccess(true);
+      }
     } catch (error) {
       console.error('Erreur tracking repas:', error);
     }
@@ -122,6 +132,18 @@ const RecipeLibraryView = ({ onBack }) => {
     setSelectedCategory('all');
     setSelectedDifficulty('all');
     setMaxPrepTime('');
+  };
+
+  const handleViewHistory = () => {
+    // TODO: Implémenter navigation vers historique nutrition
+    console.log('Navigation vers historique nutrition');
+  };
+
+  const handleRateMeal = async (rating) => {
+    if (trackedMeal) {
+      // Ici on pourrait mettre à jour la note du repas
+      console.log('Rating meal:', trackedMeal.name, rating);
+    }
   };
 
   return (
@@ -283,6 +305,18 @@ const RecipeLibraryView = ({ onBack }) => {
         isOpen={showModal}
         onClose={() => setShowModal(false)}
         onTrackMeal={handleTrackMeal}
+      />
+
+      {/* Notification tracking success */}
+      <TrackingSuccess
+        meal={trackedMeal}
+        isVisible={showTrackingSuccess}
+        onClose={() => {
+          setShowTrackingSuccess(false);
+          setTrackedMeal(null);
+        }}
+        onViewHistory={handleViewHistory}
+        onRateMeal={handleRateMeal}
       />
 
       {/* Footer informatif */}
