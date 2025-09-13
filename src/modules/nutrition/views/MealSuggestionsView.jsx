@@ -10,9 +10,11 @@ import { useAuth } from '../../../core/auth/AuthContext';
 import { useMealSuggestions } from '../hooks/useMealSuggestions';
 import SuggestionCard from '../components/SuggestionCard';
 import MealDetailModal from '../components/MealDetailModal';
+import RecipeLibraryView from './RecipeLibraryView';
 
 const MealSuggestionsView = ({ onBack }) => {
   const { user } = useAuth();
+  const [currentView, setCurrentView] = useState('suggestions'); // 'suggestions' ou 'library'
 
   // Contexte utilisateur stable (mémorisé pour éviter les re-renders)
   const userContext = useMemo(() => ({
@@ -128,6 +130,15 @@ const MealSuggestionsView = ({ onBack }) => {
     return labels[type] || type;
   };
 
+  // Vue bibliothèque de recettes
+  if (currentView === 'library') {
+    return (
+      <RecipeLibraryView
+        onBack={() => setCurrentView('suggestions')}
+      />
+    );
+  }
+
   if (!isReady) {
     return (
       <div className="p-6" style={{ backgroundColor: '#F9FAFB', minHeight: '100vh' }}>
@@ -179,43 +190,56 @@ const MealSuggestionsView = ({ onBack }) => {
         </div>
       </div>
 
-      {/* Filtres rapides */}
+      {/* Navigation et filtres */}
       <div className="mb-8">
-        <div className="flex flex-wrap gap-3 items-center">
-          <label className="text-sm font-medium" style={{ color: '#1F2937' }}>
-            Type de repas :
-          </label>
-          {['any', 'breakfast', 'lunch', 'snack', 'dinner'].map(type => (
+        <div className="flex flex-wrap gap-3 items-center justify-between">
+          <div className="flex flex-wrap gap-3 items-center">
+            <label className="text-sm font-medium" style={{ color: '#1F2937' }}>
+              Type de repas :
+            </label>
+            {['any', 'breakfast', 'lunch', 'snack', 'dinner'].map(type => (
+              <button
+                key={type}
+                onClick={() => setFilters(prev => ({ ...prev, mealType: type }))}
+                className="px-4 py-2 rounded-xl text-sm font-medium transition-colors"
+                style={{
+                  backgroundColor: filters.mealType === type ? '#6EE7B7' : '#F3F4F6',
+                  color: filters.mealType === type ? 'white' : '#6B7280'
+                }}
+                onMouseEnter={(e) => {
+                  if (filters.mealType !== type) {
+                    e.target.style.backgroundColor = '#E5E7EB';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (filters.mealType !== type) {
+                    e.target.style.backgroundColor = '#F3F4F6';
+                  }
+                }}
+              >
+                {getMealTypeLabel(type)}
+              </button>
+            ))}
             <button
-              key={type}
-              onClick={() => setFilters(prev => ({ ...prev, mealType: type }))}
-              className="px-4 py-2 rounded-xl text-sm font-medium transition-colors"
-              style={{
-                backgroundColor: filters.mealType === type ? '#6EE7B7' : '#F3F4F6',
-                color: filters.mealType === type ? 'white' : '#6B7280'
-              }}
-              onMouseEnter={(e) => {
-                if (filters.mealType !== type) {
-                  e.target.style.backgroundColor = '#E5E7EB';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (filters.mealType !== type) {
-                  e.target.style.backgroundColor = '#F3F4F6';
-                }
-              }}
+              onClick={handleRefreshSuggestions}
+              className="ml-4 px-4 py-2 rounded-xl text-sm font-medium transition-colors"
+              style={{ backgroundColor: 'rgba(110, 231, 183, 0.2)', color: '#1F2937' }}
+              onMouseEnter={(e) => e.target.style.backgroundColor = 'rgba(110, 231, 183, 0.3)'}
+              onMouseLeave={(e) => e.target.style.backgroundColor = 'rgba(110, 231, 183, 0.2)'}
             >
-              {getMealTypeLabel(type)}
+              🔄 Rafraîchir
             </button>
-          ))}
+          </div>
+
+          {/* Bouton bibliothèque recettes */}
           <button
-            onClick={handleRefreshSuggestions}
-            className="ml-4 px-4 py-2 rounded-xl text-sm font-medium transition-colors"
-            style={{ backgroundColor: 'rgba(110, 231, 183, 0.2)', color: '#1F2937' }}
-            onMouseEnter={(e) => e.target.style.backgroundColor = 'rgba(110, 231, 183, 0.3)'}
-            onMouseLeave={(e) => e.target.style.backgroundColor = 'rgba(110, 231, 183, 0.2)'}
+            onClick={() => setCurrentView('library')}
+            className="px-6 py-2 rounded-xl text-sm font-medium transition-colors"
+            style={{ backgroundColor: '#6EE7B7', color: '#1F2937' }}
+            onMouseEnter={(e) => e.target.style.backgroundColor = '#34D399'}
+            onMouseLeave={(e) => e.target.style.backgroundColor = '#6EE7B7'}
           >
-            🔄 Rafraîchir
+            📚 Bibliothèque Recettes IG Bas
           </button>
         </div>
       </div>

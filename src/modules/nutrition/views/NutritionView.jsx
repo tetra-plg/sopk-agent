@@ -5,11 +5,12 @@ import SuggestionCard from '../components/SuggestionCard';
 import MealDetailModal from '../components/MealDetailModal';
 import TrackingSuccess from '../components/TrackingSuccess';
 import MealSuggestionsView from './MealSuggestionsView';
+import RecipeLibraryView from './RecipeLibraryView';
 import trackingService from '../services/trackingService';
 
 const NutritionView = () => {
   const { user } = useAuth();
-  const [currentView, setCurrentView] = useState('overview'); // 'overview', 'suggestions'
+  const [currentView, setCurrentView] = useState('overview'); // 'overview', 'suggestions', 'library'
   const [selectedMeal, setSelectedMeal] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [trackedMeal, setTrackedMeal] = useState(null);
@@ -144,6 +145,11 @@ const NutritionView = () => {
   // Vue suggestions complètes
   if (currentView === 'suggestions') {
     return <MealSuggestionsView onBack={() => setCurrentView('overview')} />;
+  }
+
+  // Vue bibliothèque de recettes
+  if (currentView === 'library') {
+    return <RecipeLibraryView onBack={() => setCurrentView('overview')} />;
   }
 
   // Vue d'entrée du module
@@ -317,10 +323,10 @@ const NutritionView = () => {
 
           {/* Navigation claire */}
           {isReady && primarySuggestion && (
-            <section className="text-center">
+            <section className="text-center space-y-4">
               <button
                 onClick={handleNavigateToSuggestions}
-                className="px-8 py-3 rounded-xl font-medium transition-colors"
+                className="px-8 py-3 rounded-xl font-medium transition-colors mr-4"
                 style={{
                   backgroundColor: '#6EE7B7',
                   color: '#1F2937'
@@ -329,6 +335,19 @@ const NutritionView = () => {
                 onMouseLeave={(e) => e.target.style.backgroundColor = '#6EE7B7'}
               >
                 Voir toutes les suggestions →
+              </button>
+              <button
+                onClick={() => setCurrentView('library')}
+                className="px-8 py-3 rounded-xl font-medium transition-colors"
+                style={{
+                  backgroundColor: 'rgba(110, 231, 183, 0.2)',
+                  color: '#1F2937',
+                  border: '2px solid #6EE7B7'
+                }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = 'rgba(110, 231, 183, 0.3)'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = 'rgba(110, 231, 183, 0.2)'}
+              >
+                📚 Bibliothèque Recettes IG Bas
               </button>
             </section>
           )}
@@ -350,16 +369,29 @@ const NutritionView = () => {
                     return "Explore le catalogue pour trouver le repas parfait !";
                   })()}
                 </p>
-                <button
-                  onClick={handleNavigateToSuggestions}
-                  className="px-6 py-2 rounded-xl font-medium transition-colors"
-                  style={{
-                    backgroundColor: '#6EE7B7',
-                    color: '#1F2937'
-                  }}
-                >
-                  Voir le catalogue →
-                </button>
+                <div className="space-x-4">
+                  <button
+                    onClick={handleNavigateToSuggestions}
+                    className="px-6 py-2 rounded-xl font-medium transition-colors"
+                    style={{
+                      backgroundColor: '#6EE7B7',
+                      color: '#1F2937'
+                    }}
+                  >
+                    Voir le catalogue →
+                  </button>
+                  <button
+                    onClick={() => setCurrentView('library')}
+                    className="px-6 py-2 rounded-xl font-medium transition-colors"
+                    style={{
+                      backgroundColor: 'rgba(110, 231, 183, 0.2)',
+                      color: '#1F2937',
+                      border: '2px solid #6EE7B7'
+                    }}
+                  >
+                    📚 Recettes IG Bas
+                  </button>
+                </div>
               </div>
             </section>
           )}
