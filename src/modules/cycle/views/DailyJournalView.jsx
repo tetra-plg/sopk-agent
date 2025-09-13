@@ -3,10 +3,12 @@ import { useAuth } from '../../../core/auth/AuthContext';
 import { symptomsService } from '../services/symptomsService';
 import { useJournalForm } from '../hooks/useJournalForm';
 import { useAutoSave } from '../hooks/useAutoSave';
+import { useMoodJournal } from '../../stress/hooks/useMoodJournal';
 
 import DateNavigator from '../../../shared/components/DateNavigator';
 import SymptomSlider from '../components/SymptomSlider';
 import MoodPicker from '../components/MoodPicker';
+import NewMoodPicker from '../../stress/components/mood/MoodPicker';
 import NotesInput from '../components/NotesInput';
 
 import {
@@ -48,6 +50,9 @@ export default function DailyJournalView({ onBack }) {
     markAsSaved,
     setLoadingState
   });
+
+  // Hook pour le mood journal
+  const moodJournal = useMoodJournal(currentDate);
 
   // Charger les données existantes lors du changement de date
   useEffect(() => {
@@ -241,11 +246,13 @@ export default function DailyJournalView({ onBack }) {
           icon={<ExclamationTriangleIcon className="h-6 w-6" />}
         />
 
-        {/* Mood Picker */}
-        <MoodPicker
-          value={formData.mood_score}
-          onChange={(value) => updateField('mood_score', value)}
-          title="Comment vous sentez-vous aujourd'hui ?"
+        {/* Mood Journal - Nouveau composant émotionnel */}
+        <NewMoodPicker
+          value={moodJournal.moodData}
+          onChange={moodJournal.updateField}
+          compact={true}
+          autoSave={true}
+          showTitle={true}
         />
 
         {/* Notes */}
