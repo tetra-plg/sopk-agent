@@ -174,10 +174,10 @@ const MealSuggestionsView = ({ onBack }) => {
           </div>
         )}
         <h1 className="text-3xl font-bold mb-2" style={{ color: '#1F2937' }}>
-          🍽️ Suggestions Repas
+          🎯 Suggestions Personnalisées
         </h1>
         <p style={{ color: '#6B7280' }}>
-          Idées personnalisées selon vos symptômes et besoins SOPK
+          Recommandations adaptées à tes symptômes, cycle et préférences
         </p>
       </header>
 
@@ -231,7 +231,7 @@ const MealSuggestionsView = ({ onBack }) => {
             </button>
           </div>
 
-          {/* Bouton bibliothèque recettes */}
+          {/* Bouton catalogue recettes */}
           <button
             onClick={() => setCurrentView('library')}
             className="px-6 py-2 rounded-xl text-sm font-medium transition-colors"
@@ -239,7 +239,7 @@ const MealSuggestionsView = ({ onBack }) => {
             onMouseEnter={(e) => e.target.style.backgroundColor = '#34D399'}
             onMouseLeave={(e) => e.target.style.backgroundColor = '#6EE7B7'}
           >
-            📚 Bibliothèque Recettes IG Bas
+            📚 Catalogue IG Bas
           </button>
         </div>
       </div>

@@ -324,31 +324,40 @@ const NutritionView = () => {
           {/* Navigation claire */}
           {isReady && primarySuggestion && (
             <section className="text-center space-y-4">
-              <button
-                onClick={handleNavigateToSuggestions}
-                className="px-8 py-3 rounded-xl font-medium transition-colors mr-4"
-                style={{
-                  backgroundColor: '#6EE7B7',
-                  color: '#1F2937'
-                }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = '#34D399'}
-                onMouseLeave={(e) => e.target.style.backgroundColor = '#6EE7B7'}
-              >
-                Voir toutes les suggestions →
-              </button>
-              <button
-                onClick={() => setCurrentView('library')}
-                className="px-8 py-3 rounded-xl font-medium transition-colors"
-                style={{
-                  backgroundColor: 'rgba(110, 231, 183, 0.2)',
-                  color: '#1F2937',
-                  border: '2px solid #6EE7B7'
-                }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = 'rgba(110, 231, 183, 0.3)'}
-                onMouseLeave={(e) => e.target.style.backgroundColor = 'rgba(110, 231, 183, 0.2)'}
-              >
-                📚 Bibliothèque Recettes IG Bas
-              </button>
+              <div className="space-y-3">
+                <button
+                  onClick={handleNavigateToSuggestions}
+                  className="px-8 py-3 rounded-xl font-medium transition-colors block w-full"
+                  style={{
+                    backgroundColor: '#6EE7B7',
+                    color: '#1F2937'
+                  }}
+                  onMouseEnter={(e) => e.target.style.backgroundColor = '#34D399'}
+                  onMouseLeave={(e) => e.target.style.backgroundColor = '#6EE7B7'}
+                >
+                  🎯 Suggestions Personnalisées
+                </button>
+                <p className="text-sm text-gray-600 mb-4">
+                  Recommandations adaptées à tes symptômes et cycle
+                </p>
+
+                <button
+                  onClick={() => setCurrentView('library')}
+                  className="px-8 py-3 rounded-xl font-medium transition-colors block w-full"
+                  style={{
+                    backgroundColor: 'rgba(110, 231, 183, 0.2)',
+                    color: '#1F2937',
+                    border: '2px solid #6EE7B7'
+                  }}
+                  onMouseEnter={(e) => e.target.style.backgroundColor = 'rgba(110, 231, 183, 0.3)'}
+                  onMouseLeave={(e) => e.target.style.backgroundColor = 'rgba(110, 231, 183, 0.2)'}
+                >
+                  📚 Catalogue Recettes IG Bas
+                </button>
+                <p className="text-sm text-gray-600">
+                  Explorer toutes nos recettes spéciales SOPK
+                </p>
+              </div>
             </section>
           )}
 
@@ -369,27 +378,27 @@ const NutritionView = () => {
                     return "Explore le catalogue pour trouver le repas parfait !";
                   })()}
                 </p>
-                <div className="space-x-4">
+                <div className="space-y-3">
                   <button
                     onClick={handleNavigateToSuggestions}
-                    className="px-6 py-2 rounded-xl font-medium transition-colors"
+                    className="px-6 py-2 rounded-xl font-medium transition-colors block"
                     style={{
                       backgroundColor: '#6EE7B7',
                       color: '#1F2937'
                     }}
                   >
-                    Voir le catalogue →
+                    🎯 Suggestions Personnalisées
                   </button>
                   <button
                     onClick={() => setCurrentView('library')}
-                    className="px-6 py-2 rounded-xl font-medium transition-colors"
+                    className="px-6 py-2 rounded-xl font-medium transition-colors block"
                     style={{
                       backgroundColor: 'rgba(110, 231, 183, 0.2)',
                       color: '#1F2937',
                       border: '2px solid #6EE7B7'
                     }}
                   >
-                    📚 Recettes IG Bas
+                    📚 Catalogue Recettes IG Bas
                   </button>
                 </div>
               </div>

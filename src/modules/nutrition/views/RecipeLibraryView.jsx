@@ -139,10 +139,10 @@ const RecipeLibraryView = ({ onBack }) => {
           </button>
           <div>
             <h1 className="text-3xl font-bold" style={{ color: '#1F2937' }}>
-              📚 Bibliothèque Recettes IG Bas
+              📚 Catalogue Recettes IG Bas
             </h1>
             <p style={{ color: '#6B7280' }}>
-              {filteredRecipes.length} recette{filteredRecipes.length !== 1 ? 's' : ''} adaptée{filteredRecipes.length !== 1 ? 's' : ''} SOPK
+              {filteredRecipes.length} recette{filteredRecipes.length !== 1 ? 's' : ''} spéciale{filteredRecipes.length !== 1 ? 's' : ''} SOPK • Toutes à index glycémique bas
             </p>
           </div>
         </div>
