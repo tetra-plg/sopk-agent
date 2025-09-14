@@ -119,6 +119,45 @@ function parseRichText(text) {
   return segments.filter(segment => segment.text?.content || segment.text?.link);
 }
 
+// Fonction pour diviser le contenu en pages si nécessaire
+function splitContentIntoPages(blocks, maxBlocksPerPage = 100) {
+  const maxTextLength = 2000; // Limite Notion pour le texte
+
+  // D'abord, corriger les blocs qui dépassent la limite de texte
+  const fixedBlocks = blocks.map(block => {
+    const newBlock = JSON.parse(JSON.stringify(block)); // Deep copy
+
+    // Fonction pour limiter le texte dans rich_text
+    const limitRichText = (richTextArray) => {
+      if (!richTextArray) return;
+      for (const richText of richTextArray) {
+        if (richText.text?.content && richText.text.content.length > maxTextLength) {
+          richText.text.content = richText.text.content.substring(0, maxTextLength - 3) + '...';
+        }
+      }
+    };
+
+    // Appliquer la limitation à tous les types de blocs
+    if (newBlock.paragraph?.rich_text) limitRichText(newBlock.paragraph.rich_text);
+    if (newBlock.heading_1?.rich_text) limitRichText(newBlock.heading_1.rich_text);
+    if (newBlock.heading_2?.rich_text) limitRichText(newBlock.heading_2.rich_text);
+    if (newBlock.heading_3?.rich_text) limitRichText(newBlock.heading_3.rich_text);
+    if (newBlock.bulleted_list_item?.rich_text) limitRichText(newBlock.bulleted_list_item.rich_text);
+    if (newBlock.numbered_list_item?.rich_text) limitRichText(newBlock.numbered_list_item.rich_text);
+    if (newBlock.quote?.rich_text) limitRichText(newBlock.quote.rich_text);
+
+    return newBlock;
+  });
+
+  // Diviser en pages si nécessaire
+  const pages = [];
+  for (let i = 0; i < fixedBlocks.length; i += maxBlocksPerPage) {
+    pages.push(fixedBlocks.slice(i, i + maxBlocksPerPage));
+  }
+
+  return pages;
+}
+
 // Fonction pour convertir markdown en blocs Notion
 function markdownToNotionBlocks(markdown) {
   // Supprimer le frontmatter
@@ -143,15 +182,64 @@ function markdownToNotionBlocks(markdown) {
         codeBlockContent = [];
       } else {
         inCodeBlock = false;
+        // Valider et normaliser le langage pour Notion
+        const validLanguages = [
+          'abap', 'abc', 'agda', 'arduino', 'ascii art', 'assembly', 'bash', 'basic', 'bnf',
+          'c', 'c#', 'c++', 'clojure', 'coffeescript', 'coq', 'css', 'dart', 'dhall', 'diff',
+          'docker', 'ebnf', 'elixir', 'elm', 'erlang', 'f#', 'flow', 'fortran', 'gherkin',
+          'glsl', 'go', 'graphql', 'groovy', 'haskell', 'hcl', 'html', 'idris', 'java',
+          'javascript', 'json', 'julia', 'kotlin', 'latex', 'less', 'lisp', 'livescript',
+          'llvm ir', 'lua', 'makefile', 'markdown', 'markup', 'matlab', 'mathematica',
+          'mermaid', 'nix', 'notion formula', 'objective-c', 'ocaml', 'pascal', 'perl',
+          'php', 'plain text', 'powershell', 'prolog', 'protobuf', 'purescript', 'python',
+          'r', 'racket', 'reason', 'ruby', 'rust', 'sass', 'scala', 'scheme', 'scss',
+          'shell', 'smalltalk'
+        ];
+
+        let language = codeBlockLanguage.toLowerCase() || 'plain text';
+
+        // Mapper des alias courants vers les langages Notion
+        const languageMap = {
+          'js': 'javascript',
+          'ts': 'javascript',
+          'tsx': 'javascript',
+          'jsx': 'javascript',
+          'py': 'python',
+          'rb': 'ruby',
+          'sh': 'shell',
+          'yml': 'yaml',
+          'yaml': 'markup',
+          'xml': 'markup',
+          'md': 'markdown',
+          'cpp': 'c++',
+          'hpp': 'c++',
+          'cs': 'c#',
+          'fs': 'f#'
+        };
+
+        if (languageMap[language]) {
+          language = languageMap[language];
+        }
+
+        if (!validLanguages.includes(language)) {
+          language = 'plain text';
+        }
+
+        // Limiter le contenu du code à 2000 caractères
+        let codeContent = codeBlockContent.join('\n');
+        if (codeContent.length > 2000) {
+          codeContent = codeContent.substring(0, 1997) + '...';
+        }
+
         blocks.push({
           object: 'block',
           type: 'code',
           code: {
             rich_text: [{
               type: 'text',
-              text: { content: codeBlockContent.join('\n') }
+              text: { content: codeContent }
             }],
-            language: codeBlockLanguage || 'plain text'
+            language: language
           }
         });
         codeBlockContent = [];
@@ -269,7 +357,7 @@ function markdownToNotionBlocks(markdown) {
     }
   }
 
-  return blocks;
+  return blocks; // La division en pages se fera plus tard
 }
 
 // Fonction pour créer une page Notion
@@ -291,7 +379,7 @@ async function createNotionPage(parentId, title, blocks) {
             }]
           }
         },
-        children: blocks.slice(0, 100) // Notion limite à 100 blocs par requête
+        children: blocks // Déjà limité par splitContentIntoPages()
       })
     });
 
@@ -387,7 +475,7 @@ async function updateNotionPage(pageId, title, blocks) {
         'Notion-Version': NOTION_VERSION
       },
       body: JSON.stringify({
-        children: blocks.slice(0, 100) // Notion limite à 100 blocs par requête
+        children: blocks // Déjà limité par splitContentIntoPages()
       })
     });
 
@@ -506,27 +594,93 @@ async function syncDocsToNotion() {
 
     // Si la mise à jour a échoué ou pas d'ID, créer une nouvelle page
     if (!success) {
-      const newPageId = await createNotionPage(parentId, title, blocks);
-      if (newPageId) {
-        success = true;
-        createdCount++;
+      // Diviser le contenu en pages si nécessaire
+      const pages = splitContentIntoPages(blocks);
 
-        // Mettre à jour le frontmatter avec le nouvel ID
-        const newFrontmatter = `---
+      if (pages.length === 1) {
+        // Une seule page - création simple
+        const newPageId = await createNotionPage(parentId, title, pages[0]);
+        if (newPageId) {
+          success = true;
+          createdCount++;
+
+          // Mettre à jour le frontmatter avec le nouvel ID
+          const newFrontmatter = `---
 notion_page_id: "${newPageId}"
 notion_parent_page_id: "${parentId}"
 title: "${title}"
 ---
 
 `;
-        const contentWithoutFrontmatter = content.replace(/^---\s*\n[\s\S]*?\n---\s*\n/, '');
-        const newContent = newFrontmatter + contentWithoutFrontmatter;
+          const contentWithoutFrontmatter = content.replace(/^---\s*\n[\s\S]*?\n---\s*\n/, '');
+          const newContent = newFrontmatter + contentWithoutFrontmatter;
 
-        try {
-          fs.writeFileSync(filePath, newContent);
-          console.log(`📝 Updated frontmatter for ${path.basename(filePath)}`);
-        } catch (error) {
-          console.log(`⚠️  Could not update frontmatter for ${path.basename(filePath)}: ${error.message}`);
+          try {
+            fs.writeFileSync(filePath, newContent);
+            console.log(`📝 Updated frontmatter for ${path.basename(filePath)}`);
+          } catch (error) {
+            console.log(`⚠️  Could not update frontmatter for ${path.basename(filePath)}: ${error.message}`);
+          }
+        }
+      } else {
+        // Plusieurs pages - créer page principale + sous-pages
+        console.log(`📚 Content too large, creating ${pages.length} pages for: ${title}`);
+
+        // Créer la page principale avec un résumé
+        const mainPageContent = [
+          {
+            object: 'block',
+            type: 'paragraph',
+            paragraph: {
+              rich_text: [{
+                type: 'text',
+                text: { content: `Ce document est divisé en ${pages.length} parties en raison de sa taille.` }
+              }]
+            }
+          },
+          {
+            object: 'block',
+            type: 'divider',
+            divider: {}
+          }
+        ];
+
+        const mainPageId = await createNotionPage(parentId, title, mainPageContent);
+        if (mainPageId) {
+          success = true;
+          createdCount++;
+
+          // Créer les sous-pages
+          for (let i = 0; i < pages.length; i++) {
+            const subPageTitle = `${title} - Partie ${i + 1}`;
+            const subPageId = await createNotionPage(mainPageId, subPageTitle, pages[i]);
+
+            if (subPageId) {
+              createdCount++;
+              console.log(`📄 Created sub-page ${i + 1}/${pages.length}: ${subPageTitle}`);
+            }
+
+            // Attendre entre chaque création pour éviter le rate limiting
+            await new Promise(resolve => setTimeout(resolve, 1000));
+          }
+
+          // Mettre à jour le frontmatter avec l'ID de la page principale
+          const newFrontmatter = `---
+notion_page_id: "${mainPageId}"
+notion_parent_page_id: "${parentId}"
+title: "${title}"
+---
+
+`;
+          const contentWithoutFrontmatter = content.replace(/^---\s*\n[\s\S]*?\n---\s*\n/, '');
+          const newContent = newFrontmatter + contentWithoutFrontmatter;
+
+          try {
+            fs.writeFileSync(filePath, newContent);
+            console.log(`📝 Updated frontmatter for ${path.basename(filePath)}`);
+          } catch (error) {
+            console.log(`⚠️  Could not update frontmatter for ${path.basename(filePath)}: ${error.message}`);
+          }
         }
       }
     }
