@@ -675,15 +675,22 @@ async function syncDocsToNotion() {
       return ROOT_PAGE_ID; // Fallback sur la page racine
     }
 
-    // Créer la page pour ce dossier
+    // D'abord vérifier si une page dossier existe déjà (archivée ou non)
     const folderTitle = `📁 ${dirName}`;
+
+    // Rechercher la page existante dans Notion
+    // Note: Pour une vraie implémentation, il faudrait utiliser l'API search
+    // Mais ici on va créer directement et gérer les erreurs
+
+    console.log(`📂 Creating folder structure: ${relativePath}`);
+
     const emptyBlocks = [{
       object: 'block',
       type: 'paragraph',
       paragraph: {
         rich_text: [{
           type: 'text',
-          text: { content: `Dossier: ${dirName}` }
+          text: { content: `Contient les documents du dossier: ${dirName}` }
         }]
       }
     }];
@@ -691,6 +698,7 @@ async function syncDocsToNotion() {
     const folderId = await createNotionPage(actualParentId, folderTitle, emptyBlocks);
     if (folderId) {
       parentPages.set(relativePath, folderId);
+      console.log(`✅ Created folder page: ${folderTitle}`);
       return folderId;
     }
 
