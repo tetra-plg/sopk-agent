@@ -13,7 +13,9 @@ const SuggestionCard = ({
   meal,
   onViewDetails,
   onTrackMeal,
+  onStartCooking,
   compact = false,
+  showCookingButton = false,
   className = ''
 }) => {
   const handleTrackMeal = () => {
@@ -22,6 +24,10 @@ const SuggestionCard = ({
 
   const handleViewDetails = () => {
     onViewDetails(meal);
+  };
+
+  const handleStartCooking = () => {
+    onStartCooking && onStartCooking(meal);
   };
 
   const cardClasses = compact
@@ -33,7 +39,7 @@ const SuggestionCard = ({
       {/* En-tête avec titre et action rapide */}
       <div className="flex justify-between items-start mb-3">
         <h3 className={`font-semibold text-gray-800 ${compact ? 'text-base' : 'text-lg'}`}>
-          {meal.name}
+          {meal.title || meal.name}
         </h3>
       </div>
 
@@ -96,17 +102,31 @@ const SuggestionCard = ({
       )}
 
       {/* Actions */}
-      <div className={`flex gap-2 ${compact ? 'flex-col' : ''}`}>
+      <div className={`flex gap-2 ${compact ? 'flex-col' : showCookingButton ? 'flex-wrap' : ''}`}>
         <button
           onClick={handleViewDetails}
           className={`
             bg-blue-50 text-blue-600 py-2 px-4 rounded-lg text-sm font-medium
             hover:bg-blue-100 transition-colors
-            ${compact ? 'flex-1' : 'flex-1'}
+            ${compact ? 'flex-1' : showCookingButton ? 'flex-1' : 'flex-1'}
           `}
         >
           {compact ? 'Voir' : 'Voir recette'}
         </button>
+
+        {showCookingButton && (
+          <button
+            onClick={handleStartCooking}
+            className={`
+              bg-purple-500 text-white px-4 py-2 rounded-lg text-sm font-medium
+              hover:bg-purple-600 transition-colors
+              ${compact ? 'w-full' : 'flex-1'}
+            `}
+          >
+            👩‍🍳 {compact ? 'Cuisiner' : 'Mode cuisine'}
+          </button>
+        )}
+
         <button
           onClick={handleTrackMeal}
           className={`
