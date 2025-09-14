@@ -265,7 +265,7 @@ function markdownToNotionBlocks(markdown) {
       continue;
     }
 
-    // Headings
+    // Headings - Notion ne supporte que H1, H2, H3
     if (line.startsWith('# ')) {
       blocks.push({
         object: 'block',
@@ -288,6 +288,45 @@ function markdownToNotionBlocks(markdown) {
         type: 'heading_3',
         heading_3: {
           rich_text: parseRichText(line.substring(4).trim())
+        }
+      });
+    } else if (line.startsWith('#### ')) {
+      // H4 et plus -> texte en gras
+      blocks.push({
+        object: 'block',
+        type: 'paragraph',
+        paragraph: {
+          rich_text: [{
+            type: 'text',
+            text: { content: line.substring(5).trim() },
+            annotations: { bold: true }
+          }]
+        }
+      });
+    } else if (line.startsWith('##### ')) {
+      // H5 -> texte en gras
+      blocks.push({
+        object: 'block',
+        type: 'paragraph',
+        paragraph: {
+          rich_text: [{
+            type: 'text',
+            text: { content: line.substring(6).trim() },
+            annotations: { bold: true }
+          }]
+        }
+      });
+    } else if (line.startsWith('###### ')) {
+      // H6 -> texte en gras
+      blocks.push({
+        object: 'block',
+        type: 'paragraph',
+        paragraph: {
+          rich_text: [{
+            type: 'text',
+            text: { content: line.substring(7).trim() },
+            annotations: { bold: true }
+          }]
         }
       });
     }
