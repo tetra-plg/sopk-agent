@@ -26,4 +26,5 @@ jobs:
     - name: Sync Markdown files to Notion
       env:
         NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        NOTION_ROOT_PAGE_ID: ${{ secrets.NOTION_ROOT_PAGE_ID }}
       run: node .github/scripts/sync-to-notion.js
