@@ -119,12 +119,12 @@ function parseRichText(text) {
   return segments.filter(segment => segment.text?.content || segment.text?.link);
 }
 
-// Fonction pour diviser le contenu en pages si nécessaire
-function splitContentIntoPages(blocks, maxBlocksPerPage = 100) {
-  const maxTextLength = 2000; // Limite Notion pour le texte
+// Fonction pour optimiser le contenu pour l'API Notion
+function optimizeContentForNotion(blocks) {
+  const maxTextLength = 2000; // Limite par rich_text object
 
-  // D'abord, corriger les blocs qui dépassent la limite de texte
-  const fixedBlocks = blocks.map(block => {
+  // Corriger les blocs qui dépassent la limite de texte
+  const optimizedBlocks = blocks.map(block => {
     const newBlock = JSON.parse(JSON.stringify(block)); // Deep copy
 
     // Fonction pour limiter le texte dans rich_text
@@ -149,13 +149,7 @@ function splitContentIntoPages(blocks, maxBlocksPerPage = 100) {
     return newBlock;
   });
 
-  // Diviser en pages si nécessaire
-  const pages = [];
-  for (let i = 0; i < fixedBlocks.length; i += maxBlocksPerPage) {
-    pages.push(fixedBlocks.slice(i, i + maxBlocksPerPage));
-  }
-
-  return pages;
+  return optimizedBlocks;
 }
 
 // Fonction pour convertir markdown en blocs Notion
@@ -357,12 +351,56 @@ function markdownToNotionBlocks(markdown) {
     }
   }
 
-  return blocks; // La division en pages se fera plus tard
+  return optimizeContentForNotion(blocks);
+}
+
+// Fonction pour ajouter des blocs à une page par chunks
+async function addBlocksToPage(pageId, blocks) {
+  const maxBlocksPerRequest = 100;
+
+  for (let i = 0; i < blocks.length; i += maxBlocksPerRequest) {
+    const chunk = blocks.slice(i, i + maxBlocksPerRequest);
+
+    try {
+      const response = await fetch(`https://api.notion.com/v1/blocks/${pageId}/children`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${NOTION_TOKEN}`,
+          'Content-Type': 'application/json',
+          'Notion-Version': NOTION_VERSION
+        },
+        body: JSON.stringify({
+          children: chunk
+        })
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        console.error(`❌ Failed to add blocks chunk ${i / maxBlocksPerRequest + 1}:`, error.message);
+        return false;
+      }
+
+      // Attendre entre les chunks pour éviter le rate limiting
+      if (i + maxBlocksPerRequest < blocks.length) {
+        await new Promise(resolve => setTimeout(resolve, 300));
+      }
+
+    } catch (error) {
+      console.error(`❌ Error adding blocks chunk:`, error.message);
+      return false;
+    }
+  }
+
+  return true;
 }
 
 // Fonction pour créer une page Notion
 async function createNotionPage(parentId, title, blocks) {
   try {
+    // Créer la page avec les premiers 100 blocs
+    const initialBlocks = blocks.slice(0, 100);
+    const remainingBlocks = blocks.slice(100);
+
     const response = await fetch('https://api.notion.com/v1/pages', {
       method: 'POST',
       headers: {
@@ -379,13 +417,26 @@ async function createNotionPage(parentId, title, blocks) {
             }]
           }
         },
-        children: blocks // Déjà limité par splitContentIntoPages()
+        children: initialBlocks
       })
     });
 
     if (response.ok) {
       const page = await response.json();
       console.log(`✅ Created new page: ${title} (ID: ${page.id})`);
+
+      // Ajouter le reste des blocs si nécessaire
+      if (remainingBlocks.length > 0) {
+        console.log(`📄 Adding ${remainingBlocks.length} additional blocks to page...`);
+        const success = await addBlocksToPage(page.id, remainingBlocks);
+
+        if (success) {
+          console.log(`✅ Successfully added all ${blocks.length} blocks to page`);
+        } else {
+          console.log(`⚠️  Some blocks may not have been added completely`);
+        }
+      }
+
       return page.id;
     } else {
       const errorData = await response.json();
@@ -466,25 +517,15 @@ async function updateNotionPage(pageId, title, blocks) {
       }
     }
 
-    // Ajouter le nouveau contenu
-    const updateResponse = await fetch(`https://api.notion.com/v1/blocks/${pageId}/children`, {
-      method: 'PATCH',
-      headers: {
-        'Authorization': `Bearer ${NOTION_TOKEN}`,
-        'Content-Type': 'application/json',
-        'Notion-Version': NOTION_VERSION
-      },
-      body: JSON.stringify({
-        children: blocks // Déjà limité par splitContentIntoPages()
-      })
-    });
+    // Ajouter le nouveau contenu par chunks
+    console.log(`📄 Adding ${blocks.length} blocks to updated page...`);
+    const success = await addBlocksToPage(pageId, blocks);
 
-    if (updateResponse.ok) {
-      console.log(`✅ Successfully updated page: ${title}`);
+    if (success) {
+      console.log(`✅ Successfully updated page: ${title} (${blocks.length} blocks)`);
       return true;
     } else {
-      const error = await updateResponse.text();
-      console.error(`❌ Failed to update page content ${pageId}: ${error}`);
+      console.error(`❌ Failed to update page content ${pageId}`);
       return false;
     }
 
@@ -594,93 +635,27 @@ async function syncDocsToNotion() {
 
     // Si la mise à jour a échoué ou pas d'ID, créer une nouvelle page
     if (!success) {
-      // Diviser le contenu en pages si nécessaire
-      const pages = splitContentIntoPages(blocks);
+      const newPageId = await createNotionPage(parentId, title, blocks);
+      if (newPageId) {
+        success = true;
+        createdCount++;
 
-      if (pages.length === 1) {
-        // Une seule page - création simple
-        const newPageId = await createNotionPage(parentId, title, pages[0]);
-        if (newPageId) {
-          success = true;
-          createdCount++;
-
-          // Mettre à jour le frontmatter avec le nouvel ID
-          const newFrontmatter = `---
+        // Mettre à jour le frontmatter avec le nouvel ID
+        const newFrontmatter = `---
 notion_page_id: "${newPageId}"
 notion_parent_page_id: "${parentId}"
 title: "${title}"
 ---
 
 `;
-          const contentWithoutFrontmatter = content.replace(/^---\s*\n[\s\S]*?\n---\s*\n/, '');
-          const newContent = newFrontmatter + contentWithoutFrontmatter;
+        const contentWithoutFrontmatter = content.replace(/^---\s*\n[\s\S]*?\n---\s*\n/, '');
+        const newContent = newFrontmatter + contentWithoutFrontmatter;
 
-          try {
-            fs.writeFileSync(filePath, newContent);
-            console.log(`📝 Updated frontmatter for ${path.basename(filePath)}`);
-          } catch (error) {
-            console.log(`⚠️  Could not update frontmatter for ${path.basename(filePath)}: ${error.message}`);
-          }
-        }
-      } else {
-        // Plusieurs pages - créer page principale + sous-pages
-        console.log(`📚 Content too large, creating ${pages.length} pages for: ${title}`);
-
-        // Créer la page principale avec un résumé
-        const mainPageContent = [
-          {
-            object: 'block',
-            type: 'paragraph',
-            paragraph: {
-              rich_text: [{
-                type: 'text',
-                text: { content: `Ce document est divisé en ${pages.length} parties en raison de sa taille.` }
-              }]
-            }
-          },
-          {
-            object: 'block',
-            type: 'divider',
-            divider: {}
-          }
-        ];
-
-        const mainPageId = await createNotionPage(parentId, title, mainPageContent);
-        if (mainPageId) {
-          success = true;
-          createdCount++;
-
-          // Créer les sous-pages
-          for (let i = 0; i < pages.length; i++) {
-            const subPageTitle = `${title} - Partie ${i + 1}`;
-            const subPageId = await createNotionPage(mainPageId, subPageTitle, pages[i]);
-
-            if (subPageId) {
-              createdCount++;
-              console.log(`📄 Created sub-page ${i + 1}/${pages.length}: ${subPageTitle}`);
-            }
-
-            // Attendre entre chaque création pour éviter le rate limiting
-            await new Promise(resolve => setTimeout(resolve, 1000));
-          }
-
-          // Mettre à jour le frontmatter avec l'ID de la page principale
-          const newFrontmatter = `---
-notion_page_id: "${mainPageId}"
-notion_parent_page_id: "${parentId}"
-title: "${title}"
----
-
-`;
-          const contentWithoutFrontmatter = content.replace(/^---\s*\n[\s\S]*?\n---\s*\n/, '');
-          const newContent = newFrontmatter + contentWithoutFrontmatter;
-
-          try {
-            fs.writeFileSync(filePath, newContent);
-            console.log(`📝 Updated frontmatter for ${path.basename(filePath)}`);
-          } catch (error) {
-            console.log(`⚠️  Could not update frontmatter for ${path.basename(filePath)}: ${error.message}`);
-          }
+        try {
+          fs.writeFileSync(filePath, newContent);
+          console.log(`📝 Updated frontmatter for ${path.basename(filePath)}`);
+        } catch (error) {
+          console.log(`⚠️  Could not update frontmatter for ${path.basename(filePath)}: ${error.message}`);
         }
       }
     }
