@@ -219,23 +219,103 @@ function markdownToNotionBlocks(markdown) {
           language = 'plain text';
         }
 
-        // Limiter le contenu du code à 2000 caractères
+        // Gérer les blocs de code longs en les divisant si nécessaire
         let codeContent = codeBlockContent.join('\n');
-        if (codeContent.length > 2000) {
-          codeContent = codeContent.substring(0, 1997) + '...';
-        }
 
-        blocks.push({
-          object: 'block',
-          type: 'code',
-          code: {
-            rich_text: [{
-              type: 'text',
-              text: { content: codeContent }
-            }],
-            language: language
+        if (codeContent.length <= 2000) {
+          // Code court - un seul bloc
+          blocks.push({
+            object: 'block',
+            type: 'code',
+            code: {
+              rich_text: [{
+                type: 'text',
+                text: { content: codeContent }
+              }],
+              language: language
+            }
+          });
+        } else {
+          // Code long - diviser en plusieurs blocs
+          const maxChunkSize = 1900; // Laisser de la marge
+          const chunks = [];
+
+          // Diviser intelligemment aux sauts de ligne si possible
+          let currentChunk = '';
+          const lines = codeContent.split('\n');
+
+          for (const line of lines) {
+            if (currentChunk.length + line.length + 1 > maxChunkSize && currentChunk.length > 0) {
+              chunks.push(currentChunk);
+              currentChunk = line;
+            } else {
+              currentChunk += (currentChunk ? '\n' : '') + line;
+            }
           }
-        });
+          if (currentChunk) {
+            chunks.push(currentChunk);
+          }
+
+          // Ajouter le premier chunk comme bloc de code
+          if (chunks.length > 0) {
+            blocks.push({
+              object: 'block',
+              type: 'code',
+              code: {
+                rich_text: [{
+                  type: 'text',
+                  text: { content: chunks[0] }
+                }],
+                language: language
+              }
+            });
+
+            // Ajouter les chunks suivants comme blocs de code supplémentaires
+            for (let i = 1; i < chunks.length; i++) {
+              // Ajouter un indicateur de continuation
+              if (i === 1) {
+                blocks.push({
+                  object: 'block',
+                  type: 'paragraph',
+                  paragraph: {
+                    rich_text: [{
+                      type: 'text',
+                      text: { content: '... (suite du code)' },
+                      annotations: { italic: true }
+                    }]
+                  }
+                });
+              }
+
+              blocks.push({
+                object: 'block',
+                type: 'code',
+                code: {
+                  rich_text: [{
+                    type: 'text',
+                    text: { content: chunks[i] }
+                  }],
+                  language: language
+                }
+              });
+            }
+
+            // Ajouter un indicateur de fin
+            if (chunks.length > 1) {
+              blocks.push({
+                object: 'block',
+                type: 'paragraph',
+                paragraph: {
+                  rich_text: [{
+                    type: 'text',
+                    text: { content: '... (fin du code)' },
+                    annotations: { italic: true }
+                  }]
+                }
+              });
+            }
+          }
+        }
         codeBlockContent = [];
       }
       continue;
