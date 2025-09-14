@@ -27,4 +27,5 @@ jobs:
       env:
         NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
         NOTION_ROOT_PAGE_ID: ${{ secrets.NOTION_ROOT_PAGE_ID }}
+        CREATE_NOTION_FOLDERS: 'false'  # Désactiver la création de sous-dossiers
       run: node .github/scripts/sync-to-notion.js

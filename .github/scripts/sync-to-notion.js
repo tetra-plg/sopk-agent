@@ -580,6 +580,7 @@ async function syncDocsToNotion() {
 
   const docsDir = path.join(process.cwd(), 'docs');
   const ROOT_PAGE_ID = process.env.NOTION_ROOT_PAGE_ID || '26dc48d1806980b19b08ed84492ba4e3';
+  const CREATE_FOLDERS = process.env.CREATE_NOTION_FOLDERS !== 'false'; // Par défaut true
 
   // Créer une map des pages parent pour reproduire l'arborescence
   const parentPages = new Map();
@@ -602,6 +603,12 @@ async function syncDocsToNotion() {
       actualParentId = await ensureParentPage(parentDirPath, parentId);
     }
 
+    // Vérifier si le parent est accessible avant de créer
+    if (!actualParentId) {
+      console.log(`⚠️  Cannot create folder "${dirName}" - parent not accessible`);
+      return ROOT_PAGE_ID; // Fallback sur la page racine
+    }
+
     // Créer la page pour ce dossier
     const folderTitle = `📁 ${dirName}`;
     const emptyBlocks = [{
@@ -621,7 +628,9 @@ async function syncDocsToNotion() {
       return folderId;
     }
 
-    return actualParentId;
+    // Si on ne peut pas créer le dossier, utiliser le parent direct ou ROOT
+    console.log(`⚠️  Could not create folder "${dirName}", using parent page instead`);
+    return actualParentId || ROOT_PAGE_ID;
   }
 
   function findMarkdownFiles(dir) {
@@ -661,7 +670,7 @@ async function syncDocsToNotion() {
     const fileDir = path.dirname(filePath);
     let parentId = ROOT_PAGE_ID;
 
-    if (fileDir !== docsDir) {
+    if (CREATE_FOLDERS && fileDir !== docsDir) {
       parentId = await ensureParentPage(fileDir, ROOT_PAGE_ID);
     }
 
