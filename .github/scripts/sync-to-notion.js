@@ -436,6 +436,28 @@ async function addBlocksToPage(pageId, blocks) {
 // Fonction pour créer une page Notion
 async function createNotionPage(parentId, title, blocks) {
   try {
+    // Vérifier d'abord si le parent est archivé
+    const parentCheck = await fetch(`https://api.notion.com/v1/pages/${parentId}`, {
+      headers: {
+        'Authorization': `Bearer ${NOTION_TOKEN}`,
+        'Notion-Version': NOTION_VERSION
+      }
+    });
+
+    if (parentCheck.ok) {
+      const parentData = await parentCheck.json();
+      if (parentData.archived) {
+        console.log(`🗃️  Parent page ${parentId} is archived, unarchiving it first...`);
+        const unarchived = await unarchivePage(parentId);
+        if (!unarchived) {
+          console.error(`❌ Could not unarchive parent page ${parentId}`);
+          return null;
+        }
+        // Attendre après le désarchivage
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+    }
+
     // Créer la page avec les premiers 100 blocs
     const initialBlocks = blocks.slice(0, 100);
     const remainingBlocks = blocks.slice(100);
@@ -481,8 +503,9 @@ async function createNotionPage(parentId, title, blocks) {
       const errorData = await response.json();
       console.error(`❌ Failed to create page "${title}":`, errorData.message);
 
+      // Si c'est une erreur d'archive, on a déjà essayé de désarchiver, donc on abandonne
       if (errorData.code === 'validation_error' && errorData.message.includes('archived')) {
-        console.error(`🗃️  Parent page is archived. Please unarchive the page with ID: ${parentId} in Notion`);
+        console.error(`🗃️  Cannot create in archived parent. Parent ID: ${parentId}`);
       } else if (errorData.code === 'object_not_found') {
         console.error(`🔍 Parent page not found or not shared with integration: ${parentId}`);
       }
@@ -494,10 +517,39 @@ async function createNotionPage(parentId, title, blocks) {
   }
 }
 
+// Fonction pour désarchiver une page
+async function unarchivePage(pageId) {
+  try {
+    const response = await fetch(`https://api.notion.com/v1/pages/${pageId}`, {
+      method: 'PATCH',
+      headers: {
+        'Authorization': `Bearer ${NOTION_TOKEN}`,
+        'Content-Type': 'application/json',
+        'Notion-Version': NOTION_VERSION
+      },
+      body: JSON.stringify({
+        archived: false
+      })
+    });
+
+    if (response.ok) {
+      console.log(`♻️  Successfully unarchived page ${pageId}`);
+      return true;
+    } else {
+      const error = await response.json();
+      console.error(`❌ Failed to unarchive page ${pageId}:`, error.message);
+      return false;
+    }
+  } catch (error) {
+    console.error(`❌ Error unarchiving page:`, error.message);
+    return false;
+  }
+}
+
 // Fonction pour mettre à jour une page Notion
 async function updateNotionPage(pageId, title, blocks) {
   try {
-    // Vérifier si la page existe d'abord
+    // Vérifier si la page existe et son statut
     const checkResponse = await fetch(`https://api.notion.com/v1/pages/${pageId}`, {
       headers: {
         'Authorization': `Bearer ${NOTION_TOKEN}`,
@@ -508,6 +560,20 @@ async function updateNotionPage(pageId, title, blocks) {
     if (!checkResponse.ok) {
       console.log(`⚠️  Page ${pageId} not found, will need to create it`);
       return false;
+    }
+
+    const pageData = await checkResponse.json();
+
+    // Si la page est archivée, la désarchiver d'abord
+    if (pageData.archived) {
+      console.log(`🗃️  Page ${pageId} is archived, unarchiving it first...`);
+      const unarchived = await unarchivePage(pageId);
+      if (!unarchived) {
+        console.error(`❌ Could not unarchive page ${pageId}`);
+        return false;
+      }
+      // Attendre un peu après le désarchivage
+      await new Promise(resolve => setTimeout(resolve, 500));
     }
 
     // Mettre à jour le titre
@@ -719,11 +785,18 @@ title: "${title}"
   }
 
   console.log(`\n🎉 Sync completed!`);
-  console.log(`✅ Success: ${successCount} files`);
+  console.log(`✅ Success: ${successCount} files synchronized`);
   console.log(`🆕 Created: ${createdCount} new pages`);
+  console.log(`♻️  Updated: ${successCount - createdCount} existing pages`);
   console.log(`❌ Failed: ${failCount} files`);
 
+  console.log(`\n📊 Summary:`);
+  console.log(`- Pages are created ${CREATE_FOLDERS ? 'with folder hierarchy' : 'in flat structure'}`);
+  console.log(`- Archived pages are automatically unarchived when found`);
+  console.log(`- Large documents are handled with chunked uploads`);
+
   if (failCount > 0) {
+    console.log(`\n⚠️  Some files failed to sync. Check the errors above.`);
     process.exit(1);
   }
 }
