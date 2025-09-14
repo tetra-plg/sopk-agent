@@ -11,7 +11,7 @@ import MealSuggestionsView from './modules/nutrition/views/MealSuggestionsView';
 import NutritionHistoryView from './modules/nutrition/views/NutritionHistoryView';
 import StressView from './modules/stress/views/StressView';
 import ActivityView from './modules/activity/views/ActivityView';
-import ProfileEditView from './modules/profile/views/ProfileEditView';
+import ProfileEditView from './core/pages/ProfileEditView';
 
 function App() {
   const [currentRoute, setCurrentRoute] = useState('/dashboard');

@@ -8,6 +8,7 @@ const AppNavigation = ({ children, currentRoute = '/dashboard', onRouteChange })
   const { user, signOut } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userProfile, setUserProfile] = useState(null);
+  const version = "1.0"
 
   useEffect(() => {
     const loadUserProfile = async () => {
@@ -66,7 +67,7 @@ const AppNavigation = ({ children, currentRoute = '/dashboard', onRouteChange })
             </div>
             <h1 className="font-heading text-lg font-bold"
                 style={{ color: 'var(--color-primary-lavande)' }}>
-              SOPK
+              SOPK <span className="font-light text-xs">v{version}</span>
             </h1>
           </div>
           <div className="flex items-center gap-2">
@@ -151,6 +152,9 @@ const AppNavigation = ({ children, currentRoute = '/dashboard', onRouteChange })
              style={{ color: 'var(--color-text-secondaire)' }}>
             Ton espace bien-être
           </p>
+          <span className="text-xs font-light">
+            Version {version}
+          </span>
         </div>
 
         <div className="mt-6">

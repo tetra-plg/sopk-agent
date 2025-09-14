@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../../../core/auth/AuthContext';
-import userProfileService from '../../../shared/services/userProfileService';
+import { useAuth } from '../auth/AuthContext';
+import userProfileService from '../../shared/services/userProfileService';
 
 const ProfileEditView = ({ onNavigate }) => {
   const { user } = useAuth();
