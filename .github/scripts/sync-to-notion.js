@@ -34,10 +34,32 @@ function extractFrontmatter(content) {
   return frontmatter;
 }
 
+// Map globale pour stocker les correspondances path -> Notion page ID
+const pathToNotionId = new Map();
+
 // Fonction pour parser le texte avec formatage markdown
-function parseRichText(text) {
+function parseRichText(text, currentFilePath = '') {
   const richText = [];
   let currentIndex = 0;
+
+  // Fonction pour convertir les liens relatifs en liens Notion
+  const convertLink = (linkUrl, linkText) => {
+    // Si c'est un lien relatif vers un fichier .md
+    if (linkUrl.endsWith('.md') && !linkUrl.startsWith('http')) {
+      // Résoudre le chemin relatif
+      const currentDir = path.dirname(currentFilePath);
+      const absolutePath = path.resolve(currentDir, linkUrl);
+      const relativePath = path.relative(process.cwd(), absolutePath);
+
+      // Chercher l'ID Notion correspondant
+      const notionId = pathToNotionId.get(relativePath);
+      if (notionId) {
+        // Convertir en lien Notion interne
+        return `https://notion.so/${notionId.replace(/-/g, '')}`;
+      }
+    }
+    return linkUrl;
+  };
 
   // Regex pour capturer différents types de formatage
   const patterns = [
@@ -77,9 +99,10 @@ function parseRichText(text) {
 
         // Ajouter le texte formaté
         if (pattern.type === 'link') {
+          const convertedUrl = convertLink(match[2], match[1]);
           newSegments.push({
             type: 'text',
-            text: { content: match[1], link: { url: match[2] } },
+            text: { content: match[1], link: { url: convertedUrl } },
             annotations: { ...segment.annotations }
           });
         } else {
@@ -153,7 +176,7 @@ function optimizeContentForNotion(blocks) {
 }
 
 // Fonction pour convertir markdown en blocs Notion
-function markdownToNotionBlocks(markdown) {
+function markdownToNotionBlocks(markdown, filePath = '') {
   // Supprimer le frontmatter
   const contentWithoutFrontmatter = markdown.replace(/^---\s*\n[\s\S]*?\n---\s*\n/, '');
 
@@ -357,7 +380,7 @@ function markdownToNotionBlocks(markdown) {
         object: 'block',
         type: 'heading_1',
         heading_1: {
-          rich_text: parseRichText(line.substring(2).trim())
+          rich_text: parseRichText(line.substring(2).trim(), filePath)
         }
       });
     } else if (line.startsWith('## ')) {
@@ -365,7 +388,7 @@ function markdownToNotionBlocks(markdown) {
         object: 'block',
         type: 'heading_2',
         heading_2: {
-          rich_text: parseRichText(line.substring(3).trim())
+          rich_text: parseRichText(line.substring(3).trim(), filePath)
         }
       });
     } else if (line.startsWith('### ')) {
@@ -373,7 +396,7 @@ function markdownToNotionBlocks(markdown) {
         object: 'block',
         type: 'heading_3',
         heading_3: {
-          rich_text: parseRichText(line.substring(4).trim())
+          rich_text: parseRichText(line.substring(4).trim(), filePath)
         }
       });
     } else if (line.startsWith('#### ')) {
@@ -423,7 +446,7 @@ function markdownToNotionBlocks(markdown) {
         object: 'block',
         type: 'bulleted_list_item',
         bulleted_list_item: {
-          rich_text: parseRichText(line.substring(2).trim())
+          rich_text: parseRichText(line.substring(2).trim(), filePath)
         }
       });
     }
@@ -435,7 +458,7 @@ function markdownToNotionBlocks(markdown) {
         object: 'block',
         type: 'numbered_list_item',
         numbered_list_item: {
-          rich_text: parseRichText(match[1].trim())
+          rich_text: parseRichText(match[1].trim(), filePath)
         }
       });
     }
@@ -445,7 +468,7 @@ function markdownToNotionBlocks(markdown) {
         object: 'block',
         type: 'quote',
         quote: {
-          rich_text: parseRichText(line.substring(2).trim())
+          rich_text: parseRichText(line.substring(2).trim(), filePath)
         }
       });
     }
@@ -463,7 +486,7 @@ function markdownToNotionBlocks(markdown) {
         object: 'block',
         type: 'paragraph',
         paragraph: {
-          rich_text: parseRichText(line)
+          rich_text: parseRichText(line, filePath)
         }
       });
     }
@@ -776,7 +799,7 @@ async function syncDocsToNotion() {
     if (fs.existsSync(readmePath)) {
       console.log(`📄 Found README.md for folder ${dirName}, using its content`);
       const readmeContent = fs.readFileSync(readmePath, 'utf8');
-      folderBlocks = markdownToNotionBlocks(readmeContent);
+      folderBlocks = markdownToNotionBlocks(readmeContent, readmePath);
 
       // Marquer ce README comme traité pour ne pas le créer comme page séparée
       folderReadmeContent.set(readmePath, true);
@@ -827,6 +850,19 @@ async function syncDocsToNotion() {
   const markdownFiles = findMarkdownFiles(docsDir);
   console.log(`📄 Found ${markdownFiles.length} markdown files`);
 
+  // Premier passage : collecter tous les IDs de page existants pour la résolution de liens
+  console.log('🔗 Building page ID map for link resolution...');
+  for (const filePath of markdownFiles) {
+    const content = fs.readFileSync(filePath, 'utf8');
+    const frontmatter = extractFrontmatter(content);
+
+    if (frontmatter?.notion_page_id) {
+      const relativePath = path.relative(process.cwd(), filePath);
+      pathToNotionId.set(relativePath, frontmatter.notion_page_id);
+    }
+  }
+  console.log(`📋 Found ${pathToNotionId.size} existing page IDs for link resolution`);
+
   let successCount = 0;
   let failCount = 0;
   let createdCount = 0;
@@ -841,7 +877,7 @@ async function syncDocsToNotion() {
     const content = fs.readFileSync(filePath, 'utf8');
     const frontmatter = extractFrontmatter(content);
     const title = frontmatter?.title || path.basename(filePath, '.md');
-    const blocks = markdownToNotionBlocks(content);
+    const blocks = markdownToNotionBlocks(content, filePath);
 
     console.log(`📝 Syncing: ${title}`);
 
@@ -867,6 +903,10 @@ async function syncDocsToNotion() {
         success = true;
         createdCount++;
 
+        // Ajouter à la map pour la résolution de liens
+        const relativePath = path.relative(process.cwd(), filePath);
+        pathToNotionId.set(relativePath, newPageId);
+
         // Mettre à jour le frontmatter avec le nouvel ID
         const newFrontmatter = `---
 notion_page_id: "${newPageId}"
@@ -885,6 +925,10 @@ title: "${title}"
           console.log(`⚠️  Could not update frontmatter for ${path.basename(filePath)}: ${error.message}`);
         }
       }
+    } else if (frontmatter?.notion_page_id) {
+      // Ajouter à la map même pour les pages mises à jour
+      const relativePath = path.relative(process.cwd(), filePath);
+      pathToNotionId.set(relativePath, frontmatter.notion_page_id);
     }
 
     if (success) {
