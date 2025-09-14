@@ -1,3 +1,9 @@
+---
+notion_page_id: "dad1ebcaa89bb025c19ec3b0a0051ab2"
+notion_parent_page_id: "26dc48d1806980b19b08ed84492ba4e3"
+title: "🏠 Guide du Module Dashboard"
+---
+
 # 🏠 Guide du Module Dashboard
 
 ## Vue d'ensemble

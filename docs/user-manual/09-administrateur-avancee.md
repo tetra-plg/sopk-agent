@@ -1,3 +1,9 @@
+---
+notion_page_id: "13faf9c7bf6f714d7081e50911f48194"
+notion_parent_page_id: "26dc48d1806980b19b08ed84492ba4e3"
+title: "⚙️ Guide Administrateur Avancé"
+---
+
 # ⚙️ Guide Administrateur Avancé
 
 ## Vue d'ensemble

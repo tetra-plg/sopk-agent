@@ -1,3 +1,9 @@
+---
+notion_page_id: "7fd995e03db324c3df567049425824fc"
+notion_parent_page_id: "26dc48d1806980b19b08ed84492ba4e3"
+title: "📚 Lexique SOPK"
+---
+
 # 📚 Lexique SOPK
 
 ## Comprendre le SOPK et ses Termes

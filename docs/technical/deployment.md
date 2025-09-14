@@ -1,3 +1,9 @@
+---
+notion_page_id: "0743a973705be1ea95f5bf3e435d40d6"
+notion_parent_page_id: "26dc48d1806980b19b08ed84492ba4e3"
+title: "🚀 Déploiement - SOPK Agent"
+---
+
 # 🚀 Déploiement - SOPK Agent
 
 ## 📋 Vue d'ensemble

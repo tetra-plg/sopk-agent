@@ -1,3 +1,9 @@
+---
+notion_page_id: "5e2c4c6ab9f31e12f5f595761b69b591"
+notion_parent_page_id: "26dc48d1806980b19b08ed84492ba4e3"
+title: "🏃 Guide du Module Activité Physique"
+---
+
 # 🏃 Guide du Module Activité Physique
 
 ## Vue d'ensemble

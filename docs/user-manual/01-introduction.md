@@ -1,3 +1,9 @@
+---
+notion_page_id: "e8717ed72e2ba5ab54d7f955d0550870"
+notion_parent_page_id: "26dc48d1806980b19b08ed84492ba4e3"
+title: "🌸 Bienvenue dans votre compagnon SOPK"
+---
+
 # 🌸 Bienvenue dans votre compagnon SOPK
 
 ## Qu'est-ce que SOPK Companion ?

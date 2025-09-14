@@ -1,3 +1,9 @@
+---
+notion_page_id: "911c30592aaa4722164568b26bece121"
+notion_parent_page_id: "26dc48d1806980b19b08ed84492ba4e3"
+title: "🏗️ Architecture Technique - SOPK Agent"
+---
+
 # 🏗️ Architecture Technique - SOPK Agent
 
 ## 📋 Vue d'ensemble

@@ -1,3 +1,9 @@
+---
+notion_page_id: "567047976a60dfea1b908cccb7db05df"
+notion_parent_page_id: "26dc48d1806980b19b08ed84492ba4e3"
+title: "🧘 Guide du Module Stress & Bien-être"
+---
+
 # 🧘 Guide du Module Stress & Bien-être
 
 ## Vue d'ensemble

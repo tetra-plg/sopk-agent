@@ -1,3 +1,9 @@
+---
+notion_page_id: "ef1a4ee01121334b807b959f4bd040f4"
+notion_parent_page_id: "26dc48d1806980b19b08ed84492ba4e3"
+title: "🎨 Charte Graphique — Application SOPK Companion"
+---
+
 # 🎨 Charte Graphique — Application SOPK Companion
 
 ## 🌈 Palette de couleurs

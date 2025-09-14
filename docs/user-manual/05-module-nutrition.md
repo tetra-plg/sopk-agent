@@ -1,3 +1,9 @@
+---
+notion_page_id: "55724054abe312043d8c49b1147a39f0"
+notion_parent_page_id: "26dc48d1806980b19b08ed84492ba4e3"
+title: "🍽️ Guide du Module Nutrition"
+---
+
 # 🍽️ Guide du Module Nutrition
 
 ## Vue d'ensemble

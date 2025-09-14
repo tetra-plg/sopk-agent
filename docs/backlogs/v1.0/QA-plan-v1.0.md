@@ -1,3 +1,9 @@
+---
+notion_page_id: "f20318bedb33855112dca5b465b31a4c"
+notion_parent_page_id: "26dc48d1806980b19b08ed84492ba4e3"
+title: "🔍 Plan QA Complet - SOPK Companion v1.0 MVP"
+---
+
 # 🔍 Plan QA Complet - SOPK Companion v1.0 MVP
 
 ## 📋 Synthèse Exécutive

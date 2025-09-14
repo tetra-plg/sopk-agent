@@ -1,3 +1,9 @@
+---
+notion_page_id: "34cfd8071bf7dca3bed8a23a54193edb"
+notion_parent_page_id: "26dc48d1806980b19b08ed84492ba4e3"
+title: "💻 Guide de Développement - SOPK Agent"
+---
+
 # 💻 Guide de Développement - SOPK Agent
 
 ## 📋 Vue d'ensemble

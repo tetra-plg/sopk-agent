@@ -1,3 +1,9 @@
+---
+notion_page_id: "a197793de5908606c11bd2853f2c90f8"
+notion_parent_page_id: "26dc48d1806980b19b08ed84492ba4e3"
+title: "📝 Guide du Module Journal du Cycle"
+---
+
 # 📝 Guide du Module Journal du Cycle
 
 ## Vue d'ensemble
