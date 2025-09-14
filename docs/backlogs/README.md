@@ -321,23 +321,27 @@ Créer une **application compagnon** qui accompagne la patiente dans son quotidi
 
 **Modules & Features :**
 
-1. Cycle & Symptômes (socle indispensable)
-    - Journal quotidien : règles, douleurs, humeur, fatigue.
-    - Calendrier simple avec prévisions approximatives.
-    - Notifications d’anticipation règles.
-2. Nutrition
-    - Suggestions de repas/snacks adaptés aux symptômes.
-    - Bibliothèque de recettes IG bas.
-    - Suivi alimentaire simplifié (ajout manuel basique).
-3. Activité physique
-    - Séances guidées courtes (yoga, marche, mobilité).
-    - Programme hebdo léger (2–3 activités).
-4. Stress & Bien-être
-    - Exercices de respiration guidée.
-    - Journal humeur (rapide : note + emoji).
-5. Dashboard simple
-    - Vue quotidienne (symptômes + activité + humeur).
-    - Historique hebdomadaire basique.
+1. **Cycle & Symptômes** (socle indispensable)
+   - Journal quotidien : règles, douleurs, humeur, fatigue.
+   - Calendrier simple avec prévisions approximatives.
+   - Notifications d'anticipation règles.
+
+2. **Nutrition**
+   - Suggestions de repas/snacks adaptés aux symptômes.
+   - Bibliothèque de recettes IG bas.
+   - Suivi alimentaire simplifié (ajout manuel basique).
+
+3. **Activité physique**
+   - Séances guidées courtes (yoga, marche, mobilité).
+   - Programme hebdo léger (2–3 activités).
+
+4. **Stress & Bien-être**
+   - Exercices de respiration guidée.
+   - Journal humeur (rapide : note + emoji).
+
+5. **Dashboard simple**
+   - Vue quotidienne (symptômes + activité + humeur).
+   - Historique hebdomadaire basique.
 
 **✨ Valeur pour l’utilisatrice SOPK :**
 
@@ -347,30 +351,36 @@ Créer une **application compagnon** qui accompagne la patiente dans son quotidi
 
 ### Phase 2 — Version évoluée
 
-🎯 Objectif : enrichir avec du suivi de qualité et de la personnalisation, pour transformer l’app en coach santé.
+🎯 Objectif : enrichir avec du suivi de qualité et de la personnalisation, pour transformer l'app en coach santé.
+
 **Modules & Features :**
 
-1. Cycle & Symptômes
-    - Historique détaillé et tendances (corrélations).
-    - Suivi d’autres symptômes (acné, sommeil, fringales).
-2. Nutrition
-    - Tracking via scan alimentaire.
-    - Plan repas personnalisable (adapté à objectifs).
-    - Récap hebdo nutrition avec recommandations.
-3. Activité physique
-    - Connexion trackers (Fitbit, Apple Health, Google Fit).
-    - Adaptation au cycle (séances proposées selon phase).
-    - Challenges légers (“bouger 20 min/jour 1 semaine”).
-4. Sommeil (nouveau module prioritaire)
-    - Journal du sommeil (manuel ou via tracker).
-    - Routine du soir guidée (méditation, respiration).
-    - Rapport hebdo sommeil.
-5. Stress & Bien-être
-    - Méditations guidées (douleur, anxiété).
-    - Notifications bienveillantes personnalisées.
-6. Dashboard
-    - Graphiques évolués (symptômes ↔ sommeil ↔ activité).
-    - Insights automatiques simples (“tu dors mieux quand tu bouges”).
+1. **Cycle & Symptômes**
+   - Historique détaillé et tendances (corrélations).
+   - Suivi d'autres symptômes (acné, sommeil, fringales).
+
+2. **Nutrition**
+   - Tracking via scan alimentaire.
+   - Plan repas personnalisable (adapté à objectifs).
+   - Récap hebdo nutrition avec recommandations.
+
+3. **Activité physique**
+   - Connexion trackers (Fitbit, Apple Health, Google Fit).
+   - Adaptation au cycle (séances proposées selon phase).
+   - Challenges légers ("bouger 20 min/jour 1 semaine").
+
+4. **Sommeil** (nouveau module prioritaire)
+   - Journal du sommeil (manuel ou via tracker).
+   - Routine du soir guidée (méditation, respiration).
+   - Rapport hebdo sommeil.
+
+5. **Stress & Bien-être**
+   - Méditations guidées (douleur, anxiété).
+   - Notifications bienveillantes personnalisées.
+
+6. **Dashboard**
+   - Graphiques évolués (symptômes ↔ sommeil ↔ activité).
+   - Insights automatiques simples ("tu dors mieux quand tu bouges").
 
 **✨ Valeur pour l’utilisatrice SOPK :**
 
@@ -380,31 +390,38 @@ Créer une **application compagnon** qui accompagne la patiente dans son quotidi
 
 ### Phase 3 — Version avancée
 
-🎯 Objectif : faire évoluer l’app en assistant santé SOPK complet, capable d’aider aussi dans la relation médecin/patient.
+🎯 Objectif : faire évoluer l'app en assistant santé SOPK complet, capable d'aider aussi dans la relation médecin/patient.
+
 **Modules & Features :**
 
-1. Cycle & Symptômes
-    - Prédictions plus intelligentes via machine learning.
-    - Suivi fertilité (pour celles qui le souhaitent).
-2. Nutrition
-    - Suivi avancé (calories IN/OUT, macros).
-    - Conseils dynamiques en fonction de l’activité/sommeil.
-3. Activité physique
-    - Séances vidéo plus riches (yoga, renfo, cardio doux).
-    - Programme évolutif personnalisé.
-4. Sommeil
-    - Intégration avancée avec trackers sommeil.
-    - Corrélations automatiques sommeil ↔ symptômes.
-5. Stress & Bien-être
-    - Mini-défis bien-être (gratitude, respiration quotidienne).
-    - Espace “pause anti-stress” interactif.
-6. Dashboard & Insights
-    - Corrélations complexes (ex. “acné + insomnie = phase lutéale instable”).
-    - Export PDF/CSV pour médecin ou diététicien.
-7. Espace éducatif (nouveau focus)
-    - Explication analyses médicales vulgarisées.
-    - Articles/vidéos pédagogiques adaptés aux données perso.
-    - FAQ et myth-busting.
+1. **Cycle & Symptômes**
+   - Prédictions plus intelligentes via machine learning.
+   - Suivi fertilité (pour celles qui le souhaitent).
+
+2. **Nutrition**
+   - Suivi avancé (calories IN/OUT, macros).
+   - Conseils dynamiques en fonction de l'activité/sommeil.
+
+3. **Activité physique**
+   - Séances vidéo plus riches (yoga, renfo, cardio doux).
+   - Programme évolutif personnalisé.
+
+4. **Sommeil**
+   - Intégration avancée avec trackers sommeil.
+   - Corrélations automatiques sommeil ↔ symptômes.
+
+5. **Stress & Bien-être**
+   - Mini-défis bien-être (gratitude, respiration quotidienne).
+   - Espace "pause anti-stress" interactif.
+
+6. **Dashboard & Insights**
+   - Corrélations complexes (ex. "acné + insomnie = phase lutéale instable").
+   - Export PDF/CSV pour médecin ou diététicien.
+
+7. **Espace éducatif** (nouveau focus)
+   - Explication analyses médicales vulgarisées.
+   - Articles/vidéos pédagogiques adaptés aux données perso.
+   - FAQ et myth-busting.
 
 **✨ Valeur pour l’utilisatrice SOPK :**
 
@@ -426,44 +443,48 @@ Créer une **application compagnon** qui accompagne la patiente dans son quotidi
 
 ### a) Priorisation RICE
 
-1. 📊 Cycle & Symptômes
-    - Journal quotidien (douleurs, humeur, règles)
-    Reach : 5 | Impact : 5 | Confidence : 5 | Effort : 2
-    Score = 62,5 ✅ core feature
-    - Calendrier simple + prévisions règles
-    Reach : 5 | Impact : 4 | Confidence : 4 | Effort : 3
-    Score = 26,7
-    1. 🍽️ Nutrition
-    - Suggestions repas/snacks adaptés aux symptômes
-    Reach : 5 | Impact : 5 | Confidence : 4 | Effort : 2
-    Score = 50 ✅ très prioritaire
-    - Bibliothèque recettes IG bas
-    Reach : 4 | Impact : 4 | Confidence : 5 | Effort : 2
-    Score = 40
-    - Tracking alimentaire simple (manuel)
-    Reach : 4 | Impact : 3 | Confidence : 4 | Effort : 3
-    Score = 16
-2. 🏃 Activité physique
-    - Séances guidées courtes (yoga, mobilité, marche)
-    Reach : 4 | Impact : 4 | Confidence : 5 | Effort : 2
-    Score = 40
-    - Programme hebdo léger (proposé automatiquement)
-    Reach : 3 | Impact : 3 | Confidence : 4 | Effort : 3
-    Score = 12
-3. 🧘 Stress & Bien-être
-    - Exercices respiration guidée (2–5 min)
-    Reach : 4 | Impact : 4 | Confidence : 5 | Effort : 1
-    Score = 80 ✅ quick win prioritaire
-    - Journal humeur rapide (emoji + note)
-    Reach : 4 | Impact : 3 | Confidence : 5 | Effort : 1
-    Score = 60 ✅ prioritaire
-4. 📈 Dashboard simple
-    - Vue quotidienne (symptômes + humeur + activité)
-    Reach : 5 | Impact : 4 | Confidence : 4 | Effort : 2
-    Score = 40
-    - Historique hebdo basique
-    Reach : 4 | Impact : 3 | Confidence : 4 | Effort : 3
-    Score = 16
+1. **📊 Cycle & Symptômes**
+   - Journal quotidien (douleurs, humeur, règles)
+     Reach : 5 | Impact : 5 | Confidence : 5 | Effort : 2
+     Score = 62,5 ✅ core feature
+   - Calendrier simple + prévisions règles
+     Reach : 5 | Impact : 4 | Confidence : 4 | Effort : 3
+     Score = 26,7
+
+2. **🍽️ Nutrition**
+   - Suggestions repas/snacks adaptés aux symptômes
+     Reach : 5 | Impact : 5 | Confidence : 4 | Effort : 2
+     Score = 50 ✅ très prioritaire
+   - Bibliothèque recettes IG bas
+     Reach : 4 | Impact : 4 | Confidence : 5 | Effort : 2
+     Score = 40
+   - Tracking alimentaire simple (manuel)
+     Reach : 4 | Impact : 3 | Confidence : 4 | Effort : 3
+     Score = 16
+
+3. **🏃 Activité physique**
+   - Séances guidées courtes (yoga, mobilité, marche)
+     Reach : 4 | Impact : 4 | Confidence : 5 | Effort : 2
+     Score = 40
+   - Programme hebdo léger (proposé automatiquement)
+     Reach : 3 | Impact : 3 | Confidence : 4 | Effort : 3
+     Score = 12
+
+4. **🧘 Stress & Bien-être**
+   - Exercices respiration guidée (2–5 min)
+     Reach : 4 | Impact : 4 | Confidence : 5 | Effort : 1
+     Score = 80 ✅ quick win prioritaire
+   - Journal humeur rapide (emoji + note)
+     Reach : 4 | Impact : 3 | Confidence : 5 | Effort : 1
+     Score = 60 ✅ prioritaire
+
+5. **📈 Dashboard simple**
+   - Vue quotidienne (symptômes + humeur + activité)
+     Reach : 5 | Impact : 4 | Confidence : 4 | Effort : 2
+     Score = 40
+   - Historique hebdo basique
+     Reach : 4 | Impact : 3 | Confidence : 4 | Effort : 3
+     Score = 16
 
 **🎯 Résultat RICE – MVP (Top priorités)**
 
@@ -486,37 +507,41 @@ Objectif : mieux comprendre son corps et avoir un compagnon simple qui l’aide 
 
 **📅 User Journey MVP — Journée type**
 
-1. 🌅 Matin
-Action : Sarah ouvre l’app en prenant son café.
-Feature activée : Journal symptômes
-→ Elle renseigne : fatigue = 3/5, douleurs légères, règles en cours.
-Feature activée : Journal humeur
-→ Elle choisit un emoji “😐” + note 5/10.
-***Résultat*** : L’app met à jour son dashboard du jour → elle voit son état global.
-2. 🕛 Midi
-Action : Elle n’a pas beaucoup d’énergie et veut savoir quoi manger.
-Feature activée : Suggestions repas/snacks adaptés
-→ L’app lui propose : soupe de lentilles + yaourt grec + kiwi (repas digestif, protéines + fibres).
-***Résultat*** : Sarah choisit une suggestion et se sent rassurée de faire un choix adapté.
-3. 🕓 Après-midi
-Action : En pleine journée de travail, elle sent son stress monter.
-Feature activée : Exercices de respiration guidée (quick win)
-→ L’app lui propose une session de 3 min respiration “box breathing”.
-***Résultat*** : Elle se détend, baisse son stress et évite une fringale de sucre.
-4. 🕖 Soirée
-Action : Sarah veut bouger un peu mais est fatiguée.
-Feature activée : Séance guidée courte activité physique
-→ L’app lui propose : 20 min yoga doux spécial “douleurs menstruelles”.
-***Résultat*** : Elle fait la séance, se sent fière et plus détendue.
-5. 🌙 Fin de journée
-Action : Avant de se coucher, Sarah consulte son dashboard quotidien.
-Feature activée : Dashboard simple
-→ Elle voit :
-Symptômes du jour (fatigue modérée, douleurs légères).
-Humeur (5/10).
-Activité : 20 min yoga.
-Nutrition : repas équilibrés.
-***Résultat*** : Elle a une vue claire sur sa journée → sentiment de contrôle et de progression.
+1. **🌅 Matin**
+   - Action : Sarah ouvre l'app en prenant son café.
+   - Feature activée : Journal symptômes
+   - → Elle renseigne : fatigue = 3/5, douleurs légères, règles en cours.
+   - Feature activée : Journal humeur
+   - → Elle choisit un emoji "😐" + note 5/10.
+   - ***Résultat*** : L'app met à jour son dashboard du jour → elle voit son état global.
+
+2. **🕛 Midi**
+   - Action : Elle n'a pas beaucoup d'énergie et veut savoir quoi manger.
+   - Feature activée : Suggestions repas/snacks adaptés
+   - → L'app lui propose : soupe de lentilles + yaourt grec + kiwi (repas digestif, protéines + fibres).
+   - ***Résultat*** : Sarah choisit une suggestion et se sent rassurée de faire un choix adapté.
+
+3. **🕓 Après-midi**
+   - Action : En pleine journée de travail, elle sent son stress monter.
+   - Feature activée : Exercices de respiration guidée (quick win)
+   - → L'app lui propose une session de 3 min respiration "box breathing".
+   - ***Résultat*** : Elle se détend, baisse son stress et évite une fringale de sucre.
+
+4. **🕖 Soirée**
+   - Action : Sarah veut bouger un peu mais est fatiguée.
+   - Feature activée : Séance guidée courte activité physique
+   - → L'app lui propose : 20 min yoga doux spécial "douleurs menstruelles".
+   - ***Résultat*** : Elle fait la séance, se sent fière et plus détendue.
+
+5. **🌙 Fin de journée**
+   - Action : Avant de se coucher, Sarah consulte son dashboard quotidien.
+   - Feature activée : Dashboard simple
+   - → Elle voit :
+     - Symptômes du jour (fatigue modérée, douleurs légères).
+     - Humeur (5/10).
+     - Activité : 20 min yoga.
+     - Nutrition : repas équilibrés.
+   - ***Résultat*** : Elle a une vue claire sur sa journée → sentiment de contrôle et de progression.
 
 **✨ Expérience ressentie MVP**
 L’app ne surcharge pas d’infos, elle est légère et bienveillante.
@@ -528,8 +553,7 @@ prévisions règles, historique, tracking alimentaire plus avancé, routines som
 
 ### c) Maquette fonctionnelle
 
-1. Écran d’accueil / Dashboard quotidien
-    
+1. **Écran d'accueil / Dashboard quotidien**
     📌 Rôle : point de départ simple, vue claire de la journée.
     
     **Sections :**
@@ -545,8 +569,8 @@ prévisions règles, historique, tracking alimentaire plus avancé, routines som
     - “Voir plus de recettes” → ouvre module Nutrition.
     - “Faire une séance” → ouvre Activité.
     - “Faire une respiration guidée” → ouvre Bien-être.
-2. Journal quotidien (Cycle & Symptômes + Humeur)
-📌 Rôle : permettre un suivi rapide et non contraignant.
+2. **Journal quotidien (Cycle & Symptômes + Humeur)**
+    📌 Rôle : permettre un suivi rapide et non contraignant.
     
     **Fonctionnalités MVP :**
     
@@ -558,8 +582,8 @@ prévisions règles, historique, tracking alimentaire plus avancé, routines som
     **Interaction :**
     
     - Données alimentent automatiquement le Dashboard et l’historique.
-3. Module Nutrition
-📌 Rôle : accompagner sans complexité.
+3. **Module Nutrition**
+    📌 Rôle : accompagner sans complexité.
     
     **Fonctionnalités MVP :**
     
@@ -570,8 +594,8 @@ prévisions règles, historique, tracking alimentaire plus avancé, routines som
     **Interaction :**
     
     - Les choix ou ajouts apparaissent dans le Dashboard.
-4. Module Activité physique
-📌 Rôle : proposer des mouvements adaptés et accessibles.
+4. **Module Activité physique**
+    📌 Rôle : proposer des mouvements adaptés et accessibles.
     
     **Fonctionnalités MVP :**
     
@@ -582,8 +606,8 @@ prévisions règles, historique, tracking alimentaire plus avancé, routines som
     **Interaction :**
     
     - Durée de séance → remonte au Dashboard.
-5. Module Stress & Bien-être
-📌 Rôle : outils rapides anti-stress.
+5. **Module Stress & Bien-être**
+    📌 Rôle : outils rapides anti-stress.
     
     **Fonctionnalités MVP :**
     
@@ -594,8 +618,8 @@ prévisions règles, historique, tracking alimentaire plus avancé, routines som
     **Interaction :**
     
     - Journal humeur + exercices → alimentent Dashboard & corrélations futures.
-6. Historique / Vue hebdo
-📌 Rôle : donner un petit recul sur la semaine.
+6. **Historique / Vue hebdo**
+    📌 Rôle : donner un petit recul sur la semaine.
     
     **Fonctionnalités MVP :**
     
@@ -605,8 +629,8 @@ prévisions règles, historique, tracking alimentaire plus avancé, routines som
     **Interaction :**
     
     - Données croisées avec modules → visible par semaine.
-7. Paramètres (simplifiés)
-📌 Rôle : personnalisation minimale MVP.
+7. **Paramètres (simplifiés)**
+    📌 Rôle : personnalisation minimale MVP.
     
     **Fonctionnalités MVP :**
     

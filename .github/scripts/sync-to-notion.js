@@ -187,6 +187,7 @@ function markdownToNotionBlocks(markdown, filePath = '') {
   let codeBlockLanguage = '';
   let inList = false;
   let listItems = [];
+  let listType = null; // 'bulleted' ou 'numbered'
   let firstH1Skipped = false; // Pour éviter le doublon avec le titre de la page
 
   for (let i = 0; i < lines.length; i++) {
@@ -351,19 +352,40 @@ function markdownToNotionBlocks(markdown, filePath = '') {
     }
 
     // Terminer la liste si on sort du contexte de liste
-    if (inList && !line.startsWith('- ') && !line.startsWith('* ') && !line.match(/^\d+\. /) && line.trim() !== '') {
+    // Mais pas si c'est une ligne indentée qui fait partie de l'élément de liste
+    const isIndentedContent = line.match(/^\s{2,}/); // 2+ espaces d'indentation
+    if (inList && !line.startsWith('- ') && !line.startsWith('* ') && !line.match(/^\d+\. /) &&
+        line.trim() !== '' && !isIndentedContent) {
       // Ajouter la liste précédente
       for (const item of listItems) {
         blocks.push(item);
       }
       listItems = [];
       inList = false;
+      listType = null;
+    }
+
+    // Si c'est du contenu indenté et qu'on est dans une liste, l'intégrer au dernier élément de liste
+    if (inList && isIndentedContent && listItems.length > 0) {
+      const lastItem = listItems[listItems.length - 1];
+      const listItemType = listType === 'numbered' ? 'numbered_list_item' : 'bulleted_list_item';
+
+      // Ajouter le contenu indenté au rich_text du dernier élément
+      const indentedText = line.trim();
+      if (indentedText) {
+        lastItem[listItemType].rich_text.push({
+          type: 'text',
+          text: { content: '\n' + indentedText }
+        });
+      }
+      continue;
     }
 
     // Lignes vides
     if (line.trim() === '') {
       if (inList) {
-        // Conserver les éléments de liste
+        // Conserver les éléments de liste mais ajouter un separateur léger pour Notion
+        // Cela aide à maintenir la continuité des listes numérotées
         continue;
       }
       continue;
@@ -441,7 +463,16 @@ function markdownToNotionBlocks(markdown, filePath = '') {
     }
     // Listes à puces
     else if (line.startsWith('- ') || line.startsWith('* ')) {
+      // Si on change de type de liste, terminer la précédente
+      if (inList && listType === 'numbered') {
+        for (const item of listItems) {
+          blocks.push(item);
+        }
+        listItems = [];
+      }
+
       inList = true;
+      listType = 'bulleted';
       listItems.push({
         object: 'block',
         type: 'bulleted_list_item',
@@ -452,13 +483,34 @@ function markdownToNotionBlocks(markdown, filePath = '') {
     }
     // Listes numérotées
     else if (line.match(/^\d+\. /)) {
+      // Si on change de type de liste, terminer la précédente
+      if (inList && listType === 'bulleted') {
+        for (const item of listItems) {
+          blocks.push(item);
+        }
+        listItems = [];
+      }
+
+      // Détecter si c'est une nouvelle liste numérotée qui commence par 1
+      const match = line.match(/^(\d+)\. (.*)$/);
+      const currentNumber = parseInt(match[1]);
+
+      // Si on commence une nouvelle liste (numéro 1) et qu'on était déjà dans une liste numérotée,
+      // terminer la liste précédente
+      if (currentNumber === 1 && inList && listType === 'numbered' && listItems.length > 0) {
+        for (const item of listItems) {
+          blocks.push(item);
+        }
+        listItems = [];
+      }
+
       inList = true;
-      const match = line.match(/^\d+\. (.*)$/);
+      listType = 'numbered';
       listItems.push({
         object: 'block',
         type: 'numbered_list_item',
         numbered_list_item: {
-          rich_text: parseRichText(match[1].trim(), filePath)
+          rich_text: parseRichText(match[2].trim(), filePath)
         }
       });
     }
