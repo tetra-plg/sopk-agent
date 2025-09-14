@@ -678,6 +678,41 @@ async function createNotionPage(parentId, title, blocks) {
   }
 }
 
+// Fonction pour lister les pages enfants existantes d'une page parent
+async function listChildPages(parentId) {
+  try {
+    const response = await fetch(`https://api.notion.com/v1/blocks/${parentId}/children?page_size=100`, {
+      headers: {
+        'Authorization': `Bearer ${NOTION_TOKEN}`,
+        'Notion-Version': NOTION_VERSION
+      }
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      const childPages = [];
+
+      for (const block of data.results) {
+        if (block.type === 'child_page') {
+          childPages.push({
+            id: block.id,
+            title: block.child_page.title,
+            archived: block.archived || false
+          });
+        }
+      }
+
+      return childPages;
+    } else {
+      console.error(`❌ Failed to list child pages of ${parentId}`);
+      return [];
+    }
+  } catch (error) {
+    console.error(`❌ Error listing child pages: ${error.message}`);
+    return [];
+  }
+}
+
 // Fonction pour désarchiver une page
 async function unarchivePage(pageId) {
   try {
@@ -816,6 +851,31 @@ async function syncDocsToNotion() {
   // Map pour stocker les pages de dossiers créées et leur contenu README
   const folderReadmeContent = new Map();
 
+  // Map pour stocker les pages existantes par titre
+  const existingPagesByTitle = new Map();
+
+  // Collecter toutes les pages existantes récursivement
+  console.log('🔍 Scanning existing Notion pages...');
+  async function collectExistingPages(parentId, parentPath = '') {
+    const childPages = await listChildPages(parentId);
+    for (const page of childPages) {
+      const fullTitle = parentPath ? `${parentPath}/${page.title}` : page.title;
+      existingPagesByTitle.set(page.title.toLowerCase(), {
+        id: page.id,
+        title: page.title,
+        fullPath: fullTitle,
+        archived: page.archived,
+        parentId: parentId
+      });
+
+      // Collecter récursivement les sous-pages
+      await collectExistingPages(page.id, fullTitle);
+    }
+  }
+
+  await collectExistingPages(ROOT_PAGE_ID);
+  console.log(`📋 Found ${existingPagesByTitle.size} existing pages in Notion`);
+
   // Mettre à jour la page parent avec le contenu du README principal
   const mainReadmePath = path.join(docsDir, 'README.md');
   if (fs.existsSync(mainReadmePath)) {
@@ -823,6 +883,23 @@ async function syncDocsToNotion() {
     try {
       const readmeContent = fs.readFileSync(mainReadmePath, 'utf8');
       const readmeBlocks = markdownToNotionBlocks(readmeContent, mainReadmePath);
+
+      // D'abord vérifier le statut de la page racine et la désarchiver si nécessaire
+      const rootPageCheck = await fetch(`https://api.notion.com/v1/pages/${ROOT_PAGE_ID}`, {
+        headers: {
+          'Authorization': `Bearer ${NOTION_TOKEN}`,
+          'Notion-Version': NOTION_VERSION
+        }
+      });
+
+      if (rootPageCheck.ok) {
+        const rootPageData = await rootPageCheck.json();
+        if (rootPageData.archived) {
+          console.log('🗃️  Root page is archived, unarchiving it first...');
+          await unarchivePage(ROOT_PAGE_ID);
+          await new Promise(resolve => setTimeout(resolve, 500));
+        }
+      }
 
       // Mettre à jour la page parent avec le contenu du README
       const success = await updateNotionPage(ROOT_PAGE_ID, '📚 Documentation Complète - SOPK Companion', readmeBlocks);
@@ -834,7 +911,42 @@ async function syncDocsToNotion() {
         const relativeMainReadme = path.relative(process.cwd(), mainReadmePath);
         pathToNotionId.set(relativeMainReadme, ROOT_PAGE_ID);
       } else {
-        console.log('⚠️  Could not update root page with README content');
+        console.log('⚠️  Could not update root page with README content, trying alternative method...');
+
+        // Méthode alternative : supprimer le contenu et ajouter les nouveaux blocs
+        try {
+          // Supprimer le contenu existant
+          const pageResponse = await fetch(`https://api.notion.com/v1/blocks/${ROOT_PAGE_ID}/children`, {
+            headers: {
+              'Authorization': `Bearer ${NOTION_TOKEN}`,
+              'Notion-Version': NOTION_VERSION
+            }
+          });
+
+          if (pageResponse.ok) {
+            const pageData = await pageResponse.json();
+            for (const block of pageData.results) {
+              await fetch(`https://api.notion.com/v1/blocks/${block.id}`, {
+                method: 'DELETE',
+                headers: {
+                  'Authorization': `Bearer ${NOTION_TOKEN}`,
+                  'Notion-Version': NOTION_VERSION
+                }
+              });
+            }
+          }
+
+          // Ajouter le nouveau contenu
+          const addSuccess = await addBlocksToPage(ROOT_PAGE_ID, readmeBlocks);
+          if (addSuccess) {
+            console.log('✅ Root page updated with README content using alternative method');
+            folderReadmeContent.set(mainReadmePath, true);
+            const relativeMainReadme = path.relative(process.cwd(), mainReadmePath);
+            pathToNotionId.set(relativeMainReadme, ROOT_PAGE_ID);
+          }
+        } catch (altError) {
+          console.log(`❌ Alternative method also failed: ${altError.message}`);
+        }
       }
     } catch (error) {
       console.log(`⚠️  Error processing main README: ${error.message}`);
@@ -975,13 +1087,45 @@ async function syncDocsToNotion() {
     }
 
     let success = false;
+    let pageId = null;
 
-    // Si on a un notion_page_id, essayer de mettre à jour
+    // 1. D'abord, vérifier si on a un notion_page_id dans le frontmatter
     if (frontmatter?.notion_page_id) {
-      success = await updateNotionPage(frontmatter.notion_page_id, title, blocks);
+      pageId = frontmatter.notion_page_id;
+      success = await updateNotionPage(pageId, title, blocks);
     }
 
-    // Si la mise à jour a échoué ou pas d'ID, créer une nouvelle page
+    // 2. Si pas d'ID ou mise à jour échouée, chercher une page existante par titre
+    if (!success) {
+      const existingPage = existingPagesByTitle.get(title.toLowerCase());
+      if (existingPage) {
+        console.log(`📄 Found existing page "${title}" (ID: ${existingPage.id})`);
+        pageId = existingPage.id;
+        success = await updateNotionPage(pageId, title, blocks);
+
+        if (success) {
+          // Mettre à jour le frontmatter avec l'ID trouvé
+          const newFrontmatter = `---
+notion_page_id: "${pageId}"
+notion_parent_page_id: "${existingPage.parentId}"
+title: "${title}"
+---
+
+`;
+          const contentWithoutFrontmatter = content.replace(/^---\s*\n[\s\S]*?\n---\s*\n/, '');
+          const newContent = newFrontmatter + contentWithoutFrontmatter;
+
+          try {
+            fs.writeFileSync(filePath, newContent);
+            console.log(`📝 Updated frontmatter for ${path.basename(filePath)}`);
+          } catch (error) {
+            console.log(`⚠️  Could not update frontmatter for ${path.basename(filePath)}: ${error.message}`);
+          }
+        }
+      }
+    }
+
+    // 3. En dernier recours, créer une nouvelle page
     if (!success) {
       const newPageId = await createNotionPage(parentId, title, blocks);
       if (newPageId) {
