@@ -816,6 +816,33 @@ async function syncDocsToNotion() {
   // Map pour stocker les pages de dossiers créées et leur contenu README
   const folderReadmeContent = new Map();
 
+  // Mettre à jour la page parent avec le contenu du README principal
+  const mainReadmePath = path.join(docsDir, 'README.md');
+  if (fs.existsSync(mainReadmePath)) {
+    console.log('📄 Found main README.md, updating root page with its content...');
+    try {
+      const readmeContent = fs.readFileSync(mainReadmePath, 'utf8');
+      const readmeBlocks = markdownToNotionBlocks(readmeContent, mainReadmePath);
+
+      // Mettre à jour la page parent avec le contenu du README
+      const success = await updateNotionPage(ROOT_PAGE_ID, '📚 Documentation Complète - SOPK Companion', readmeBlocks);
+      if (success) {
+        console.log('✅ Root page updated with main README content');
+        // Marquer ce README comme traité pour ne pas le créer comme page séparée
+        folderReadmeContent.set(mainReadmePath, true);
+        // Ajouter à la map pour la résolution de liens
+        const relativeMainReadme = path.relative(process.cwd(), mainReadmePath);
+        pathToNotionId.set(relativeMainReadme, ROOT_PAGE_ID);
+      } else {
+        console.log('⚠️  Could not update root page with README content');
+      }
+    } catch (error) {
+      console.log(`⚠️  Error processing main README: ${error.message}`);
+    }
+  } else {
+    console.log('📄 No main README.md found in docs directory');
+  }
+
   // Fonction pour créer les dossiers parent si nécessaire
   async function ensureParentPage(dirPath, parentId) {
     const relativePath = path.relative(process.cwd(), dirPath);
@@ -920,6 +947,12 @@ async function syncDocsToNotion() {
   let createdCount = 0;
 
   for (const filePath of markdownFiles) {
+    // Ignorer le README principal qui a été intégré dans la page parent
+    if (filePath === mainReadmePath) {
+      console.log(`⏭️  Skipping ${filePath} - already integrated in root page`);
+      continue;
+    }
+
     // Ignorer les README qui ont déjà été intégrés dans les pages de dossier
     if (path.basename(filePath) === 'README.md' && folderReadmeContent.has(filePath)) {
       console.log(`⏭️  Skipping ${filePath} - already integrated in folder page`);
