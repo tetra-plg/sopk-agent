@@ -123,8 +123,14 @@ async function createNotionPage(parentId, title, blocks) {
       console.log(`✅ Created new page: ${title} (ID: ${page.id})`);
       return page.id;
     } else {
-      const error = await response.text();
-      console.error(`❌ Failed to create page: ${error}`);
+      const errorData = await response.json();
+      console.error(`❌ Failed to create page "${title}":`, errorData.message);
+
+      if (errorData.code === 'validation_error' && errorData.message.includes('archived')) {
+        console.error(`🗃️  Parent page is archived. Please unarchive the page with ID: ${parentId} in Notion`);
+      } else if (errorData.code === 'object_not_found') {
+        console.error(`🔍 Parent page not found or not shared with integration: ${parentId}`);
+      }
       return null;
     }
   } catch (error) {
