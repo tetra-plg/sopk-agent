@@ -38,7 +38,7 @@ Le **Module Journal du Cycle** est votre espace personnel pour noter quotidienne
 
 ### Navigation entre les jours
 ```
-← Hier     Mercredi 13 Sept. 2024     Demain →
+← Hier     Mercredi 13 Sept. 2025     Demain →
 ```
 
 - **Flèches de navigation** pour consulter les jours précédents

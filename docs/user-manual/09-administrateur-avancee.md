@@ -299,7 +299,7 @@ Données sensibles:
 Comptes autorisés:
 • Dr. Martin (Gynécologue)
   Accès: Données médicales uniquement
-  Validité: Jusqu'au [31/12/2024]
+  Validité: Jusqu'au [31/12/2025]
   [Révoquer] [Modifier permissions]
 
 • Partenaire (Prénom masqué)

@@ -65,7 +65,7 @@ SOPK Companion vous accompagne au quotidien avec bienveillance dans la gestion d
 ## 📊 Fonctionnalités par Version
 
 ### 🎯 Version 1.0 (MVP) - Actuelle
-**Disponible depuis :** Septembre 2024
+**Disponible depuis :** Septembre 2025
 
 #### ✅ Fonctionnalités Principales
 - **Dashboard personnalisé** avec suggestions intelligentes
@@ -87,7 +87,7 @@ SOPK Companion vous accompagne au quotidien avec bienveillance dans la gestion d
 - Export PDF médical
 - Conformité RGPD
 
-### 🚀 Version 1.1 - Prévue Q1 2025
+### 🚀 Version 1.1 - Prévue Q1 2026
 **Fonctionnalités Annoncées :**
 
 #### ✨ Nouvelles Fonctionnalités
@@ -102,7 +102,7 @@ SOPK Companion vous accompagne au quotidien avec bienveillance dans la gestion d
 - **Personnalisation interface** : Réorganisation des widgets
 - **Mode offline** : Fonctionnalités de base sans internet
 
-### 🌟 Version 1.2 - Prévue Q3 2025
+### 🌟 Version 1.2 - Prévue Q3 2026
 **Vision Long Terme :**
 
 #### 🔗 Intégrations
@@ -253,9 +253,9 @@ Application propriétaire - Tous droits réservés SOPK Companion SAS
 
 ## 🔄 Mise à Jour de la Documentation
 
-**Dernière mise à jour :** Septembre 2024
+**Dernière mise à jour :** Septembre 2025
 **Version :** 1.0
-**Prochaine révision :** Décembre 2024
+**Prochaine révision :** Décembre 2025
 
 ### ✍️ Contribuer à la Documentation
 Vous avez des suggestions d'amélioration ? Contactez-nous :
@@ -269,4 +269,4 @@ Vous avez des suggestions d'amélioration ? Contactez-nous :
 
 ---
 
-**© 2024 SOPK Companion - Tous droits réservés**
+**© 2025 SOPK Companion - Tous droits réservés**

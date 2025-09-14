@@ -30,7 +30,7 @@ Le **Dashboard** est votre page d'accueil dans SOPK Companion. C'est votre point
 ### En-tête de bienvenue
 ```
 👋 Bonjour [Votre prénom] !
-Mercredi 13 septembre 2024
+Mercredi 13 septembre 2025
 ```
 
 L'en-tête personnalisé vous accueille avec la date du jour et s'adapte selon le moment :
