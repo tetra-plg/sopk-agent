@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../../core/auth/AuthContext';
 import { symptomsService } from '../../cycle/services/symptomsService';
+import userProfileService from '../../../shared/services/userProfileService';
 import { useMealSuggestions } from '../../nutrition/hooks/useMealSuggestions';
 import MealDetailModal from '../../nutrition/components/MealDetailModal';
 import TrackingSuccess from '../../nutrition/components/TrackingSuccess';
@@ -14,6 +15,8 @@ const DashboardView = ({ onNavigate }) => {
   const [currentView, setCurrentView] = useState('dashboard');
   const [todaySymptoms, setTodaySymptoms] = useState(null);
   const [loadingSymptoms, setLoadingSymptoms] = useState(true);
+  const [userProfile, setUserProfile] = useState(null);
+  const [loadingProfile, setLoadingProfile] = useState(true);
 
   // États pour les modales nutrition
   const [selectedMeal, setSelectedMeal] = useState(null);
@@ -36,6 +39,27 @@ const DashboardView = ({ onNavigate }) => {
     maxPrepTime: 30
   });
 
+  // Charger le profil utilisateur
+  useEffect(() => {
+    const loadUserProfile = async () => {
+      if (!user?.id) {
+        setLoadingProfile(false);
+        return;
+      }
+
+      try {
+        const { data } = await userProfileService.getUserProfile(user.id);
+        setUserProfile(data);
+      } catch (error) {
+        // Profil optionnel, pas d'erreur bloquante
+      } finally {
+        setLoadingProfile(false);
+      }
+    };
+
+    loadUserProfile();
+  }, [user?.id]);
+
   // Charger les symptômes du jour
   useEffect(() => {
     const loadTodaySymptoms = async () => {
@@ -49,12 +73,12 @@ const DashboardView = ({ onNavigate }) => {
         const { data, error } = await symptomsService.getDailyEntry(user.id, today);
 
         if (error && error.status !== 406 && error.code !== 'PGRST116') {
-
+          // Erreur non bloquante
         } else {
           setTodaySymptoms(data);
         }
       } catch (error) {
-
+        // Erreur non bloquante
       } finally {
         setLoadingSymptoms(false);
       }
@@ -129,6 +153,43 @@ const DashboardView = ({ onNavigate }) => {
   // Obtenir la suggestion du jour
   const todaySuggestion = mealSuggestions.getQuickSuggestion();
 
+  // Obtenir le nom d'affichage
+  const getDisplayName = () => {
+    // 1. Essayer le prénom du profil
+    if (userProfile?.preferred_name) {
+      return userProfile.preferred_name;
+    }
+    if (userProfile?.first_name) {
+      return userProfile.first_name;
+    }
+
+    // 2. Essayer les métadonnées utilisateur Supabase
+    if (user?.user_metadata?.first_name) {
+      return user.user_metadata.first_name;
+    }
+    if (user?.user_metadata?.preferred_name) {
+      return user.user_metadata.preferred_name;
+    }
+    if (user?.user_metadata?.name) {
+      return user.user_metadata.name.split(' ')[0]; // Premier prénom si nom complet
+    }
+
+    // 3. Extraire du nom dans app_metadata
+    if (user?.app_metadata?.name) {
+      return user.app_metadata.name.split(' ')[0];
+    }
+
+    // 4. Extraire de l'email (partie avant @)
+    if (user?.email) {
+      const emailName = user.email.split('@')[0];
+      // Capitaliser la première lettre
+      return emailName.charAt(0).toUpperCase() + emailName.slice(1);
+    }
+
+    // 5. Fallback
+    return 'Utilisatrice';
+  };
+
   return (
     <div className="p-4 md:p-6 lg:p-8">
       <header className="mb-6 md:mb-8 lg:mb-10 text-center">
@@ -138,7 +199,7 @@ const DashboardView = ({ onNavigate }) => {
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent'
             }}>
-          Bonjour Sarah 🌸
+          Bonjour {getDisplayName()} 🌸
         </h1>
         <p className="font-emotional italic text-base md:text-lg px-4"
            style={{ color: 'var(--color-text-secondaire)' }}>

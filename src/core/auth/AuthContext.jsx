@@ -7,6 +7,7 @@
 
 import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../../shared/services/supabase';
+import userProfileService from '../../shared/services/userProfileService';
 
 // Créer le contexte
 export const AuthContext = createContext({
@@ -32,31 +33,17 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // TEMPORAIRE: Utilisateur de test pour développement
-    // TODO: Remettre l'authentification réelle pour production
-    const mockUser = {
-      id: '550e8400-e29b-41d4-a716-446655440000',
-      email: 'test@sopk-companion.com',
-      app_metadata: {},
-      user_metadata: {}
-    };
-
-    setUser(mockUser);
-    setLoading(false);
-
-    // Code réel commenté pour test
-    /*
     // Récupérer la session initiale
     const getInitialSession = async () => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
         if (error) {
-
+          setUser(null);
         } else {
           setUser(session?.user ?? null);
         }
       } catch (error) {
-
+        setUser(null);
       } finally {
         setLoading(false);
       }
@@ -68,7 +55,6 @@ export const AuthProvider = ({ children }) => {
     const {
       data: { subscription }
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-
       setUser(session?.user ?? null);
       setLoading(false);
     });
@@ -76,7 +62,6 @@ export const AuthProvider = ({ children }) => {
     return () => {
       subscription.unsubscribe();
     };
-    */
   }, []);
 
   // Fonction de connexion
@@ -92,14 +77,13 @@ export const AuthProvider = ({ children }) => {
 
       return { user: data.user, error: null };
     } catch (error) {
-
       return { user: null, error };
     } finally {
       setLoading(false);
     }
   };
 
-  // Fonction d'inscription
+  // Fonction d'inscription avec création automatique de profil
   const signUp = async (email, password, metadata = {}) => {
     try {
       setLoading(true);
@@ -113,9 +97,38 @@ export const AuthProvider = ({ children }) => {
 
       if (error) throw error;
 
+      // Créer automatiquement un profil basique si l'utilisateur est créé
+      if (data.user && !error) {
+        try {
+          const firstName = metadata.first_name ||
+                           metadata.preferred_name ||
+                           metadata.name?.split(' ')[0] ||
+                           email.split('@')[0].charAt(0).toUpperCase() + email.split('@')[0].slice(1);
+
+          await userProfileService.saveUserProfile(data.user.id, {
+            first_name: firstName,
+            preferred_name: firstName,
+            date_of_birth: null,
+            sopk_diagnosis_year: null,
+            current_symptoms: [],
+            severity_level: null,
+            timezone: 'Europe/Paris',
+            language_preference: 'fr',
+            primary_goals: [],
+            notification_preferences: {
+              daily_reminder: true,
+              weekly_summary: true,
+              new_features: false
+            }
+          });
+        } catch (profileError) {
+          // Profil non créé mais utilisateur créé - pas bloquant
+          console.warn('Profil utilisateur non créé automatiquement:', profileError);
+        }
+      }
+
       return { user: data.user, error: null };
     } catch (error) {
-
       return { user: null, error };
     } finally {
       setLoading(false);
@@ -126,10 +139,27 @@ export const AuthProvider = ({ children }) => {
   const signOut = async () => {
     try {
       setLoading(true);
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-    } catch (error) {
 
+      // Nettoyer directement le localStorage et l'état - plus fiable
+      localStorage.removeItem(`supabase.auth.token`);
+      localStorage.removeItem(`sb-127.0.0.1-auth-token`);
+
+      // Tenter signOut Supabase mais ignorer les erreurs
+      try {
+        await supabase.auth.signOut({ scope: 'local' });
+      } catch (supabaseError) {
+        // Ignorer toutes les erreurs Supabase lors du logout
+        console.log('Session Supabase déjà expirée/invalide (normal)');
+      }
+
+      // Nettoyer l'état côté client
+      setUser(null);
+      return { success: true };
+    } catch (error) {
+      console.warn('Erreur lors de la déconnexion (non critique):', error.message);
+      // Force logout côté client même en cas d'erreur totale
+      setUser(null);
+      return { success: true };
     } finally {
       setLoading(false);
     }

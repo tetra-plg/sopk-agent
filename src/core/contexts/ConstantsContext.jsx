@@ -23,7 +23,8 @@ const constants = {
     nutrition: '/nutrition',
     stress: '/stress',
     activity: '/activity',
-    login: '/login'
+    login: '/login',
+    profile: '/profile'
   }
 };
 

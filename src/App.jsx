@@ -11,6 +11,7 @@ import MealSuggestionsView from './modules/nutrition/views/MealSuggestionsView';
 import NutritionHistoryView from './modules/nutrition/views/NutritionHistoryView';
 import StressView from './modules/stress/views/StressView';
 import ActivityView from './modules/activity/views/ActivityView';
+import ProfileEditView from './modules/profile/views/ProfileEditView';
 
 function App() {
   const [currentRoute, setCurrentRoute] = useState('/dashboard');
@@ -32,8 +33,10 @@ function App() {
         return <StressView />;
       case '/activity':
         return <ActivityView />;
+      case '/profile':
+        return <ProfileEditView onNavigate={setCurrentRoute} />;
       default:
-        return <DashboardView />;
+        return <DashboardView onNavigate={setCurrentRoute} />;
     }
   };
 

@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { supabase } from '../../shared/services/supabase';
+import { useAuth } from '../auth/AuthContext';
 
 const LoginView = () => {
+  const { signIn, signUp } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isSignUp, setIsSignUp] = useState(false);
@@ -15,17 +16,11 @@ const LoginView = () => {
 
     try {
       if (isSignUp) {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-        });
+        const { error } = await signUp(email, password);
         if (error) throw error;
         setMessage('Un email de confirmation a été envoyé !');
       } else {
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
+        const { error } = await signIn(email, password);
         if (error) throw error;
       }
     } catch (error) {

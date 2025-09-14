@@ -5,13 +5,13 @@
  */
 
 import { useState, useEffect } from 'react';
+import { useAuth } from '../../../core/auth/AuthContext';
 import trackingService from '../services/trackingService';
 import NutritionTag from '../../../shared/components/ui/NutritionTag';
 import PrepTimeIndicator from '../../../shared/components/ui/PrepTimeIndicator';
 
-const MOCK_USER_ID = '550e8400-e29b-41d4-a716-446655440000';
-
 const NutritionHistoryView = () => {
+  const { user } = useAuth();
   const [history, setHistory] = useState([]);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -20,15 +20,16 @@ const NutritionHistoryView = () => {
   useEffect(() => {
     loadHistory();
     loadStats();
-  }, [selectedPeriod]);
+  }, [selectedPeriod, user?.id]);
 
   const loadHistory = async () => {
+    if (!user?.id) return;
+
     setLoading(true);
     try {
-      const { data } = await trackingService.getMealHistory(MOCK_USER_ID, 20);
+      const { data } = await trackingService.getMealHistory(user.id, 20);
       setHistory(data || []);
     } catch (error) {
-
       setHistory([]);
     } finally {
       setLoading(false);
@@ -36,11 +37,12 @@ const NutritionHistoryView = () => {
   };
 
   const loadStats = async () => {
+    if (!user?.id) return;
+
     try {
-      const { data } = await trackingService.getNutritionStats(MOCK_USER_ID, selectedPeriod);
+      const { data } = await trackingService.getNutritionStats(user.id, selectedPeriod);
       calculateStats(data || []);
     } catch (error) {
-
       setStats(null);
     }
   };

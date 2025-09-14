@@ -1,40 +1,8 @@
-import { useEffect, useState } from 'react';
-import { supabase } from '../../shared/services/supabase';
+import { useAuth } from '../auth/AuthContext';
+import LoginView from '../pages/LoginView';
 
 const ProtectedRoute = ({ children }) => {
-  // TODO: Temporairement désactivé pour le développement
-  // const [user, setUser] = useState(null);
-  // const [loading, setLoading] = useState(true);
-
-  // Mode développement - bypasser l'authentification
-  const isDevelopment = import.meta.env.DEV;
-
-  if (isDevelopment) {
-    return children;
-  }
-
-  // Code d'authentification pour la production (commenté temporairement)
-  /*
-  useEffect(() => {
-    // Vérifier la session utilisateur
-    const checkUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setUser(session?.user || null);
-      setLoading(false);
-    };
-
-    checkUser();
-
-    // Écouter les changements d'authentification
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setUser(session?.user || null);
-        setLoading(false);
-      }
-    );
-
-    return () => subscription.unsubscribe();
-  }, []);
+  const { user, loading } = useAuth();
 
   if (loading) {
     return (
@@ -48,27 +16,8 @@ const ProtectedRoute = ({ children }) => {
   }
 
   if (!user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <div className="bg-white p-8 rounded-lg shadow-md max-w-md w-full">
-          <h2 className="text-2xl font-bold text-center mb-6">Connexion requise</h2>
-          <p className="text-gray-600 text-center mb-4">
-            Connecte-toi pour accéder à ton espace personnel SOPK.
-          </p>
-          <button
-            className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition-colors"
-            onClick={() => {
-              // TODO: Implémenter la connexion Supabase
-
-            }}
-          >
-            Se connecter
-          </button>
-        </div>
-      </div>
-    );
+    return <LoginView />;
   }
-  */
 
   return children;
 };

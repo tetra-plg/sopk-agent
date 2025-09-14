@@ -7,6 +7,9 @@
 -- 👥 UTILISATEURS FAKE POUR DÉVELOPPEMENT
 -- =====================================================
 
+-- NOTE: Le hash utilisé est pour "password123" généré avec bcrypt
+-- Hash correct: $2a$10$PNgTWkCo3fLwJM8YqT0bKORM/zL.ZmXBV.2bTVJvSfVXQ0Ix1LFXS
+
 -- Créer plusieurs utilisateurs de test pour simuler différents profils
 INSERT INTO auth.users (
   instance_id,
@@ -32,12 +35,12 @@ INSERT INTO auth.users (
   'authenticated',
   'authenticated',
   'sarah.dev@sopk-companion.com',
-  '$2a$10$EH5Q/SEHK6FzNGrEzF1E5O0sPBf4FQfKfq4RHOKrGr4Vf3j4hLlOy', -- password: password123
+  crypt('password123', gen_salt('bf')), -- Génère le hash correct pour password123
   NOW(),
   NOW(),
   NOW(),
   '{"provider": "email", "providers": ["email"]}',
-  '{"name": "Sarah Martin", "prenom": "Sarah"}',
+  '{"name": "Sarah Martin", "first_name": "Sarah", "email": "sarah.dev@sopk-companion.com", "email_verified": true, "phone_verified": false}',
   '', '', '', ''
 ),
 -- Utilisateur 2 : Emma (nouveau profil, peu de données)
@@ -47,12 +50,12 @@ INSERT INTO auth.users (
   'authenticated',
   'authenticated',
   'emma.dev@sopk-companion.com',
-  '$2a$10$EH5Q/SEHK6FzNGrEzF1E5O0sPBf4FQfKfq4RHOKrGr4Vf3j4hLlOy',
+  crypt('password123', gen_salt('bf')), -- Génère le hash correct pour password123
   NOW(),
   NOW(),
   NOW(),
   '{"provider": "email", "providers": ["email"]}',
-  '{"name": "Emma Dubois", "prenom": "Emma"}',
+  '{"name": "Emma Dubois", "first_name": "Emma", "email": "emma.dev@sopk-companion.com", "email_verified": true, "phone_verified": false}',
   '', '', '', ''
 ),
 -- Utilisateur 3 : Claire (profil expérimenté)
@@ -62,12 +65,12 @@ INSERT INTO auth.users (
   'authenticated',
   'authenticated',
   'claire.dev@sopk-companion.com',
-  '$2a$10$EH5Q/SEHK6FzNGrEzF1E5O0sPBf4FQfKfq4RHOKrGr4Vf3j4hLlOy',
+  crypt('password123', gen_salt('bf')), -- Génère le hash correct pour password123
   NOW(),
   NOW(),
   NOW(),
   '{"provider": "email", "providers": ["email"]}',
-  '{"name": "Claire Moreau", "prenom": "Claire"}',
+  '{"name": "Claire Moreau", "first_name": "Claire", "email": "claire.dev@sopk-companion.com", "email_verified": true, "phone_verified": false}',
   '', '', '', ''
 ) ON CONFLICT (id) DO NOTHING;
 
@@ -82,13 +85,13 @@ INSERT INTO auth.identities (
   updated_at
 ) VALUES
 ('550e8400-e29b-41d4-a716-446655440000', '550e8400-e29b-41d4-a716-446655440000',
- '{"sub": "550e8400-e29b-41d4-a716-446655440000", "email": "sarah.dev@sopk-companion.com"}',
+ '{"sub": "550e8400-e29b-41d4-a716-446655440000", "email": "sarah.dev@sopk-companion.com", "email_verified": true}',
  'email', NOW(), NOW(), NOW()),
 ('550e8400-e29b-41d4-a716-446655440001', '550e8400-e29b-41d4-a716-446655440001',
- '{"sub": "550e8400-e29b-41d4-a716-446655440001", "email": "emma.dev@sopk-companion.com"}',
+ '{"sub": "550e8400-e29b-41d4-a716-446655440001", "email": "emma.dev@sopk-companion.com", "email_verified": true}',
  'email', NOW(), NOW(), NOW()),
 ('550e8400-e29b-41d4-a716-446655440002', '550e8400-e29b-41d4-a716-446655440002',
- '{"sub": "550e8400-e29b-41d4-a716-446655440002", "email": "claire.dev@sopk-companion.com"}',
+ '{"sub": "550e8400-e29b-41d4-a716-446655440002", "email": "claire.dev@sopk-companion.com", "email_verified": true}',
  'email', NOW(), NOW(), NOW())
 ON CONFLICT (provider_id, provider) DO NOTHING;
 
