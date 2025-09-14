@@ -7,11 +7,13 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../../../core/auth/AuthContext';
-import nutritionService from '../services/nutritionService';
+import recipeService from '../services/recipeService';
+import recipeTrackingService from '../services/recipeTrackingService';
 import SuggestionCard from '../components/SuggestionCard';
 import MealDetailModal from '../components/MealDetailModal';
 import TrackingSuccess from '../components/TrackingSuccess';
-import trackingService from '../services/trackingService';
+import GroceryListGenerator from '../components/GroceryListGenerator';
+import CookingModeView from './CookingModeView';
 
 const RecipeLibraryView = ({ onBack }) => {
   const { user } = useAuth();
@@ -25,6 +27,12 @@ const RecipeLibraryView = ({ onBack }) => {
   const [showModal, setShowModal] = useState(false);
   const [trackedMeal, setTrackedMeal] = useState(null);
   const [showTrackingSuccess, setShowTrackingSuccess] = useState(false);
+
+  // Nouvelles fonctionnalités
+  const [selectedRecipes, setSelectedRecipes] = useState([]);
+  const [showGroceryList, setShowGroceryList] = useState(false);
+  const [cookingRecipe, setCookingRecipe] = useState(null);
+  const [selectionMode, setSelectionMode] = useState(false);
 
   // Catégories de repas
   const categories = [
@@ -48,14 +56,12 @@ const RecipeLibraryView = ({ onBack }) => {
     const loadRecipes = async () => {
       setLoading(true);
       try {
-        const { data } = await nutritionService.getAllMealSuggestions();
-        // Filtrer pour ne garder que les recettes IG bas
-        const lowGIRecipes = data.filter(recipe =>
-          recipe.glycemic_index_category === 'low'
-        );
-        setRecipes(lowGIRecipes);
+        const { data } = await recipeService.getAllRecipes({
+          glycemicIndex: 'low' // Filtrer par IG bas directement
+        });
+        setRecipes(data);
       } catch (error) {
-
+        console.error('Erreur lors du chargement des recettes:', error);
         setRecipes([]);
       } finally {
         setLoading(false);
@@ -73,10 +79,10 @@ const RecipeLibraryView = ({ onBack }) => {
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase().trim();
       filtered = filtered.filter(recipe =>
-        recipe.name.toLowerCase().includes(query) ||
+        recipe.title.toLowerCase().includes(query) ||
         recipe.description?.toLowerCase().includes(query) ||
-        recipe.main_nutrients?.some(nutrient =>
-          nutrient.toLowerCase().includes(query)
+        recipe.sopk_benefits?.some(benefit =>
+          benefit.toLowerCase().includes(query)
         )
       );
     }
@@ -111,9 +117,9 @@ const RecipeLibraryView = ({ onBack }) => {
     if (!user?.id) return;
 
     try {
-      await trackingService.trackMealConsumption(user.id, mealId, mealType, {
-        satisfaction_rating: 5,
-        will_remake: true
+      await recipeTrackingService.trackRecipe(user.id, mealId, {
+        taste_rating: 5,
+        would_make_again: true
       });
 
       // Trouver la recette trackée pour l'affichage
@@ -123,8 +129,34 @@ const RecipeLibraryView = ({ onBack }) => {
         setShowTrackingSuccess(true);
       }
     } catch (error) {
-
+      console.error('Erreur lors du tracking:', error);
     }
+  };
+
+  const handleStartCooking = (recipe) => {
+    setCookingRecipe(recipe);
+  };
+
+  const handleToggleSelection = (recipe) => {
+    setSelectedRecipes(prev => {
+      const isSelected = prev.some(r => r.id === recipe.id);
+      if (isSelected) {
+        return prev.filter(r => r.id !== recipe.id);
+      } else {
+        return [...prev, recipe];
+      }
+    });
+  };
+
+  const handleGenerateGroceryList = () => {
+    if (selectedRecipes.length > 0) {
+      setShowGroceryList(true);
+    }
+  };
+
+  const handleClearSelection = () => {
+    setSelectedRecipes([]);
+    setSelectionMode(false);
   };
 
   const clearFilters = () => {
@@ -157,6 +189,32 @@ const RecipeLibraryView = ({ onBack }) => {
           >
             ← Retour
           </button>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setSelectionMode(!selectionMode)}
+              className={`px-4 py-2 rounded-lg transition-colors ${
+                selectionMode ? 'bg-blue-500 text-white' : 'bg-white border border-gray-200 hover:bg-gray-50'
+              }`}
+            >
+              {selectionMode ? '✓ Mode sélection' : '🛒 Sélectionner'}
+            </button>
+            {selectedRecipes.length > 0 && (
+              <>
+                <button
+                  onClick={handleGenerateGroceryList}
+                  className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+                >
+                  📝 Liste courses ({selectedRecipes.length})
+                </button>
+                <button
+                  onClick={handleClearSelection}
+                  className="px-3 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+                >
+                  ✖
+                </button>
+              </>
+            )}
+          </div>
           <div>
             <h1 className="text-3xl font-bold" style={{ color: '#1F2937' }}>
               📚 Catalogue Recettes IG Bas
@@ -287,15 +345,33 @@ const RecipeLibraryView = ({ onBack }) => {
 
       {!loading && filteredRecipes.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredRecipes.map((recipe) => (
-            <SuggestionCard
-              key={recipe.id}
-              meal={recipe}
-              onViewDetails={handleViewMealDetails}
-              onTrackMeal={handleTrackMeal}
-              compact={false}
-            />
-          ))}
+          {filteredRecipes.map((recipe) => {
+            const isSelected = selectedRecipes.some(r => r.id === recipe.id);
+            return (
+              <div key={recipe.id} className="relative">
+                {selectionMode && (
+                  <div className="absolute top-2 left-2 z-10">
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      onChange={() => handleToggleSelection(recipe)}
+                      className="w-5 h-5 text-blue-600 bg-white border-gray-300 rounded focus:ring-blue-500"
+                    />
+                  </div>
+                )}
+                <div className={`${isSelected ? 'ring-2 ring-blue-500 rounded-xl' : ''}`}>
+                  <SuggestionCard
+                    meal={recipe}
+                    onViewDetails={handleViewMealDetails}
+                    onTrackMeal={handleTrackMeal}
+                    onStartCooking={() => handleStartCooking(recipe)}
+                    compact={false}
+                    showCookingButton={true}
+                  />
+                </div>
+              </div>
+            );
+          })}
         </div>
       )}
 
@@ -318,6 +394,33 @@ const RecipeLibraryView = ({ onBack }) => {
         onViewHistory={handleViewHistory}
         onRateMeal={handleRateMeal}
       />
+
+      {/* Générateur de liste de courses */}
+      {showGroceryList && (
+        <GroceryListGenerator
+          selectedRecipes={selectedRecipes}
+          onClose={() => setShowGroceryList(false)}
+          onGenerate={(result) => {
+            console.log('Liste générée:', result);
+            setShowGroceryList(false);
+          }}
+        />
+      )}
+
+      {/* Mode cuisine guidé */}
+      {cookingRecipe && (
+        <div className="fixed inset-0 z-50">
+          <CookingModeView
+            recipeId={cookingRecipe.id}
+            onBack={() => setCookingRecipe(null)}
+            onComplete={(result) => {
+              console.log('Cuisine terminée:', result);
+              setCookingRecipe(null);
+              // Optionnel: Afficher une notification de succès
+            }}
+          />
+        </div>
+      )}
 
       {/* Footer informatif */}
       <footer className="mt-12 pt-6 text-center" style={{ borderTop: '1px solid #E5E7EB' }}>
