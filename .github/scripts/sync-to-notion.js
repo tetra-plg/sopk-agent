@@ -164,6 +164,7 @@ function markdownToNotionBlocks(markdown) {
   let codeBlockLanguage = '';
   let inList = false;
   let listItems = [];
+  let firstH1Skipped = false; // Pour éviter le doublon avec le titre de la page
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
@@ -347,6 +348,11 @@ function markdownToNotionBlocks(markdown) {
 
     // Headings - Notion ne supporte que H1, H2, H3
     if (line.startsWith('# ')) {
+      // Ignorer le premier H1 car il fait doublon avec le titre de la page
+      if (!firstH1Skipped) {
+        firstH1Skipped = true;
+        continue;
+      }
       blocks.push({
         object: 'block',
         type: 'heading_1',
