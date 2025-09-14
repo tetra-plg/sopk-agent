@@ -14,18 +14,32 @@ Application React moderne développée avec Vite, Tailwind CSS et intégration S
 ```
 sopk-agent/
 ├── src/
-│   ├── components/     # Composants React réutilisables
-│   ├── pages/          # Pages de l'application
-│   ├── services/       # Services (API, Supabase, etc.)
-│   ├── utils/          # Fonctions utilitaires
-│   ├── App.jsx         # Composant principal
-│   ├── main.jsx        # Point d'entrée
-│   └── index.css       # Styles Tailwind
-├── public/             # Assets publics
-├── .env               # Variables d'environnement locales
-├── .env.development   # Variables pour développement
-├── .env.production    # Variables pour production
-└── package.json       # Dépendances et scripts
+│   ├── modules/                    # Modules fonctionnels
+│   │   ├── cycle/                  # Module journal cycle
+│   │   ├── stress/                 # Module gestion stress
+│   │   ├── nutrition/              # Module nutrition
+│   │   ├── activity/               # Module activité physique
+│   │   └── dashboard/              # Module dashboard
+│   ├── core/                       # Éléments centraux
+│   │   ├── contexts/               # Contexts React globaux
+│   │   ├── layouts/                # Layouts principaux
+│   │   └── pages/                  # Pages principales
+│   ├── shared/                     # Éléments partagés
+│   │   ├── components/             # Composants réutilisables
+│   │   ├── hooks/                  # Hooks personnalisés
+│   │   ├── services/               # Services (API, Supabase)
+│   │   └── utils/                  # Fonctions utilitaires
+│   ├── admin/                      # Interface d'administration
+│   ├── App.jsx                     # Composant principal
+│   ├── main.jsx                    # Point d'entrée
+│   └── index.css                   # Styles Tailwind
+├── docs/                           # Documentation
+│   └── backlogs/                   # Plans de développement
+├── public/                         # Assets publics
+├── .env                           # Variables d'environnement locales
+├── .env.development               # Variables pour développement
+├── .env.production                # Variables pour production
+└── package.json                   # Dépendances et scripts
 
 ```
 
@@ -42,7 +56,7 @@ sopk-agent/
 - **Local Development**: Supabase CLI pour environnement local
 
 ## Scripts NPM
-- `npm run dev`: Lancer le serveur de développement
+- `npm run dev`: Lancer le serveur de développement (http://localhost:9090)
 - `npm run build`: Build de production
 - `npm run preview`: Prévisualiser le build
 - `npm run lint`: Vérifier le code avec ESLint
@@ -73,7 +87,7 @@ sopk-agent/
 # Installation des dépendances
 npm install
 
-# Développement local
+# Développement local (port 9090)
 npm run dev
 
 # Build production
