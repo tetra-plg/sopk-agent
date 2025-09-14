@@ -738,6 +738,9 @@ async function syncDocsToNotion() {
   const parentPages = new Map();
   parentPages.set('docs', ROOT_PAGE_ID);
 
+  // Map pour stocker les pages de dossiers créées et leur contenu README
+  const folderReadmeContent = new Map();
+
   // Fonction pour créer les dossiers parent si nécessaire
   async function ensureParentPage(dirPath, parentId) {
     const relativePath = path.relative(process.cwd(), dirPath);
@@ -764,24 +767,34 @@ async function syncDocsToNotion() {
     // D'abord vérifier si une page dossier existe déjà (archivée ou non)
     const folderTitle = `📁 ${dirName}`;
 
-    // Rechercher la page existante dans Notion
-    // Note: Pour une vraie implémentation, il faudrait utiliser l'API search
-    // Mais ici on va créer directement et gérer les erreurs
-
     console.log(`📂 Creating folder structure: ${relativePath}`);
 
-    const emptyBlocks = [{
-      object: 'block',
-      type: 'paragraph',
-      paragraph: {
-        rich_text: [{
-          type: 'text',
-          text: { content: `Contient les documents du dossier: ${dirName}` }
-        }]
-      }
-    }];
+    // Vérifier si un README existe pour ce dossier
+    const readmePath = path.join(dirPath, 'README.md');
+    let folderBlocks = [];
 
-    const folderId = await createNotionPage(actualParentId, folderTitle, emptyBlocks);
+    if (fs.existsSync(readmePath)) {
+      console.log(`📄 Found README.md for folder ${dirName}, using its content`);
+      const readmeContent = fs.readFileSync(readmePath, 'utf8');
+      folderBlocks = markdownToNotionBlocks(readmeContent);
+
+      // Marquer ce README comme traité pour ne pas le créer comme page séparée
+      folderReadmeContent.set(readmePath, true);
+    } else {
+      // Contenu par défaut si pas de README
+      folderBlocks = [{
+        object: 'block',
+        type: 'paragraph',
+        paragraph: {
+          rich_text: [{
+            type: 'text',
+            text: { content: `Contient les documents du dossier: ${dirName}` }
+          }]
+        }
+      }];
+    }
+
+    const folderId = await createNotionPage(actualParentId, folderTitle, folderBlocks);
     if (folderId) {
       parentPages.set(relativePath, folderId);
       console.log(`✅ Created folder page: ${folderTitle}`);
@@ -819,6 +832,12 @@ async function syncDocsToNotion() {
   let createdCount = 0;
 
   for (const filePath of markdownFiles) {
+    // Ignorer les README qui ont déjà été intégrés dans les pages de dossier
+    if (path.basename(filePath) === 'README.md' && folderReadmeContent.has(filePath)) {
+      console.log(`⏭️  Skipping ${filePath} - already integrated in folder page`);
+      continue;
+    }
+
     const content = fs.readFileSync(filePath, 'utf8');
     const frontmatter = extractFrontmatter(content);
     const title = frontmatter?.title || path.basename(filePath, '.md');
