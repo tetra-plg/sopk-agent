@@ -126,7 +126,7 @@ const NutritionTracker = () => {
   }
 
   return (
-    <div className="bg-white rounded-xl p-6 shadow-sm">
+    <div className="card-nutrition rounded-xl p-6 shadow-sm h-full min-h-[400px] flex flex-col">
       <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
         🥗 Mon suivi nutrition
       </h3>
@@ -218,8 +218,10 @@ const NutritionTracker = () => {
         </div>
       )}
 
+      <div className="flex-grow"></div>
+
       {/* Message d'encouragement si pas de données */}
-      {(!weeklyStats || weeklyStats.totalRecipesMade === 0) && recentMeals.length === 0 && _weeklyData.length === 0 && (
+      {(!weeklyStats || (weeklyStats.totalRecipesMade === 0)) && recentMeals.length === 0 && _weeklyData.length === 0 && (
         <div className="text-center py-6 text-gray-500">
           <div className="text-4xl mb-2">🍽️</div>
           <p className="text-sm">

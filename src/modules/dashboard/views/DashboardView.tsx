@@ -6,6 +6,7 @@ import { useMealSuggestions } from '../../nutrition/hooks/useMealSuggestions';
 import MealDetailModal from '../../nutrition/components/MealDetailModal';
 import TrackingSuccess from '../../nutrition/components/TrackingSuccess';
 import BreathingSession from '../../stress/components/BreathingSession';
+import CookingModeView from '../../nutrition/views/CookingModeView';
 import { useBreathingTechniques } from '../../stress/hooks/useBreathingTechniques';
 import DailyJournalView from '../../cycle/views/DailyJournalView';
 import StateEvolutionTracker from '../components/StateEvolutionTracker';
@@ -31,6 +32,7 @@ const DashboardView = ({ onNavigate }) => {
   const [showMealModal, setShowMealModal] = useState(false);
   const [trackedMeal, setTrackedMeal] = useState(null);
   const [showTrackingSuccess, setShowTrackingSuccess] = useState(false);
+  const [cookingRecipe, setCookingRecipe] = useState<Recipe | null>(null);
 
   // État pour la session de respiration
   const [showBreathingSession, setShowBreathingSession] = useState(false);
@@ -158,6 +160,10 @@ const DashboardView = ({ onNavigate }) => {
     setShowBreathingSession(true);
   };
 
+  const handleStartCooking = (recipe) => {
+    setCookingRecipe(recipe);
+  };
+
   // Obtenir la suggestion du jour
   const todaySuggestion: Recipe | null = mealSuggestions.getQuickSuggestion();
 
@@ -239,7 +245,7 @@ const DashboardView = ({ onNavigate }) => {
 
       
         {/* Version desktop avec grid */}
-        <div className="hidden lg:grid gap-4 md:gap-6 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
+        <div className="hidden lg:grid gap-4 md:gap-6 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 items-stretch">
           <div className="col-span-1">
             {/* Carte État du jour */}
             <SymptomsCard
@@ -286,7 +292,7 @@ const DashboardView = ({ onNavigate }) => {
         </div>
 
         {/* Version desktop avec grid */}
-        <div className="hidden lg:grid gap-4 md:gap-6 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
+        <div className="hidden lg:grid gap-4 md:gap-6 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 items-stretch">
           <div className="col-span-1">
             <StateEvolutionTracker />
           </div>
@@ -324,6 +330,7 @@ const DashboardView = ({ onNavigate }) => {
             setSelectedMeal(null);
           }}
           onTrackMeal={handleTrackMeal}
+          onStartCooking={handleStartCooking}
         />
       )}
 
@@ -345,6 +352,20 @@ const DashboardView = ({ onNavigate }) => {
             setTrackedMeal(null);
           }}
         />
+      )}
+
+      {/* Mode cuisine guidé */}
+      {cookingRecipe && (
+        <div className="fixed inset-0 z-50">
+          <CookingModeView
+            recipeId={cookingRecipe.id}
+            onBack={() => setCookingRecipe(null)}
+            onComplete={() => {
+              setCookingRecipe(null);
+              // Optionnel : afficher une notification de succès
+            }}
+          />
+        </div>
       )}
     </div>
   );

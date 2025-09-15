@@ -15,7 +15,7 @@ interface NutritionCardProps {
 
 const NutritionCard = ({ todaySuggestion, loading, onShowMealDetails, onNavigate }: NutritionCardProps) => {
   return (
-    <div className="card-nutrition p-4 md:p-6 transform hover:scale-105 transition-transform duration-200 flex flex-col">
+    <div className="card-nutrition p-4 md:p-6 transform hover:scale-105 transition-transform duration-200 flex flex-col h-full min-h-[320px]">
       <h3 className="font-heading text-lg font-semibold mb-4 flex items-center gap-2"
           style={{ color: 'var(--color-accent-vert-sauge)' }}>
         🥗 Idée repas

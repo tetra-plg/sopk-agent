@@ -12,7 +12,7 @@ interface SymptomsCardProps {
 
 const SymptomsCard = ({ todaySymptoms, loadingSymptoms, onEditJournal }: SymptomsCardProps) => {
   return (
-    <div className="card-dashboard p-3 md:p-6 col-span-1 sm:col-span-2 lg:col-span-1 transform hover:scale-105 transition-transform duration-200 flex flex-col">
+    <div className="card-dashboard p-3 md:p-6 col-span-1 sm:col-span-2 lg:col-span-1 transform hover:scale-105 transition-transform duration-200 flex flex-col h-full min-h-[320px]">
       <h3 className="font-heading text-lg font-semibold mb-4 flex items-center gap-2"
           style={{ color: 'var(--color-primary-lavande)' }}>
         ✨ État du jour

@@ -125,7 +125,7 @@ const StateEvolutionTracker = () => {
   }
 
   return (
-    <div className="bg-white rounded-xl p-6 shadow-sm">
+    <div className="card-dashboard rounded-xl p-6 shadow-sm h-full min-h-[400px] flex flex-col">
       <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
         📖 Mon journal cette semaine
       </h3>
@@ -247,6 +247,8 @@ const StateEvolutionTracker = () => {
           </div>
         ))}
       </div>
+
+      <div className="flex-grow"></div>
 
       {/* Message si aucune donnée */}
       {weekData.filter(d => d.journalEntry).length === 0 && (

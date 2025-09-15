@@ -135,7 +135,7 @@ const StressManagementTracker = ({ onStartBreathing }) => {
   const quickTechnique = getQuickTechnique();
 
   return (
-    <div className="bg-white rounded-xl p-6 shadow-sm">
+    <div className="card-stress rounded-xl p-6 shadow-sm h-full min-h-[400px] flex flex-col">
       <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
         🧘 Gestion du stress
       </h3>
@@ -233,6 +233,8 @@ const StressManagementTracker = ({ onStartBreathing }) => {
           </div>
         </div>
       )}
+
+      <div className="flex-grow"></div>
 
       {/* Message d'encouragement si pas de données */}
       {(!weeklyStats || weeklyStats.totalSessions === 0) && recentSessions.length === 0 && (

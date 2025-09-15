@@ -11,7 +11,7 @@ interface WellnessCardProps {
 
 const WellnessCard = ({ techniques, onStartBreathingExercise }: WellnessCardProps) => {
   return (
-    <div className="card-stress p-4 md:p-6 transform hover:scale-105 transition-transform duration-200 flex flex-col">
+    <div className="card-stress p-4 md:p-6 transform hover:scale-105 transition-transform duration-200 flex flex-col h-full min-h-[320px]">
       <h3 className="font-heading text-lg font-semibold mb-4 flex items-center gap-2"
           style={{ color: 'var(--color-primary-bleu-ciel)' }}>
         🧘 Pause bien-être
