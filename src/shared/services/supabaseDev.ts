@@ -7,18 +7,19 @@
  * ⚠️ NE JAMAIS utiliser en production !
  */
 
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js'
+import type { Database } from '@/types';
 import { supabase } from './supabase';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseServiceKey = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY;
+const supabaseUrl: string = import.meta.env.VITE_SUPABASE_URL;
+const supabaseServiceKey: string = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY;
 
 // Helper pour savoir si on est en développement
 export const isDevelopment = import.meta.env.DEV;
 
 // Client avec les privilèges service_role pour le développement
 // En production, on utilise null pour éviter l'instanciation
-export const supabaseDev = isDevelopment && supabaseServiceKey
+export const supabaseDev: SupabaseClient<Database> | null = isDevelopment && supabaseServiceKey
   ? createClient(supabaseUrl, supabaseServiceKey, {
       auth: {
         autoRefreshToken: false,
@@ -33,7 +34,7 @@ if (!isDevelopment && supabaseDev) {
 }
 
 // Fonction utilitaire pour obtenir le bon client Supabase
-export const getSupabaseClient = () => {
+export const getSupabaseClient = (): SupabaseClient<Database> => {
   // En développement, utiliser supabaseDev si disponible, sinon supabase
   if (isDevelopment && supabaseDev) {
     return supabaseDev;

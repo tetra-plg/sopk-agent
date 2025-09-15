@@ -5,12 +5,13 @@
  */
 
 import { getSupabaseClient } from './supabaseDev';
+import type { UserProfile, ApiResponse } from '@/types';
 
 const userProfileService = {
   /**
    * Récupérer le profil complet d'un utilisateur
    */
-  async getUserProfile(userId) {
+  async getUserProfile(userId: string): Promise<ApiResponse<UserProfile>> {
     try {
       const client = getSupabaseClient();
       const { data, error } = await client

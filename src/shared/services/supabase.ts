@@ -1,7 +1,8 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient, SupabaseClient } from '@supabase/supabase-js'
+import type { Database } from '@/types'
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+const supabaseUrl: string = import.meta.env.VITE_SUPABASE_URL
+const supabaseAnonKey: string = import.meta.env.VITE_SUPABASE_ANON_KEY
 
 console.log('🔍 Debug Variables Supabase:', {
   isDevelopment: import.meta.env.DEV,
@@ -27,4 +28,4 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 console.log('✅ Supabase configuré avec succès');
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+export const supabase: SupabaseClient<Database> = createClient(supabaseUrl, supabaseAnonKey)
