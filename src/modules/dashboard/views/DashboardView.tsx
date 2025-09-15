@@ -8,6 +8,10 @@ import TrackingSuccess from '../../nutrition/components/TrackingSuccess';
 import BreathingSession from '../../stress/components/BreathingSession';
 import { useBreathingTechniques } from '../../stress/hooks/useBreathingTechniques';
 import DailyJournalView from '../../cycle/views/DailyJournalView';
+import StateEvolutionTracker from '../components/StateEvolutionTracker';
+import NutritionTracker from '../components/NutritionTracker';
+import StressManagementTracker from '../components/StressManagementTracker';
+import SwipeContainer from '../../../shared/components/SwipeContainer';
 
 const DashboardView = ({ onNavigate }) => {
   const { user } = useAuth();
@@ -387,6 +391,38 @@ const DashboardView = ({ onNavigate }) => {
           "Les oméga-3 peuvent aider à réduire l'inflammation liée au SOPK.
           Pense à inclure du saumon, des noix ou des graines de lin dans tes repas !"
         </p>
+      </div>
+
+      {/* Section Tracking */}
+      <div className="mt-6 md:mt-8">
+        <h2 className="font-heading text-lg md:text-xl font-semibold mb-4 md:mb-6 text-center"
+            style={{ color: 'var(--color-primary-lavande)' }}>
+          📊 Ton suivi personnalisé
+        </h2>
+
+        {/* Version mobile avec swipe */}
+        <div className="block lg:hidden">
+          <SwipeContainer>
+            <StateEvolutionTracker />
+            <NutritionTracker />
+            <StressManagementTracker onStartBreathing={handleStartBreathingExercise} />
+          </SwipeContainer>
+        </div>
+
+        {/* Version desktop avec grid */}
+        <div className="hidden lg:grid gap-4 md:gap-6 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
+          <div className="col-span-1">
+            <StateEvolutionTracker />
+          </div>
+
+          <div className="col-span-1">
+            <NutritionTracker />
+          </div>
+
+          <div className="col-span-1 lg:col-span-2 xl:col-span-1">
+            <StressManagementTracker onStartBreathing={handleStartBreathingExercise} />
+          </div>
+        </div>
       </div>
 
       {/* Modales et composants overlay */}
