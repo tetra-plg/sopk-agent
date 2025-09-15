@@ -7,7 +7,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../../core/auth/AuthContext';
 import recipeService from '../services/recipeService';
-import recipeTrackingService from '../services/recipeTrackingService';
+import trackingService from '../services/trackingService';
 
 const CookingModeView = ({ recipeId, onBack, onComplete }) => {
   const { user } = useAuth();
@@ -124,7 +124,7 @@ const CookingModeView = ({ recipeId, onBack, onComplete }) => {
     // Enregistrer le tracking de la recette
     if (user?.id) {
       try {
-        await recipeTrackingService.trackRecipe(user.id, recipe.id, {
+        await trackingService.trackMealConsumption(user.id, recipe.id, null, {
           servings_made: Math.round(recipe.servings * servingAdjustment),
           preparation_time_actual: totalTime
         });

@@ -34,11 +34,34 @@ const SuggestionCard = ({
     ? 'bg-white p-4 rounded-lg border border-gray-200'
     : 'bg-white p-6 rounded-xl border-2 border-gray-100 hover:border-green-400 transition-all duration-300 hover:shadow-lg';
 
+  // Fonction pour obtenir l'emoji et le label du type de repas
+  const getMealTypeDisplay = (category) => {
+    const mealTypes = {
+      'breakfast': { emoji: '🌅', label: 'Petit-déjeuner' },
+      'lunch': { emoji: '🍽️', label: 'Déjeuner' },
+      'dinner': { emoji: '🌙', label: 'Dîner' },
+      'snack': { emoji: '🥨', label: 'Collation' }
+    };
+    return mealTypes[category] || { emoji: '🍽️', label: category || 'Repas' };
+  };
+
+  const mealTypeInfo = getMealTypeDisplay(meal.category);
+
   return (
     <div className={`${cardClasses} ${className}`}>
-      {/* En-tête avec titre et action rapide */}
-      <div className="flex justify-between items-start mb-3">
-        <h3 className={`font-semibold text-gray-800 ${compact ? 'text-base' : 'text-lg'}`}>
+      {/* Type de repas */}
+      {!compact && (
+        <div className="mb-3">
+          <span className="inline-flex items-center gap-1 bg-green-100 text-green-700 text-xs font-medium px-2 py-1 rounded-full">
+            <span>{mealTypeInfo.emoji}</span>
+            <span>{mealTypeInfo.label}</span>
+          </span>
+        </div>
+      )}
+
+      {/* En-tête avec titre */}
+      <div className="mb-3">
+        <h3 className={`font-semibold text-gray-800 ${compact ? 'text-base' : 'text-lg'} leading-tight`}>
           {meal.title || meal.name}
         </h3>
       </div>
@@ -126,21 +149,10 @@ const SuggestionCard = ({
             👩‍🍳 {compact ? 'Cuisiner' : 'Mode cuisine'}
           </button>
         )}
-
-        <button
-          onClick={handleTrackMeal}
-          className={`
-            bg-green-500 text-white px-4 py-2 rounded-lg text-sm font-medium
-            hover:bg-green-600 transition-colors
-            ${compact ? 'w-full' : 'shrink-0'}
-          `}
-        >
-          ✅ {compact ? 'Mangé' : 'J\'ai mangé ça'}
-        </button>
       </div>
 
       {/* Score debug (seulement en dev) */}
-      {process.env.NODE_ENV === 'development' && meal.score && (
+      {import.meta.env.DEV && meal.score && (
         <div className="mt-2 text-xs text-gray-400">
           Score: {meal.score}
         </div>

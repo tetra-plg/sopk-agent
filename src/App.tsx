@@ -8,7 +8,6 @@ import ProtectedRoute from './core/layouts/ProtectedRoute';
 import DashboardView from './modules/dashboard/views/DashboardView';
 import CycleView from './modules/cycle/views/CycleView';
 import NutritionView from './modules/nutrition/views/NutritionView';
-import MealSuggestionsView from './modules/nutrition/views/MealSuggestionsView';
 import NutritionHistoryView from './modules/nutrition/views/NutritionHistoryView';
 import StressView from './modules/stress/views/StressView';
 import ActivityView from './modules/activity/views/ActivityView';
@@ -26,8 +25,6 @@ const App: FC = () => {
         return <CycleView />;
       case '/nutrition':
         return <NutritionView />;
-      case '/nutrition/suggestions':
-        return <MealSuggestionsView />;
       case '/nutrition/history':
         return <NutritionHistoryView />;
       case '/stress':

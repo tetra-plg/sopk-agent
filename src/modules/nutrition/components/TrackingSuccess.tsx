@@ -40,7 +40,7 @@ const TrackingSuccess = ({
               Super ! Repas ajouté 🍽️
             </h4>
             <p className="text-sm text-gray-600 mb-3">
-              <strong>{meal.name}</strong> a été ajouté à ton suivi nutrition.
+              <strong>{meal.title || meal.name}</strong> a été ajouté à ton suivi nutrition.
             </p>
 
             {!showRatingPrompt ? (

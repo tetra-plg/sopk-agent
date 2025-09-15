@@ -8,14 +8,14 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../../../core/auth/AuthContext';
 import recipeService from '../services/recipeService';
-import recipeTrackingService from '../services/recipeTrackingService';
+import trackingService from '../services/trackingService';
 import SuggestionCard from '../components/SuggestionCard';
 import MealDetailModal from '../components/MealDetailModal';
 import TrackingSuccess from '../components/TrackingSuccess';
 import GroceryListGenerator from '../components/GroceryListGenerator';
 import CookingModeView from './CookingModeView';
 
-const RecipeLibraryView = ({ onBack }) => {
+const RecipeLibraryView = ({ onBack, onViewHistory }) => {
   const { user } = useAuth();
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -117,9 +117,9 @@ const RecipeLibraryView = ({ onBack }) => {
     if (!user?.id) return;
 
     try {
-      await recipeTrackingService.trackRecipe(user.id, mealId, {
-        taste_rating: 5,
-        would_make_again: true
+      await trackingService.trackMealConsumption(user.id, mealId, mealType, {
+        satisfaction_rating: 5,
+        will_remake: true
       });
 
       // Trouver la recette trackée pour l'affichage
@@ -167,8 +167,7 @@ const RecipeLibraryView = ({ onBack }) => {
   };
 
   const handleViewHistory = () => {
-    // TODO: Implémenter navigation vers historique nutrition
-
+    onViewHistory && onViewHistory();
   };
 
   const handleRateMeal = async (rating) => {

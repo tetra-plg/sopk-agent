@@ -10,7 +10,7 @@ import trackingService from '../services/trackingService';
 import NutritionTag from '../../../shared/components/ui/NutritionTag';
 import PrepTimeIndicator from '../../../shared/components/ui/PrepTimeIndicator';
 
-const NutritionHistoryView = () => {
+const NutritionHistoryView = ({ onBack }) => {
   const { user } = useAuth();
   const [history, setHistory] = useState([]);
   const [stats, setStats] = useState(null);
@@ -47,6 +47,21 @@ const NutritionHistoryView = () => {
     }
   };
 
+  const handleDeleteMeal = async (trackingId, mealTitle) => {
+    if (!window.confirm(`Êtes-vous sûr de vouloir supprimer "${mealTitle}" de votre historique ?`)) {
+      return;
+    }
+
+    try {
+      await trackingService.deleteMealTracking(trackingId);
+      // Recharger l'historique après suppression
+      await loadHistory();
+      await loadStats();
+    } catch (error) {
+      alert('Erreur lors de la suppression du repas. Veuillez réessayer.');
+    }
+  };
+
   const calculateStats = (data) => {
     if (data.length === 0) {
       setStats(null);
@@ -55,11 +70,11 @@ const NutritionHistoryView = () => {
 
     const totalMeals = data.length;
     const avgSatisfaction = data
-      .filter(item => item.satisfaction_rating)
-      .reduce((sum, item) => sum + item.satisfaction_rating, 0) /
-      data.filter(item => item.satisfaction_rating).length;
+      .filter(item => item.taste_rating)
+      .reduce((sum, item) => sum + item.taste_rating, 0) /
+      data.filter(item => item.taste_rating).length;
 
-    const favoriteCount = data.filter(item => item.will_remake).length;
+    const favoriteCount = data.filter(item => item.would_make_again).length;
     const lowGICount = data.filter(item =>
       item.recipes?.glycemic_index_category === 'low'
     ).length;
@@ -125,12 +140,22 @@ const NutritionHistoryView = () => {
     <div className="p-6 max-w-4xl mx-auto">
       {/* En-tête */}
       <header className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">
-          📊 Mon Historique Nutrition
-        </h1>
-        <p className="text-gray-600">
-          Suivi de tes habitudes alimentaires et insights personnalisés
-        </p>
+        <div className="flex items-center gap-4 mb-4">
+          <button
+            onClick={onBack}
+            className="p-2 rounded-lg bg-white border border-gray-200 hover:bg-gray-50 transition-colors"
+          >
+            ← Retour
+          </button>
+          <div>
+            <h1 className="text-3xl font-bold text-gray-800 mb-2">
+              📊 Mon Historique Nutrition
+            </h1>
+            <p className="text-gray-600">
+              Suivi de tes habitudes alimentaires et insights personnalisés
+            </p>
+          </div>
+        </div>
       </header>
 
       {/* Filtres période */}
@@ -248,14 +273,21 @@ const NutritionHistoryView = () => {
                   </div>
 
                   <div className="flex items-center gap-2">
-                    {entry.satisfaction_rating && (
-                      <span className="text-lg" title={`${entry.satisfaction_rating}/5`}>
-                        {getRatingEmoji(entry.satisfaction_rating)}
+                    {entry.taste_rating && (
+                      <span className="text-lg" title={`${entry.taste_rating}/5`}>
+                        {getRatingEmoji(entry.taste_rating)}
                       </span>
                     )}
-                    {entry.will_remake && (
+                    {entry.would_make_again && (
                       <span className="text-green-600 text-sm">❤️ Favori</span>
                     )}
+                    <button
+                      onClick={() => handleDeleteMeal(entry.id, entry.recipes?.title || 'ce repas')}
+                      className="text-red-500 hover:text-red-700 hover:bg-red-50 p-1 rounded transition-colors"
+                      title="Supprimer ce repas"
+                    >
+                      🗑️
+                    </button>
                   </div>
                 </div>
 

@@ -5,11 +5,12 @@ import SuggestionCard from '../components/SuggestionCard';
 import MealDetailModal from '../components/MealDetailModal';
 import TrackingSuccess from '../components/TrackingSuccess';
 import RecipeLibraryView from './RecipeLibraryView';
+import NutritionHistoryView from './NutritionHistoryView';
 import trackingService from '../services/trackingService';
 
 const NutritionView = () => {
   const { user } = useAuth();
-  const [currentView, setCurrentView] = useState('overview'); // 'overview', 'library'
+  const [currentView, setCurrentView] = useState('overview'); // 'overview', 'library', 'history'
   const [selectedMeal, setSelectedMeal] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [trackedMeal, setTrackedMeal] = useState(null);
@@ -84,7 +85,6 @@ const NutritionView = () => {
         const { data } = await trackingService.getTodayMeals(user.id);
         setTodayMeals(data || []);
       } catch (error) {
-
         setTodayMeals([]);
       } finally {
         setLoadingTodayMeals(false);
@@ -126,8 +126,10 @@ const NutritionView = () => {
   };
 
   const handleViewHistory = () => {
-    // TODO: Implémenter historique nutrition quand disponible
-
+    setCurrentView('history');
+    // Fermer le toast de tracking success
+    setShowTrackingSuccess(false);
+    setTrackedMeal(null);
   };
 
   const handleRateMeal = async (rating) => {
@@ -139,7 +141,45 @@ const NutritionView = () => {
 
   // Vue bibliothèque de recettes
   if (currentView === 'library') {
-    return <RecipeLibraryView onBack={() => setCurrentView('overview')} />;
+    return (
+      <>
+        <RecipeLibraryView
+          onBack={() => setCurrentView('overview')}
+          onViewHistory={handleViewHistory}
+        />
+        {/* Notification tracking success globale */}
+        <TrackingSuccess
+          meal={trackedMeal}
+          isVisible={showTrackingSuccess}
+          onClose={() => {
+            setShowTrackingSuccess(false);
+            setTrackedMeal(null);
+          }}
+          onViewHistory={handleViewHistory}
+          onRateMeal={handleRateMeal}
+        />
+      </>
+    );
+  }
+
+  // Vue historique nutrition
+  if (currentView === 'history') {
+    return (
+      <>
+        <NutritionHistoryView onBack={() => setCurrentView('overview')} />
+        {/* Notification tracking success globale */}
+        <TrackingSuccess
+          meal={trackedMeal}
+          isVisible={showTrackingSuccess}
+          onClose={() => {
+            setShowTrackingSuccess(false);
+            setTrackedMeal(null);
+          }}
+          onViewHistory={handleViewHistory}
+          onRateMeal={handleRateMeal}
+        />
+      </>
+    );
   }
 
   // Vue d'entrée du module
@@ -193,7 +233,8 @@ const NutritionView = () => {
                     { type: 'breakfast', name: 'Petit-déjeuner', icon: '🌅' },
                     { type: 'lunch', name: 'Déjeuner', icon: '🍽️' },
                     { type: 'dinner', name: 'Dîner', icon: '🌙' },
-                    { type: 'snack', name: 'Collation', icon: '🥨' }
+                    { type: 'snack', name: 'Collation', icon: '🥨' },
+                    { type: null, name: 'Repas sans catégorie', icon: '❓' }
                   ];
 
                   const mealsByType = todayMeals.reduce((acc, meal) => {
@@ -208,13 +249,23 @@ const NutritionView = () => {
                         const meals = mealsByType[category.type] || [];
                         const isEmpty = meals.length === 0;
 
+                        // Ne pas afficher "Repas sans catégorie" s'il est vide
+                        if (category.type === null && isEmpty) {
+                          return null;
+                        }
+
                         return (
-                          <div key={category.type} className="border-b border-gray-100 last:border-b-0 pb-3 last:pb-0">
+                          <div key={category.type || 'null'} className="border-b border-gray-100 last:border-b-0 pb-3 last:pb-0">
                             <div className="flex items-center gap-2 mb-2">
                               <span className="text-lg">{category.icon}</span>
                               <span className="font-medium" style={{ color: '#1F2937' }}>
                                 {category.name}
                               </span>
+                              {category.type === null && (
+                                <span className="text-xs bg-orange-100 text-orange-600 px-2 py-1 rounded-full">
+                                  À catégoriser
+                                </span>
+                              )}
                             </div>
 
                             {isEmpty ? (
@@ -311,26 +362,6 @@ const NutritionView = () => {
             </section>
           )}
 
-          {/* Navigation claire */}
-          {isReady && primarySuggestion && (
-            <section className="text-center space-y-4">
-              <button
-                onClick={() => setCurrentView('library')}
-                className="px-8 py-3 rounded-xl font-medium transition-colors"
-                style={{
-                  backgroundColor: '#6EE7B7',
-                  color: '#1F2937'
-                }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = '#34D399'}
-                onMouseLeave={(e) => e.target.style.backgroundColor = '#6EE7B7'}
-              >
-                📚 Découvrir plus de recettes IG bas →
-              </button>
-              <p className="text-sm text-gray-600">
-                Explorer toutes nos recettes spéciales SOPK
-              </p>
-            </section>
-          )}
 
           {/* Empty state */}
           {!loading && (!suggestions || suggestions.length === 0) && (
@@ -349,21 +380,48 @@ const NutritionView = () => {
                     return "Explore le catalogue pour trouver le repas parfait !";
                   })()}
                 </p>
-                <button
-                  onClick={() => setCurrentView('library')}
-                  className="px-6 py-2 rounded-xl font-medium transition-colors"
-                  style={{
-                    backgroundColor: '#6EE7B7',
-                    color: '#1F2937'
-                  }}
-                >
-                  📚 Découvrir nos recettes IG bas →
-                </button>
               </div>
             </section>
           )}
         </div>
       )}
+
+      {/* Navigation permanente */}
+      <section className="text-center space-y-4">
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <button
+            onClick={() => setCurrentView('library')}
+            className="px-8 py-3 rounded-xl font-medium transition-colors"
+            style={{
+              backgroundColor: '#6EE7B7',
+              color: '#1F2937'
+            }}
+            onMouseEnter={(e) => e.target.style.backgroundColor = '#34D399'}
+            onMouseLeave={(e) => e.target.style.backgroundColor = '#6EE7B7'}
+          >
+            📚 Découvrir nos recettes IG bas →
+          </button>
+          <button
+            onClick={() => setCurrentView('history')}
+            className="px-6 py-3 rounded-xl font-medium transition-colors border-2"
+            style={{
+              borderColor: '#6EE7B7',
+              color: '#1F2937'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = '#6EE7B7';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = 'transparent';
+            }}
+          >
+            📊 Voir mon historique
+          </button>
+        </div>
+        <p className="text-sm text-gray-600">
+          Explorer toutes nos recettes spéciales SOPK ou consulter ton historique nutrition
+        </p>
+      </section>
 
       {/* Footer discret avec couleurs SOPK */}
       <footer className="mt-12 pt-6 text-center" style={{ borderTop: '1px solid #E5E7EB' }}>
