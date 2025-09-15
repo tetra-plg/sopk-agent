@@ -103,7 +103,8 @@ INSERT INTO user_profiles (
   user_id, first_name, preferred_name, date_of_birth,
   sopk_diagnosis_year, current_symptoms, severity_level,
   primary_goals
-) VALUES
+)
+VALUES
 -- Sarah : Profil actif avec SOPK modéré
 ('550e8400-e29b-41d4-a716-446655440000', 'Sarah', 'Sarah', '1992-06-15',
  2020, ARRAY['irregular_cycles', 'fatigue', 'mood_swings', 'weight_gain'],
@@ -117,7 +118,8 @@ INSERT INTO user_profiles (
 -- Claire : Expérience longue avec SOPK
 ('550e8400-e29b-41d4-a716-446655440002', 'Claire', 'Claire', '1988-11-08',
  2015, ARRAY['insulin_resistance', 'hirsutism', 'anxiety'],
- 'moderate', ARRAY['weight_management', 'hormonal_balance']);
+ 'moderate', ARRAY['weight_management', 'hormonal_balance'])
+ON CONFLICT (user_id) DO NOTHING;
 
 -- =====================================================
 -- 📝 DONNÉES JOURNAL QUOTIDIEN (SYMPTÔMES)
@@ -247,22 +249,22 @@ INSERT INTO user_nutrition_preferences (
  ARRAY['hormonal_balance', 'insulin_regulation']);
 
 -- Tracking des repas consommés
-INSERT INTO user_meal_tracking (
-  user_id, meal_id, date, meal_type,
-  satisfaction_rating, will_remake
+INSERT INTO user_recipe_tracking (
+  user_id, recipe_id, date_cooked, meal_type, servings_made,
+  taste_rating, would_make_again
 ) VALUES
 -- Sarah a testé plusieurs suggestions
 ('550e8400-e29b-41d4-a716-446655440000',
- (SELECT id FROM meal_suggestions WHERE name = 'Bowl Quinoa-Avocat Protéiné' LIMIT 1),
- CURRENT_DATE - INTERVAL '3 days', 'lunch', 5, true),
+ (SELECT id FROM recipes WHERE title = 'Bowl Quinoa-Avocat Protéiné' AND is_simple_suggestion = true LIMIT 1),
+ CURRENT_DATE - INTERVAL '3 days', 'lunch', 1, 5, true),
 
 ('550e8400-e29b-41d4-a716-446655440000',
- (SELECT id FROM meal_suggestions WHERE name = 'Omelette aux Épinards' LIMIT 1),
- CURRENT_DATE - INTERVAL '2 days', 'breakfast', 4, true),
+ (SELECT id FROM recipes WHERE title = 'Omelette aux Épinards' AND is_simple_suggestion = true LIMIT 1),
+ CURRENT_DATE - INTERVAL '2 days', 'breakfast', 1, 4, true),
 
 ('550e8400-e29b-41d4-a716-446655440000',
- (SELECT id FROM meal_suggestions WHERE name = 'Smoothie Vert Protéiné' LIMIT 1),
- CURRENT_DATE - INTERVAL '1 day', 'snack', 5, true);
+ (SELECT id FROM recipes WHERE title = 'Smoothie Vert Protéiné' AND is_simple_suggestion = true LIMIT 1),
+ CURRENT_DATE - INTERVAL '1 day', 'snack', 1, 5, true);
 
 -- =====================================================
 -- 📚 RECETTES SOPK-FRIENDLY
@@ -272,16 +274,16 @@ INSERT INTO user_meal_tracking (
 -- Cette section était obsolète et a été supprimée pour éviter les conflits de schéma
 
 -- =====================================================
--- 🍽️ SUGGESTIONS DE REPAS (DONNÉES COMPLÉMENTAIRES)
+-- 🍽️ RECETTES SUPPLÉMENTAIRES (DONNÉES COMPLÉMENTAIRES)
 -- =====================================================
 
--- Ajouter plus de suggestions de repas pour enrichir les données
-INSERT INTO meal_suggestions (
-  name, category, difficulty, prep_time_minutes,
+-- Ajouter plus de recettes pour enrichir les données
+INSERT INTO recipes (
+  title, category, difficulty, prep_time_minutes,
   glycemic_index_category, main_nutrients, estimated_calories,
   sopk_benefits, symptom_targets, cycle_phases,
-  ingredients_simple, preparation_steps, tips,
-  season, dietary_restrictions, mood_boosting
+  ingredients_simple, ingredients, instructions, tips,
+  dietary_tags, mood_boosting, is_simple_suggestion
 ) VALUES
 -- Compléter avec plus de variété
 ('Toast Avocat Complet',
@@ -289,27 +291,57 @@ INSERT INTO meal_suggestions (
  'low', ARRAY['healthy_fats', 'fiber'], 280,
  ARRAY['sustained_energy'], ARRAY['fatigue', 'cravings'], ARRAY['any'],
  'Pain complet (2 tranches), avocat (1), citron, sel, poivre',
- '1. Griller le pain\n2. Écraser l''avocat avec citron\n3. Étaler et assaisonner',
+ JSONB_BUILD_ARRAY(
+   JSONB_BUILD_OBJECT('name', 'Pain complet', 'quantity', '2 tranches'),
+   JSONB_BUILD_OBJECT('name', 'Avocat', 'quantity', '1'),
+   JSONB_BUILD_OBJECT('name', 'Citron', 'quantity', '1/2'),
+   JSONB_BUILD_OBJECT('name', 'Sel', 'quantity', '1 pincée'),
+   JSONB_BUILD_OBJECT('name', 'Poivre', 'quantity', '1 pincée')
+ ),
+ JSONB_BUILD_ARRAY(
+   JSONB_BUILD_OBJECT('step', 1, 'instruction', 'Griller le pain'),
+   JSONB_BUILD_OBJECT('step', 2, 'instruction', 'Écraser l''avocat avec citron'),
+   JSONB_BUILD_OBJECT('step', 3, 'instruction', 'Étaler et assaisonner')
+ ),
  'Parfait quand on n''a pas le temps !',
- ARRAY['spring', 'summer', 'autumn', 'winter'], ARRAY['vegetarian'], true),
+ ARRAY['vegetarian'], true, true),
 
 ('Soupe Lentilles Épices',
  'lunch', 'easy', 20,
  'low', ARRAY['protein', 'fiber'], 320,
  ARRAY['inflammation_reduction'], ARRAY['digestive_issues', 'period_pain'], ARRAY['any'],
  'Lentilles corail (100g), légumes variés, épices douces, lait de coco',
- '1. Faire revenir légumes\n2. Ajouter lentilles et épices\n3. Mijoter 15 min',
+ JSONB_BUILD_ARRAY(
+   JSONB_BUILD_OBJECT('name', 'Lentilles corail', 'quantity', '100g'),
+   JSONB_BUILD_OBJECT('name', 'Légumes variés', 'quantity', '200g'),
+   JSONB_BUILD_OBJECT('name', 'Épices douces', 'quantity', '1 c. à café'),
+   JSONB_BUILD_OBJECT('name', 'Lait de coco', 'quantity', '200ml')
+ ),
+ JSONB_BUILD_ARRAY(
+   JSONB_BUILD_OBJECT('step', 1, 'instruction', 'Faire revenir légumes'),
+   JSONB_BUILD_OBJECT('step', 2, 'instruction', 'Ajouter lentilles et épices'),
+   JSONB_BUILD_OBJECT('step', 3, 'instruction', 'Mijoter 15 min')
+ ),
  'Les épices douces apaisent l''inflammation',
- ARRAY['autumn', 'winter'], ARRAY['vegan'], true),
+ ARRAY['vegan'], true, true),
 
 ('Collation Amandes-Dattes',
  'snack', 'very_easy', 2,
  'low', ARRAY['healthy_fats', 'natural_sugars'], 180,
  ARRAY['energy_boost'], ARRAY['cravings', 'fatigue'], ARRAY['any'],
  'Amandes (15), dattes Medjool (2), cannelle',
- '1. Ouvrir les dattes\n2. Farcir avec amandes\n3. Saupoudrer cannelle',
+ JSONB_BUILD_ARRAY(
+   JSONB_BUILD_OBJECT('name', 'Amandes', 'quantity', '15'),
+   JSONB_BUILD_OBJECT('name', 'Dattes Medjool', 'quantity', '2'),
+   JSONB_BUILD_OBJECT('name', 'Cannelle', 'quantity', '1 pincée')
+ ),
+ JSONB_BUILD_ARRAY(
+   JSONB_BUILD_OBJECT('step', 1, 'instruction', 'Ouvrir les dattes'),
+   JSONB_BUILD_OBJECT('step', 2, 'instruction', 'Farcir avec amandes'),
+   JSONB_BUILD_OBJECT('step', 3, 'instruction', 'Saupoudrer cannelle')
+ ),
  'Alternative saine aux sucreries',
- ARRAY['spring', 'summer', 'autumn', 'winter'], ARRAY['vegan'], true);
+ ARRAY['vegan'], true, true);
 
 -- =====================================================
 -- 🏃 SESSIONS D'ACTIVITÉ COMPLÈTES (avec nouvelles colonnes)
@@ -576,7 +608,8 @@ INSERT INTO user_profiles (
   user_id, first_name, preferred_name, date_of_birth,
   sopk_diagnosis_year, current_symptoms, severity_level,
   primary_goals, timezone, language_preference, notification_preferences
-) VALUES
+)
+VALUES
 -- Sarah : Profil actif avec SOPK modéré
 ('550e8400-e29b-41d4-a716-446655440000', 'Sarah', 'Sarah', '1992-06-15',
  2020, ARRAY['irregular_cycles', 'fatigue', 'mood_swings', 'weight_gain'],
@@ -849,7 +882,7 @@ COMMENT ON TABLE user_profiles IS 'Profils utilisateur fake pour développement 
 COMMENT ON TABLE daily_symptoms IS 'Contient des données de symptômes fictifs pour tester le dashboard et journal';
 COMMENT ON TABLE breathing_sessions IS 'Sessions de respiration simulées pour tester les statistiques';
 COMMENT ON TABLE mood_entries IS 'Entrées d''humeur fictives pour développement interface';
-COMMENT ON TABLE user_meal_tracking IS 'Suivi fictif de repas pour développement module nutrition';
+COMMENT ON TABLE user_recipe_tracking IS 'Suivi fictif de recettes pour développement module nutrition';
 
 -- =====================================================
 -- 🔧 FONCTIONS SQL UTILES POUR LES NOUVEAUX SERVICES
@@ -925,8 +958,8 @@ BEGIN
   RAISE NOTICE '✅ daily_symptoms - Tracking symptômes quotidiens';
   RAISE NOTICE '✅ breathing_sessions - Sessions de respiration variées';
   RAISE NOTICE '✅ mood_entries - Journal d''humeur avec emojis';
-  RAISE NOTICE '✅ meal_suggestions - Suggestions repas existantes';
-  RAISE NOTICE '✅ user_meal_tracking - Tracking repas simples';
+  RAISE NOTICE '✅ recipes - Recettes et suggestions existantes';
+  RAISE NOTICE '✅ user_recipe_tracking - Tracking recettes et repas';
   RAISE NOTICE '✅ user_nutrition_preferences - Préférences nutrition';
   RAISE NOTICE '✅ recipes - 4 recettes détaillées avec instructions';
   RAISE NOTICE '✅ user_recipe_tracking - 12 trackings recettes détaillés';
@@ -937,8 +970,8 @@ BEGIN
   RAISE NOTICE '✅ symptomsService ↔ daily_symptoms';
   RAISE NOTICE '✅ breathingService ↔ breathing_sessions';
   RAISE NOTICE '✅ moodService ↔ mood_entries';
-  RAISE NOTICE '✅ nutritionService ↔ meal_suggestions';
-  RAISE NOTICE '✅ trackingService ↔ user_meal_tracking';
+  RAISE NOTICE '✅ nutritionService ↔ recipes';
+  RAISE NOTICE '✅ trackingService ↔ user_recipe_tracking';
   RAISE NOTICE '✅ activityService ↔ user_activity_tracking (CORRIGÉ)';
   RAISE NOTICE '✅ recipeService ↔ recipes (NOUVEAU)';
   RAISE NOTICE '✅ recipeTrackingService ↔ user_recipe_tracking (NOUVEAU)';

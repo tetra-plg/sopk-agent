@@ -5,12 +5,7 @@
  * depuis la base de données Supabase.
  */
 
-import { supabase } from '../../../shared/services/supabase';
-import { supabaseDev, isDevelopment } from '../../../shared/services/supabaseDev';
-
-const getSupabaseClient = () => {
-  return isDevelopment ? supabaseDev : supabase;
-};
+import { getSupabaseClient } from '../../../shared/services/supabaseDev';
 
 const breathingTechniquesService = {
   /**

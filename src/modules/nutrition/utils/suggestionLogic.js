@@ -102,7 +102,7 @@ class SuggestionEngine {
         const daysSince = (Date.now() - mealDate.getTime()) / (1000 * 60 * 60 * 24);
         return daysSince < dayThreshold;
       })
-      .map(rm => rm.meal_id);
+      .map(rm => rm.recipe_id);
 
     return meals.filter(meal => !recentMealIds.includes(meal.id));
   }
@@ -169,7 +169,7 @@ class SuggestionEngine {
 
     // Malus pour répétition récente (mais moins strict que l'exclusion)
     if (context.recentMeals?.length) {
-      const recentCount = context.recentMeals.filter(rm => rm.meal_id === meal.id).length;
+      const recentCount = context.recentMeals.filter(rm => rm.recipe_id === meal.id).length;
       score -= recentCount * 5;
     }
 

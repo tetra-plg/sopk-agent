@@ -4,12 +4,7 @@
  * Gestion du suivi des recettes cuisinées et testées par les utilisatrices.
  */
 
-import { supabase } from '../../../shared/services/supabase';
-import { supabaseDev, isDevelopment } from '../../../shared/services/supabaseDev';
-
-const getSupabaseClient = () => {
-  return isDevelopment ? supabaseDev : supabase;
-};
+import { getSupabaseClient } from '../../../shared/services/supabaseDev';
 
 const recipeTrackingService = {
   /**

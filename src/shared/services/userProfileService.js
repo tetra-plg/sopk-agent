@@ -4,12 +4,7 @@
  * Gestion des profils étendus des utilisatrices SOPK avec préférences et objectifs.
  */
 
-import { supabase } from './supabase';
-import { supabaseDev, isDevelopment } from './supabaseDev';
-
-const getSupabaseClient = () => {
-  return isDevelopment ? supabaseDev : supabase;
-};
+import { getSupabaseClient } from './supabaseDev';
 
 const userProfileService = {
   /**

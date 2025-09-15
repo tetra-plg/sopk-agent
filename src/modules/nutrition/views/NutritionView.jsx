@@ -227,14 +227,14 @@ const NutritionView = () => {
                                   <div key={`${trackedMeal.id}-${index}`} className="flex items-center justify-between p-3 rounded-lg" style={{ backgroundColor: 'rgba(110, 231, 183, 0.1)' }}>
                                     <div className="flex-1">
                                       <div className="font-medium mb-1" style={{ color: '#1F2937' }}>
-                                        {trackedMeal.meal_suggestions?.name || 'Repas inconnu'}
+                                        {trackedMeal.recipes?.title || 'Repas inconnu'}
                                       </div>
                                       <div className="flex gap-4 text-xs" style={{ color: '#6B7280' }}>
-                                        {trackedMeal.meal_suggestions?.prep_time_minutes && (
-                                          <span>⏱️ {trackedMeal.meal_suggestions.prep_time_minutes} min</span>
+                                        {trackedMeal.recipes?.prep_time_minutes && (
+                                          <span>⏱️ {trackedMeal.recipes.prep_time_minutes} min</span>
                                         )}
-                                        {trackedMeal.meal_suggestions?.difficulty && (
-                                          <span>📊 {trackedMeal.meal_suggestions.difficulty}</span>
+                                        {trackedMeal.recipes?.difficulty && (
+                                          <span>📊 {trackedMeal.recipes.difficulty}</span>
                                         )}
                                       </div>
                                     </div>

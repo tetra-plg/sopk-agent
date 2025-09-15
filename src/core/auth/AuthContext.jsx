@@ -7,7 +7,6 @@
 
 import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../../shared/services/supabase';
-import userProfileService from '../../shared/services/userProfileService';
 
 // Créer le contexte
 export const AuthContext = createContext({
@@ -97,35 +96,8 @@ export const AuthProvider = ({ children }) => {
 
       if (error) throw error;
 
-      // Créer automatiquement un profil basique si l'utilisateur est créé
-      if (data.user && !error) {
-        try {
-          const firstName = metadata.first_name ||
-                           metadata.preferred_name ||
-                           metadata.name?.split(' ')[0] ||
-                           email.split('@')[0].charAt(0).toUpperCase() + email.split('@')[0].slice(1);
-
-          await userProfileService.saveUserProfile(data.user.id, {
-            first_name: firstName,
-            preferred_name: firstName,
-            date_of_birth: null,
-            sopk_diagnosis_year: null,
-            current_symptoms: [],
-            severity_level: null,
-            timezone: 'Europe/Paris',
-            language_preference: 'fr',
-            primary_goals: [],
-            notification_preferences: {
-              daily_reminder: true,
-              weekly_summary: true,
-              new_features: false
-            }
-          });
-        } catch (profileError) {
-          // Profil non créé mais utilisateur créé - pas bloquant
-          console.warn('Profil utilisateur non créé automatiquement:', profileError);
-        }
-      }
+      // Le profil sera créé automatiquement par un trigger SQL côté Supabase
+      // lors de l'insertion dans auth.users
 
       return { user: data.user, error: null };
     } catch (error) {

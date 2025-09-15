@@ -5,13 +5,7 @@
  * règles, fatigue, douleurs, humeur et notes.
  */
 
-import { supabase } from '../../../shared/services/supabase';
-import { supabaseDev, isDevelopment } from '../../../shared/services/supabaseDev';
-
-// Utiliser le client approprié selon l'environnement
-const getSupabaseClient = () => {
-  return isDevelopment ? supabaseDev : supabase;
-};
+import { getSupabaseClient } from '../../../shared/services/supabaseDev';
 
 /**
  * Service de gestion des symptômes quotidiens

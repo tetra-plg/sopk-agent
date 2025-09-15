@@ -1,38 +1,36 @@
 /**
  * 📊 Service Tracking Nutrition
  *
- * Gestion du suivi des repas consommés par les utilisatrices.
+ * Gestion du suivi des repas/recettes consommés par les utilisatrices.
+ * Utilise la table unifiée user_recipe_tracking et recipes.
  */
 
-import { supabase } from '../../../shared/services/supabase';
-import { supabaseDev, isDevelopment } from '../../../shared/services/supabaseDev';
-
-const getSupabaseClient = () => {
-  return isDevelopment ? supabaseDev : supabase;
-};
+import { getSupabaseClient } from '../../../shared/services/supabaseDev';
 
 const trackingService = {
   /**
-   * Enregistrer un repas consommé
+   * Enregistrer un repas/recette consommé(e)
    */
-  async trackMealConsumption(userId, mealId, mealType, feedback = {}) {
+  async trackMealConsumption(userId, recipeId, mealType, feedback = {}) {
     const client = getSupabaseClient();
     const { data, error } = await client
-      .from('user_meal_tracking')
+      .from('user_recipe_tracking')
       .insert({
         user_id: userId,
-        meal_id: mealId,
-        meal_type: mealType,
-        date: new Date().toISOString().split('T')[0],
-        satisfaction_rating: feedback.satisfaction_rating || null,
-        difficulty_felt: feedback.difficulty_felt || null,
-        will_remake: feedback.will_remake || null
+        recipe_id: recipeId,
+        date_cooked: new Date().toISOString().split('T')[0],
+        servings_made: 1,
+        taste_rating: feedback.satisfaction_rating || null,
+        difficulty_rating: feedback.difficulty_felt === 'easier' ? 5 :
+                         feedback.difficulty_felt === 'as_expected' ? 3 :
+                         feedback.difficulty_felt === 'harder' ? 1 : null,
+        would_make_again: feedback.will_remake || null,
+        notes: mealType ? `Type de repas: ${mealType}` : null
       })
       .select('*')
       .limit(1);
 
     if (error) {
-
       throw error;
     }
 
@@ -46,15 +44,16 @@ const trackingService = {
     const startDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
     const client = getSupabaseClient();
     const { data, error } = await client
-      .from('user_meal_tracking')
+      .from('user_recipe_tracking')
       .select(`
         *,
-        meal_suggestions(
+        recipes(
           id,
-          name,
+          title,
           category,
           main_nutrients,
-          difficulty
+          difficulty,
+          is_simple_suggestion
         )
       `)
       .eq('user_id', userId)
@@ -62,7 +61,6 @@ const trackingService = {
       .order('created_at', { ascending: false });
 
     if (error && error.code !== 'PGRST116') {
-
       return { data: [] };
     }
 
@@ -76,24 +74,24 @@ const trackingService = {
     const today = new Date().toISOString().split('T')[0];
     const client = getSupabaseClient();
     const { data, error } = await client
-      .from('user_meal_tracking')
+      .from('user_recipe_tracking')
       .select(`
         *,
-        meal_suggestions(
+        recipes(
           id,
-          name,
+          title,
           category,
           main_nutrients,
           difficulty,
-          prep_time_minutes
+          prep_time_minutes,
+          is_simple_suggestion
         )
       `)
       .eq('user_id', userId)
-      .eq('date', today)
+      .eq('date_cooked', today)
       .order('created_at', { ascending: true });
 
     if (error && error.code !== 'PGRST116') {
-
       return { data: [] };
     }
 
@@ -106,16 +104,17 @@ const trackingService = {
   async getMealHistory(userId, limit = 50) {
     const client = getSupabaseClient();
     const { data, error } = await client
-      .from('user_meal_tracking')
+      .from('user_recipe_tracking')
       .select(`
         *,
-        meal_suggestions(
+        recipes(
           id,
-          name,
+          title,
           category,
           main_nutrients,
           difficulty,
-          prep_time_minutes
+          prep_time_minutes,
+          is_simple_suggestion
         )
       `)
       .eq('user_id', userId)
@@ -123,7 +122,6 @@ const trackingService = {
       .limit(limit);
 
     if (error && error.code !== 'PGRST116') {
-
       return { data: [] };
     }
 
@@ -137,23 +135,23 @@ const trackingService = {
     const startDate = new Date(Date.now() - period * 24 * 60 * 60 * 1000);
     const client = getSupabaseClient();
     const { data, error } = await client
-      .from('user_meal_tracking')
+      .from('user_recipe_tracking')
       .select(`
-        meal_type,
-        satisfaction_rating,
-        will_remake,
-        meal_suggestions(
+        taste_rating,
+        difficulty_rating,
+        will_cook_again,
+        recipes(
           category,
           main_nutrients,
           difficulty,
-          glycemic_index_category
+          glycemic_index_category,
+          is_simple_suggestion
         )
       `)
       .eq('user_id', userId)
       .gte('created_at', startDate.toISOString());
 
     if (error && error.code !== 'PGRST116') {
-
       return { data: [] };
     }
 
@@ -166,18 +164,19 @@ const trackingService = {
   async updateMealFeedback(trackingId, feedback) {
     const client = getSupabaseClient();
     const { data, error } = await client
-      .from('user_meal_tracking')
+      .from('user_recipe_tracking')
       .update({
-        satisfaction_rating: feedback.satisfaction_rating,
-        difficulty_felt: feedback.difficulty_felt,
-        will_remake: feedback.will_remake
+        taste_rating: feedback.satisfaction_rating,
+        difficulty_rating: feedback.difficulty_felt === 'easier' ? 5 :
+                         feedback.difficulty_felt === 'as_expected' ? 3 :
+                         feedback.difficulty_felt === 'harder' ? 1 : null,
+        would_make_again: feedback.will_remake
       })
       .eq('id', trackingId)
       .select('*')
       .limit(1);
 
     if (error) {
-
       throw error;
     }
 
@@ -190,12 +189,11 @@ const trackingService = {
   async deleteMealTracking(trackingId) {
     const client = getSupabaseClient();
     const { error } = await client
-      .from('user_meal_tracking')
+      .from('user_recipe_tracking')
       .delete()
       .eq('id', trackingId);
 
     if (error) {
-
       throw error;
     }
 
@@ -203,40 +201,40 @@ const trackingService = {
   },
 
   /**
-   * Obtenir les repas favoris d'un utilisateur (basé sur will_remake = true)
+   * Obtenir les repas favoris d'un utilisateur (basé sur will_cook_again = true)
    */
   async getFavoriteMeals(userId) {
     const client = getSupabaseClient();
     const { data, error } = await client
-      .from('user_meal_tracking')
+      .from('user_recipe_tracking')
       .select(`
-        meal_id,
-        meal_suggestions(
+        recipe_id,
+        recipes(
           id,
-          name,
+          title,
           category,
           difficulty,
           prep_time_minutes,
-          main_nutrients
+          main_nutrients,
+          is_simple_suggestion
         )
       `)
       .eq('user_id', userId)
-      .eq('will_remake', true)
+      .eq('would_make_again', true)
       .order('created_at', { ascending: false });
 
     if (error && error.code !== 'PGRST116') {
-
       return { data: [] };
     }
 
     // Déduplication des repas favoris
     const uniqueMeals = [];
-    const seenMealIds = new Set();
+    const seenRecipeIds = new Set();
 
     for (const item of data || []) {
-      if (!seenMealIds.has(item.meal_id)) {
-        seenMealIds.add(item.meal_id);
-        uniqueMeals.push(item.meal_suggestions);
+      if (!seenRecipeIds.has(item.recipe_id)) {
+        seenRecipeIds.add(item.recipe_id);
+        uniqueMeals.push(item.recipes);
       }
     }
 

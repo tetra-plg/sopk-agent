@@ -1,26 +1,23 @@
 /**
  * 🍽️ Service Nutrition
  *
- * Gestion des appels API pour les suggestions et préférences nutrition.
+ * Gestion des suggestions rapides de repas depuis la table recipes unifiée.
+ * Utilise le filtre is_simple_suggestion = true pour les suggestions courtes.
  */
 
-import { supabase } from '../../../shared/services/supabase';
-import { supabaseDev, isDevelopment } from '../../../shared/services/supabaseDev';
-
-const getSupabaseClient = () => {
-  return isDevelopment ? supabaseDev : supabase;
-};
+import { getSupabaseClient } from '../../../shared/services/supabaseDev';
 
 const nutritionService = {
   /**
-   * Récupérer toutes les suggestions de repas
+   * Récupérer toutes les suggestions de repas (simples)
    */
   async getAllMealSuggestions() {
     const client = getSupabaseClient();
     const { data, error } = await client
-      .from('meal_suggestions')
+      .from('recipes')
       .select('*')
-      .order('name');
+      .eq('is_simple_suggestion', true)
+      .order('title');
 
     if (error && error.code !== 'PGRST116') {
 
@@ -35,7 +32,7 @@ const nutritionService = {
    */
   async searchMeals(filters = {}) {
     const client = getSupabaseClient();
-    let query = client.from('meal_suggestions').select('*');
+    let query = client.from('recipes').select('*').eq('is_simple_suggestion', true);
 
     if (filters.category && filters.category !== 'any') {
       query = query.eq('category', filters.category);
@@ -58,10 +55,10 @@ const nutritionService = {
     }
 
     if (filters.dietaryRestrictions && filters.dietaryRestrictions.length > 0) {
-      query = query.overlaps('dietary_restrictions', filters.dietaryRestrictions);
+      query = query.overlaps('dietary_tags', filters.dietaryRestrictions);
     }
 
-    const { data, error } = await query.order('name');
+    const { data, error } = await query.order('title');
 
     if (error && error.code !== 'PGRST116') {
 
@@ -77,9 +74,10 @@ const nutritionService = {
   async getMealById(mealId) {
     const client = getSupabaseClient();
     const { data, error } = await client
-      .from('meal_suggestions')
+      .from('recipes')
       .select('*')
       .eq('id', mealId)
+      .eq('is_simple_suggestion', true)
       .limit(1);
 
     if (error && error.code !== 'PGRST116') {
@@ -96,9 +94,10 @@ const nutritionService = {
   async getMealsByCategory(category) {
     const client = getSupabaseClient();
     const { data, error } = await client
-      .from('meal_suggestions')
+      .from('recipes')
       .select('*')
       .eq('category', category)
+      .eq('is_simple_suggestion', true)
       .order('prep_time_minutes');
 
     if (error && error.code !== 'PGRST116') {
@@ -119,8 +118,9 @@ const nutritionService = {
 
     const client = getSupabaseClient();
     const { data, error } = await client
-      .from('meal_suggestions')
+      .from('recipes')
       .select('*')
+      .eq('is_simple_suggestion', true)
       .overlaps('symptom_targets', symptoms)
       .order('prep_time_minutes');
 

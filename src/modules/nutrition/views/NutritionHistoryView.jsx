@@ -61,12 +61,12 @@ const NutritionHistoryView = () => {
 
     const favoriteCount = data.filter(item => item.will_remake).length;
     const lowGICount = data.filter(item =>
-      item.meal_suggestions?.glycemic_index_category === 'low'
+      item.recipes?.glycemic_index_category === 'low'
     ).length;
 
     const nutrientFrequency = {};
     data.forEach(item => {
-      item.meal_suggestions?.main_nutrients?.forEach(nutrient => {
+      item.recipes?.main_nutrients?.forEach(nutrient => {
         nutrientFrequency[nutrient] = (nutrientFrequency[nutrient] || 0) + 1;
       });
     });
@@ -238,7 +238,7 @@ const NutritionHistoryView = () => {
                 <div className="flex justify-between items-start mb-3">
                   <div>
                     <h3 className="font-semibold text-gray-800">
-                      {entry.meal_suggestions?.name || 'Repas supprimé'}
+                      {entry.recipes?.title || 'Repas supprimé'}
                     </h3>
                     <div className="flex gap-2 items-center text-sm text-gray-600 mt-1">
                       <span>{getMealTypeLabel(entry.meal_type)}</span>
@@ -259,14 +259,14 @@ const NutritionHistoryView = () => {
                   </div>
                 </div>
 
-                {entry.meal_suggestions && (
+                {entry.recipes && (
                   <div className="flex gap-2 flex-wrap">
                     <PrepTimeIndicator
-                      minutes={entry.meal_suggestions.prep_time_minutes}
+                      minutes={entry.recipes.prep_time_minutes}
                       variant="badge"
                       size="xs"
                     />
-                    {entry.meal_suggestions.main_nutrients?.slice(0, 3).map(nutrient => (
+                    {entry.recipes.main_nutrients?.slice(0, 3).map(nutrient => (
                       <NutritionTag key={nutrient} type={nutrient} size="xs" />
                     ))}
                   </div>
