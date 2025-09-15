@@ -7,7 +7,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../../../core/auth/AuthContext';
 import trackingService from '../../nutrition/services/trackingService';
-import MiniChart from '../../../shared/components/MiniChart';
+// import MiniChart from '../../../shared/components/MiniChart';
 
 const NutritionTracker = () => {
   const { user } = useAuth();
@@ -20,7 +20,7 @@ const NutritionTracker = () => {
     dinner: false,
     snack: false
   });
-  const [weeklyData, setWeeklyData] = useState<Array<{date: string, mealsCount: number, avgRating: number}>>([]);
+  const [_weeklyData, _setWeeklyData] = useState<Array<{date: string, mealsCount: number, avgRating: number}>>([]);
 
   useEffect(() => {
     const loadNutritionData = async () => {
@@ -71,7 +71,7 @@ const NutritionTracker = () => {
               mealsCount,
               avgRating: Math.round(avgRating * 10) / 10
             });
-          } catch (error) {
+          } catch {
             // Si la méthode n'existe pas, utiliser des données simulées
             weekData.push({
               date: dateString,
@@ -80,7 +80,7 @@ const NutritionTracker = () => {
             });
           }
         }
-        setWeeklyData(weekData);
+        _setWeeklyData(weekData);
       } catch (error) {
         console.error('Error loading nutrition data:', error);
       } finally {

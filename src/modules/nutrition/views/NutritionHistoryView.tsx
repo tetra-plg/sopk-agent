@@ -137,21 +137,21 @@ const NutritionHistoryView = ({ onBack }) => {
   };
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
+    <div className="p-3 lg:p-6 max-w-4xl mx-auto">
       {/* En-tête */}
-      <header className="mb-8">
-        <div className="flex items-center gap-4 mb-4">
+      <header className="mb-4 lg:mb-8">
+        <div className="flex items-start justify-between mb-3">
           <button
             onClick={onBack}
-            className="p-2 rounded-lg bg-white border border-gray-200 hover:bg-gray-50 transition-colors"
+            className="p-2 rounded-lg bg-white border border-gray-200 hover:bg-gray-50 transition-colors flex-shrink-0"
           >
             ← Retour
           </button>
-          <div>
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">
+          <div className="flex-1 min-w-0 px-2 lg:px-4">
+            <h1 className="text-lg lg:text-3xl font-bold text-gray-800 mb-1 lg:mb-2 truncate">
               📊 Mon Historique Nutrition
             </h1>
-            <p className="text-gray-600">
+            <p className="text-gray-600 text-xs lg:text-base">
               Suivi de tes habitudes alimentaires et insights personnalisés
             </p>
           </div>
@@ -159,7 +159,7 @@ const NutritionHistoryView = ({ onBack }) => {
       </header>
 
       {/* Filtres période */}
-      <div className="mb-6">
+      <div className="mb-4 lg:mb-6">
         <div className="flex gap-2 flex-wrap">
           {[
             { value: 7, label: '7 derniers jours' },
@@ -169,7 +169,7 @@ const NutritionHistoryView = ({ onBack }) => {
             <button
               key={period.value}
               onClick={() => setSelectedPeriod(period.value)}
-              className={`px-4 py-2 rounded-lg text-sm transition-colors ${
+              className={`px-3 lg:px-4 py-1.5 lg:py-2 rounded-lg text-xs lg:text-sm transition-colors ${
                 selectedPeriod === period.value
                   ? 'bg-green-500 text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -183,27 +183,27 @@ const NutritionHistoryView = ({ onBack }) => {
 
       {/* Stats résumées */}
       {stats && (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
-          <div className="bg-white rounded-xl p-4 shadow-sm border">
-            <div className="text-2xl font-bold text-green-600">{stats.totalMeals}</div>
-            <div className="text-sm text-gray-600">Repas trackés</div>
+        <div className="grid gap-3 lg:gap-4 md:grid-cols-2 lg:grid-cols-4 mb-6 lg:mb-8">
+          <div className="bg-white rounded-xl p-3 lg:p-4 shadow-sm border">
+            <div className="text-xl lg:text-2xl font-bold text-green-600">{stats.totalMeals}</div>
+            <div className="text-xs lg:text-sm text-gray-600">Repas trackés</div>
           </div>
 
-          <div className="bg-white rounded-xl p-4 shadow-sm border">
-            <div className="text-2xl font-bold text-blue-600">
+          <div className="bg-white rounded-xl p-3 lg:p-4 shadow-sm border">
+            <div className="text-xl lg:text-2xl font-bold text-blue-600">
               {stats.avgSatisfaction.toFixed(1)}/5
             </div>
-            <div className="text-sm text-gray-600">Satisfaction moyenne</div>
+            <div className="text-xs lg:text-sm text-gray-600">Satisfaction moyenne</div>
           </div>
 
-          <div className="bg-white rounded-xl p-4 shadow-sm border">
-            <div className="text-2xl font-bold text-purple-600">{stats.favoritePercentage}%</div>
-            <div className="text-sm text-gray-600">Repas à refaire</div>
+          <div className="bg-white rounded-xl p-3 lg:p-4 shadow-sm border">
+            <div className="text-xl lg:text-2xl font-bold text-purple-600">{stats.favoritePercentage}%</div>
+            <div className="text-xs lg:text-sm text-gray-600">Repas à refaire</div>
           </div>
 
-          <div className="bg-white rounded-xl p-4 shadow-sm border">
-            <div className="text-2xl font-bold text-orange-600">{stats.lowGIPercentage}%</div>
-            <div className="text-sm text-gray-600">Index glycémique bas</div>
+          <div className="bg-white rounded-xl p-3 lg:p-4 shadow-sm border">
+            <div className="text-xl lg:text-2xl font-bold text-orange-600">{stats.lowGIPercentage}%</div>
+            <div className="text-xs lg:text-sm text-gray-600">Index glycémique bas</div>
           </div>
         </div>
       )}

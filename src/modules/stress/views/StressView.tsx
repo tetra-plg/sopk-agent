@@ -65,19 +65,19 @@ const StressView = () => {
 
   // Vue d'ensemble simplifiée - focus sur exercices de respiration uniquement
   const OverviewView = () => (
-    <div className="p-6 max-w-4xl mx-auto" style={{ backgroundColor: '#F9FAFB', minHeight: '100vh' }}>
-      <header className="text-center mb-8">
-        <h1 className="text-3xl font-bold mb-2" style={{ color: '#1F2937' }}>
+    <div className="p-3 lg:p-6 max-w-4xl mx-auto" style={{ backgroundColor: '#F9FAFB', minHeight: '100vh' }}>
+      <header className="text-center mb-4 lg:mb-8">
+        <h1 className="text-lg lg:text-3xl font-bold mb-1 lg:mb-2" style={{ color: '#1F2937' }}>
           🌬️ Exercices de Respiration
         </h1>
-        <p style={{ color: '#6B7280' }}>
+        <p className="text-xs lg:text-base" style={{ color: '#6B7280' }}>
           Techniques de respiration guidée pour gérer le stress lié au SOPK
         </p>
       </header>
 
-      <div className="space-y-6">
+      <div className="space-y-4 lg:space-y-6">
         {/* Journal d'Humeur */}
-        <section className="bg-white rounded-xl p-6" style={{
+        <section className="bg-white rounded-xl p-4 lg:p-6" style={{
           boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)',
           border: '2px solid #A78BFA'
         }}>

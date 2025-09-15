@@ -9,7 +9,7 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 
 // Types pour le hook useTimer
 interface TimerOptions {
-  onTick?: (timeLeft: number, elapsed: number) => void;
+  onTick?: (_timeLeft: number, _elapsed: number) => void;
   onComplete?: () => void;
   onStart?: () => void;
   onPause?: () => void;
@@ -35,7 +35,7 @@ export const useTimer = (initialDuration = 0, options: TimerOptions = {}) => {
   const [totalElapsed, setTotalElapsed] = useState(0);
   const [currentDuration, setCurrentDuration] = useState(initialDuration);
 
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const startTimeRef = useRef<number | null>(null);
   const pausedTimeRef = useRef(0);
 

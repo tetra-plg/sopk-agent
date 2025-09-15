@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { validateDailySymptoms } from '../utils/symptomsValidation';
 import { formatDateForAPI } from '../../../shared/utils/dateHelpers';
 

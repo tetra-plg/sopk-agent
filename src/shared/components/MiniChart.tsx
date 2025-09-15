@@ -4,6 +4,8 @@
  * Composant réutilisable pour afficher de petits graphiques d'évolution
  */
 
+import { memo } from 'react';
+
 interface MiniChartProps {
   data: number[];
   color?: string;
@@ -131,4 +133,4 @@ const MiniChart = ({
   );
 };
 
-export default MiniChart;
+export default memo(MiniChart);

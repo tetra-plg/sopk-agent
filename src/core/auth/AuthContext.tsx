@@ -34,7 +34,7 @@ export const useAuth = () => {
 // Provider du contexte d'authentification
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [userProfile, setUserProfile] = useState<any>(null);
+  const [userProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -47,7 +47,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         } else {
           setUser(session?.user ?? null);
         }
-      } catch (error) {
+      } catch {
         setUser(null);
       } finally {
         setLoading(false);
@@ -89,7 +89,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   // Fonction d'inscription avec création automatique de profil
-  const signUp = async (email: string, password: string, metadata: any = {}) => {
+  const signUp = async (email: string, password: string, metadata: Record<string, any> = {}) => {
     try {
       setLoading(true);
       const { data, error } = await supabase.auth.signUp({
@@ -125,7 +125,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       // Tenter signOut Supabase mais ignorer les erreurs
       try {
         await supabase.auth.signOut({ scope: 'local' });
-      } catch (supabaseError) {
+      } catch {
         // Ignorer toutes les erreurs Supabase lors du logout
       }
 
@@ -143,7 +143,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   // Méthode updateProfile
-  const updateProfile = async (updates: any) => {
+  const updateProfile = async (updates: Record<string, any>) => {
     try {
       // Ici on pourrait ajouter la logique de mise à jour du profil
       // Pour l'instant, on retourne juste un succès

@@ -26,8 +26,7 @@ const userProfileService = {
       }
 
       return { data: data || null };
-    } catch (error) {
-
+    } catch (_error) {
       return { data: null };
     }
   },
@@ -229,8 +228,7 @@ const userProfileService = {
       };
 
       return { data: summary };
-    } catch (error) {
-
+    } catch (_error) {
       return { data: null };
     }
   },
@@ -313,8 +311,7 @@ const userProfileService = {
           recommendations: recommendations
         }
       };
-    } catch (error) {
-
+    } catch (_error) {
       return { data: null };
     }
   },
@@ -375,8 +372,7 @@ const userProfileService = {
       });
 
       return { data: stats };
-    } catch (error) {
-
+    } catch (_error) {
       return { data: null };
     }
   }

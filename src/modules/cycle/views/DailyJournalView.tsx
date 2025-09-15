@@ -7,7 +7,7 @@ import { useMoodJournal } from '../../stress/hooks/useMoodJournal';
 
 import DateNavigator from '../../../shared/components/DateNavigator';
 import SymptomSlider from '../components/SymptomSlider';
-import MoodPicker from '../components/MoodPicker';
+// import MoodPicker from '../components/MoodPicker';
 import NewMoodPicker from '../../stress/components/mood/MoodPicker';
 import NotesInput from '../components/NotesInput';
 
@@ -109,9 +109,9 @@ export default function DailyJournalView({ onBack }) {
   const handleManualSave = async () => {
     const result = await forceSave();
     if (result.success) {
-
+      // Sauvegarde réussie
     } else {
-
+      // Erreur de sauvegarde
     }
   };
 
@@ -140,12 +140,12 @@ export default function DailyJournalView({ onBack }) {
     <div className="min-h-screen" style={{ backgroundColor: '#F9FAFB' }}>
       {/* Header */}
       <div className="bg-white shadow-sm" style={{ borderBottom: '1px solid #E5E7EB' }}>
-        <div className="max-w-2xl mx-auto px-4 py-6">
+        <div className="max-w-2xl mx-auto px-3 lg:px-4 py-4 lg:py-6">
           {onBack && (
-            <div className="flex items-center mb-4">
+            <div className="flex items-center mb-3 lg:mb-4">
               <button
                 onClick={onBack}
-                className="flex items-center gap-2 transition-colors"
+                className="flex items-center gap-2 transition-colors text-sm lg:text-base"
                 style={{ color: '#6B7280' }}
                 onMouseEnter={(e) => e.target.style.color = '#1F2937'}
                 onMouseLeave={(e) => e.target.style.color = '#6B7280'}
@@ -162,7 +162,7 @@ export default function DailyJournalView({ onBack }) {
           />
 
           {/* Save status */}
-          <div className="flex items-center justify-between mt-4 text-sm">
+          <div className="flex items-center justify-between mt-3 lg:mt-4 text-xs lg:text-sm">
             <div className="flex items-center gap-2">
               {isLoading && (
                 <div className="flex items-center gap-2" style={{ color: '#93C5FD' }}>

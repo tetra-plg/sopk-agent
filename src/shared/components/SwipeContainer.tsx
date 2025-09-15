@@ -4,7 +4,7 @@
  * Conteneur avec navigation par swipe pour mobile
  */
 
-import { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, memo, useCallback } from 'react';
 
 interface SwipeContainerProps {
   children: React.ReactNode[];
@@ -111,9 +111,9 @@ const SwipeContainer = ({ children, showDots = true, className = '' }: SwipeCont
     }
   }, [currentIndex, isDragging]);
 
-  const goToSlide = (index: number) => {
+  const goToSlide = useCallback((index: number) => {
     setCurrentIndex(index);
-  };
+  }, []);
 
   return (
     <div className={`relative overflow-hidden ${className}`}>
@@ -187,4 +187,4 @@ const SwipeContainer = ({ children, showDots = true, className = '' }: SwipeCont
   );
 };
 
-export default SwipeContainer;
+export default memo(SwipeContainer);

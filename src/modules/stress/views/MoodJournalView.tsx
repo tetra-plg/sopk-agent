@@ -27,8 +27,8 @@ const MoodJournalView = ({ onBack, onNavigateToBreathing }) => {
       try {
         const stats = await moodService.getMoodStats(user.id, 'week');
         setMoodStats(stats);
-      } catch (error) {
-
+      } catch {
+        // Erreur lors du chargement des stats
       }
     };
 

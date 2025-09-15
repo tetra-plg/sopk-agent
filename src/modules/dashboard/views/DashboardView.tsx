@@ -20,7 +20,7 @@ const DashboardView = ({ onNavigate }) => {
   const [todaySymptoms, setTodaySymptoms] = useState(null);
   const [loadingSymptoms, setLoadingSymptoms] = useState(true);
   const [userProfile, setUserProfile] = useState(null);
-  const [loadingProfile, setLoadingProfile] = useState(true);
+  const [_loadingProfile, _setLoadingProfile] = useState(true);
 
   // États pour les modales nutrition
   const [selectedMeal, setSelectedMeal] = useState(null);
@@ -47,7 +47,7 @@ const DashboardView = ({ onNavigate }) => {
   useEffect(() => {
     const loadUserProfile = async () => {
       if (!user?.id) {
-        setLoadingProfile(false);
+        _setLoadingProfile(false);
         return;
       }
 
@@ -57,7 +57,7 @@ const DashboardView = ({ onNavigate }) => {
       } catch (error) {
         // Profil optionnel, pas d'erreur bloquante
       } finally {
-        setLoadingProfile(false);
+        _setLoadingProfile(false);
       }
     };
 
@@ -195,9 +195,9 @@ const DashboardView = ({ onNavigate }) => {
   };
 
   return (
-    <div className="p-4 md:p-6 lg:p-8">
-      <header className="mb-6 md:mb-8 lg:mb-10 text-center">
-        <h1 className="font-heading text-2xl md:text-3xl lg:text-4xl font-bold mb-2 md:mb-3"
+    <div className="p-3 md:p-6 lg:p-8">
+      <header className="mb-4 md:mb-8 lg:mb-10 text-center">
+        <h1 className="font-heading text-xl md:text-3xl lg:text-4xl font-bold mb-1 md:mb-3"
             style={{
               background: 'linear-gradient(135deg, var(--color-primary-lavande) 0%, var(--color-primary-bleu-ciel) 100%)',
               WebkitBackgroundClip: 'text',
@@ -205,16 +205,16 @@ const DashboardView = ({ onNavigate }) => {
             }}>
           Bonjour {getDisplayName()} 🌸
         </h1>
-        <p className="font-emotional italic text-base md:text-lg px-4"
+        <p className="font-emotional italic text-sm md:text-lg px-4"
            style={{ color: 'var(--color-text-secondaire)' }}>
           Prête à prendre soin de toi aujourd'hui ?
         </p>
       </header>
 
       {/* Grid responsive mobile-first */}
-      <div className="grid gap-4 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-3 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         {/* Widget État du jour - Prend toute la largeur sur mobile */}
-        <div className="card-dashboard p-4 md:p-6 col-span-1 sm:col-span-2 lg:col-span-1 transform hover:scale-105 transition-transform duration-200 flex flex-col">
+        <div className="card-dashboard p-3 md:p-6 col-span-1 sm:col-span-2 lg:col-span-1 transform hover:scale-105 transition-transform duration-200 flex flex-col">
           <h3 className="font-heading text-lg font-semibold mb-4 flex items-center gap-2"
               style={{ color: 'var(--color-primary-lavande)' }}>
             ✨ État du jour
@@ -380,19 +380,6 @@ const DashboardView = ({ onNavigate }) => {
         </div>
       </div>
 
-      {/* Section Conseil du jour */}
-      <div className="mt-6 md:mt-8 card-sopk p-4 md:p-6" style={{ background: 'linear-gradient(135deg, #FFF 0%, #EDE9FE 100%)' }}>
-        <h2 className="font-heading text-lg md:text-xl font-semibold mb-3 md:mb-4"
-            style={{ color: 'var(--color-primary-lavande)' }}>
-          💡 Conseil du jour
-        </h2>
-        <p className="font-emotional italic text-sm md:text-base lg:text-lg"
-           style={{ color: 'var(--color-text-principal)' }}>
-          "Les oméga-3 peuvent aider à réduire l'inflammation liée au SOPK.
-          Pense à inclure du saumon, des noix ou des graines de lin dans tes repas !"
-        </p>
-      </div>
-
       {/* Section Tracking */}
       <div className="mt-6 md:mt-8">
         <h2 className="font-heading text-lg md:text-xl font-semibold mb-4 md:mb-6 text-center"
@@ -423,6 +410,19 @@ const DashboardView = ({ onNavigate }) => {
             <StressManagementTracker onStartBreathing={handleStartBreathingExercise} />
           </div>
         </div>
+      </div>
+
+      {/* Section Conseil du jour */}
+      <div className="mt-6 md:mt-8 card-sopk p-4 md:p-6" style={{ background: 'linear-gradient(135deg, #FFF 0%, #EDE9FE 100%)' }}>
+        <h2 className="font-heading text-lg md:text-xl font-semibold mb-3 md:mb-4"
+            style={{ color: 'var(--color-primary-lavande)' }}>
+          💡 Conseil du jour
+        </h2>
+        <p className="font-emotional italic text-sm md:text-base lg:text-lg"
+           style={{ color: 'var(--color-text-principal)' }}>
+          "Les oméga-3 peuvent aider à réduire l'inflammation liée au SOPK.
+          Pense à inclure du saumon, des noix ou des graines de lin dans tes repas !"
+        </p>
       </div>
 
       {/* Modales et composants overlay */}

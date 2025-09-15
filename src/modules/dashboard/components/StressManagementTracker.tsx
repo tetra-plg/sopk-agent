@@ -15,7 +15,7 @@ const StressManagementTracker = ({ onStartBreathing }) => {
   const { techniques, loading: techniquesLoading } = useBreathingTechniques();
   const [recentSessions, setRecentSessions] = useState([]);
   const [weeklyStats, setWeeklyStats] = useState(null);
-  const [todayMood, setTodayMood] = useState(null);
+  const [_todayMood, _setTodayMood] = useState(null);
   const [loading, setLoading] = useState(true);
   const [moodWeekData, setMoodWeekData] = useState<Array<{date: string, mood: number, stress: number}>>([]);
 
@@ -38,7 +38,7 @@ const StressManagementTracker = ({ onStartBreathing }) => {
         // Charger l'humeur du jour
         const today = new Date().toISOString().split('T')[0];
         const moodResult = await moodService.getMoodEntry(user.id, today);
-        setTodayMood(moodResult.data);
+        _setTodayMood(moodResult.data);
 
         // Simuler des données pour le moment
         setRecentSessions([
@@ -67,7 +67,7 @@ const StressManagementTracker = ({ onStartBreathing }) => {
               mood: moodResult.data?.mood_score || 0,
               stress: Math.random() * 5 // Simulé pour l'instant
             });
-          } catch (error) {
+          } catch {
             moodData.push({
               date: dateString,
               mood: Math.random() * 5,
@@ -92,7 +92,7 @@ const StressManagementTracker = ({ onStartBreathing }) => {
     return techniques.find(t => t.id === 'quick') || techniques[0];
   };
 
-  const getMoodEmoji = (level) => {
+  const _getMoodEmoji = (level) => {
     if (!level) return '😐';
     if (level <= 2) return '😢';
     if (level <= 3) return '😐';

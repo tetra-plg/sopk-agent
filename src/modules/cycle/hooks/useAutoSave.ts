@@ -3,7 +3,7 @@ import { symptomsService } from '../services/symptomsService';
 
 export function useAutoSave({
   userId,
-  formData,
+  formData: _formData,
   currentDate,
   hasChanges,
   getValidatedData,
@@ -38,14 +38,12 @@ export function useAutoSave({
       if (!isMountedRef.current) return { success: false };
 
       if (error) {
-
         return { success: false, error };
       }
 
       markAsSaved();
       return { success: true };
     } catch (error) {
-
       return { success: false, error };
     } finally {
       if (isMountedRef.current) {

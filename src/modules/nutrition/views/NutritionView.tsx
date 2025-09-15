@@ -132,7 +132,7 @@ const NutritionView = () => {
     setTrackedMeal(null);
   };
 
-  const handleRateMeal = async (rating) => {
+  const handleRateMeal = async (_rating) => {
     if (trackedMeal) {
       // Ici on pourrait mettre à jour la note du repas
 
@@ -184,19 +184,19 @@ const NutritionView = () => {
 
   // Vue d'entrée du module
   const OverviewView = () => (
-    <div className="p-6 max-w-4xl mx-auto" style={{ backgroundColor: '#F9FAFB', minHeight: '100vh' }}>
+    <div className="p-3 lg:p-6 max-w-4xl mx-auto" style={{ backgroundColor: '#F9FAFB', minHeight: '100vh' }}>
       {/* En-tête avec accent vert sauge */}
-      <header className="text-center mb-8">
-        <h1 className="text-3xl font-bold mb-2" style={{ color: '#1F2937' }}>
+      <header className="text-center mb-4 lg:mb-8 px-4">
+        <h1 className="text-lg lg:text-3xl font-bold mb-1 lg:mb-2" style={{ color: '#1F2937' }}>
           🍽️ Nutrition SOPK
         </h1>
-        <p style={{ color: '#6B7280' }}>
+        <p className="text-xs lg:text-base" style={{ color: '#6B7280' }}>
           Suggestions repas adaptées à tes besoins
         </p>
       </header>
 
       {!user && (
-        <div className="bg-white rounded-xl p-8 text-center" style={{ boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)' }}>
+        <div className="bg-white rounded-xl p-4 lg:p-8 text-center" style={{ boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)' }}>
           <div className="text-4xl mb-4">🔐</div>
           <h3 className="text-xl font-semibold mb-2" style={{ color: '#1F2937' }}>
             Connexion requise
@@ -325,7 +325,7 @@ const NutritionView = () => {
               </div>
 
               {/* Carte suggestion avec couleurs SOPK */}
-              <div className="bg-white rounded-xl p-6" style={{
+              <div className="bg-white rounded-xl p-4 lg:p-6" style={{
                 boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)',
                 border: '2px solid #6EE7B7'
               }}>
@@ -387,11 +387,11 @@ const NutritionView = () => {
       )}
 
       {/* Navigation permanente */}
-      <section className="text-center space-y-4">
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+      <section className="text-center space-y-4 mt-8">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center px-4">
           <button
             onClick={() => setCurrentView('library')}
-            className="px-8 py-3 rounded-xl font-medium transition-colors"
+            className="px-6 sm:px-8 py-3 rounded-xl font-medium transition-colors text-sm sm:text-base"
             style={{
               backgroundColor: '#6EE7B7',
               color: '#1F2937'
@@ -403,7 +403,7 @@ const NutritionView = () => {
           </button>
           <button
             onClick={() => setCurrentView('history')}
-            className="px-6 py-3 rounded-xl font-medium transition-colors border-2"
+            className="px-6 sm:px-8 py-3 rounded-xl font-medium transition-colors border-2 text-sm sm:text-base"
             style={{
               borderColor: '#6EE7B7',
               color: '#1F2937'
@@ -418,7 +418,7 @@ const NutritionView = () => {
             📊 Voir mon historique
           </button>
         </div>
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-gray-600 px-4">
           Explorer toutes nos recettes spéciales SOPK ou consulter ton historique nutrition
         </p>
       </section>

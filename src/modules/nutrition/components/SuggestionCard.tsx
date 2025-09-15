@@ -18,7 +18,7 @@ const SuggestionCard = ({
   showCookingButton = false,
   className = ''
 }) => {
-  const handleTrackMeal = () => {
+  const _handleTrackMeal = () => {
     onTrackMeal(meal.id, meal.category);
   };
 

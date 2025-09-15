@@ -4,7 +4,7 @@ import userProfileService from '../../shared/services/userProfileService';
 
 const ProfileEditView = ({ onNavigate }) => {
   const { user } = useAuth();
-  const [_, setProfile] = useState(null);
+  const [, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState(null);
@@ -103,15 +103,15 @@ const ProfileEditView = ({ onNavigate }) => {
     }));
   };
 
-  const handleNotificationChange = (field, checked) => {
-    setFormData(prev => ({
-      ...prev,
-      notification_preferences: {
-        ...prev.notification_preferences,
-        [field]: checked
-      }
-    }));
-  };
+  // const handleNotificationChange = (field, checked) => {
+  //   setFormData(prev => ({
+  //     ...prev,
+  //     notification_preferences: {
+  //       ...prev.notification_preferences,
+  //       [field]: checked
+  //     }
+  //   }));
+  // };
 
   // Sauvegarder le profil
   const handleSave = async (e) => {

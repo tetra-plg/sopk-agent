@@ -1,15 +1,25 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuth } from '../../../core/auth/AuthContext';
 import { symptomsService } from '../services/symptomsService';
 import DailyJournalView from './DailyJournalView';
 
+interface DailyEntry {
+  date: string;
+  period_flow: number | null;
+  fatigue_level: number | null;
+  pain_level: number | null;
+  mood_score: number | null;
+  mood_emoji: string | null;
+  notes: string | null;
+}
+
 const CycleView = () => {
   const { user } = useAuth();
   const [currentView, setCurrentView] = useState('overview'); // 'overview', 'journal'
-  const [todayEntry, setTodayEntry] = useState(null);
-  const [weeklyEntries, setWeeklyEntries] = useState([]);
+  const [todayEntry, setTodayEntry] = useState<DailyEntry | null>(null);
+  const [weeklyEntries, setWeeklyEntries] = useState<DailyEntry[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<Error | null>(null);
 
   // Chargement des données d'aujourd'hui et de la semaine
   useEffect(() => {
@@ -28,15 +38,15 @@ const CycleView = () => {
           symptomsService.getRecentEntries(user.id, 7)
         ]);
 
-        if (todayResult.error || weekResult.error) {
-          throw todayResult.error || weekResult.error;
+        if (todayResult?.error || weekResult?.error) {
+          throw todayResult?.error || weekResult?.error;
         }
 
-        setTodayEntry(todayResult.data);
-        setWeeklyEntries(weekResult.data || []);
+        setTodayEntry(todayResult?.data as DailyEntry || null);
+        setWeeklyEntries(weekResult?.data as DailyEntry[] || []);
       } catch (err) {
-
-        setError(err);
+        console.error('Erreur lors du chargement des données du cycle:', err);
+        setError(err as Error);
       } finally {
         setLoading(false);
       }
@@ -46,27 +56,39 @@ const CycleView = () => {
   }, [user?.id]);
 
   // Vérifier si l'entrée d'aujourd'hui est complète
-  const isTodayComplete = todayEntry && (
-    todayEntry.period_flow !== null ||
-    todayEntry.fatigue_level !== null ||
-    todayEntry.pain_level !== null ||
-    todayEntry.mood_score !== null ||
-    todayEntry.notes?.trim()
-  );
+  const isTodayComplete = useMemo(() => {
+    return todayEntry && (
+      todayEntry.period_flow !== null ||
+      todayEntry.fatigue_level !== null ||
+      todayEntry.pain_level !== null ||
+      todayEntry.mood_score !== null ||
+      todayEntry.notes?.trim()
+    );
+  }, [todayEntry]);
+
+  // Handler pour retourner à l'overview
+  const handleBackToOverview = useCallback(() => {
+    setCurrentView('overview');
+  }, []);
+
+  // Handler pour aller au journal
+  const handleGoToJournal = useCallback(() => {
+    setCurrentView('journal');
+  }, []);
 
   // Vue du journal quotidien
   if (currentView === 'journal') {
-    return <DailyJournalView onBack={() => setCurrentView('overview')} />;
+    return <DailyJournalView onBack={handleBackToOverview} />;
   }
 
   // Vue d'entrée du module
   const OverviewView = () => (
-    <div className="p-6 max-w-4xl mx-auto" style={{ backgroundColor: '#F9FAFB', minHeight: '100vh' }}>
-      <header className="text-center mb-8">
-        <h1 className="text-3xl font-bold mb-2" style={{ color: '#1F2937' }}>
+    <div className="p-3 lg:p-6 max-w-4xl mx-auto" style={{ backgroundColor: '#F9FAFB', minHeight: '100vh' }}>
+      <header className="text-center mb-4 lg:mb-8">
+        <h1 className="text-lg lg:text-3xl font-bold mb-1 lg:mb-2" style={{ color: '#1F2937' }}>
           📅 Mon Journal Cycle
         </h1>
-        <p style={{ color: '#6B7280' }}>
+        <p className="text-xs lg:text-base" style={{ color: '#6B7280' }}>
           Suivez votre cycle et vos symptômes quotidiens pour mieux comprendre votre SOPK
         </p>
       </header>
@@ -93,16 +115,16 @@ const CycleView = () => {
       {!loading && !error && (
         <div className="space-y-6">
           {/* État du journal d'aujourd'hui */}
-          <section className="bg-white rounded-xl p-6" style={{
+          <section className="bg-white rounded-xl p-4 lg:p-6" style={{
             boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)',
             border: `2px solid ${isTodayComplete ? '#A78BFA' : '#93C5FD'}`
           }}>
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-xl font-semibold mb-2" style={{ color: '#1F2937' }}>
+                <h2 className="text-base lg:text-xl font-semibold mb-1 lg:mb-2" style={{ color: '#1F2937' }}>
                   {isTodayComplete ? '✅ Journal complété aujourd\'hui' : '📝 Compléter votre journal'}
                 </h2>
-                <p style={{ color: '#6B7280' }}>
+                <p className="text-xs lg:text-base" style={{ color: '#6B7280' }}>
                   {isTodayComplete
                     ? 'Merci d\'avoir pris le temps de noter vos ressentis aujourd\'hui.'
                     : 'Prenez quelques minutes pour enregistrer comment vous vous sentez aujourd\'hui.'
@@ -110,17 +132,19 @@ const CycleView = () => {
                 </p>
               </div>
               <button
-                onClick={() => setCurrentView('journal')}
-                className="px-6 py-3 rounded-xl font-semibold transition-colors"
+                onClick={handleGoToJournal}
+                className="px-4 lg:px-6 py-2 lg:py-3 rounded-xl font-semibold transition-colors text-sm lg:text-base"
                 style={{
                   backgroundColor: isTodayComplete ? '#F3F4F6' : '#A78BFA',
                   color: isTodayComplete ? '#6B7280' : 'white'
                 }}
                 onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = isTodayComplete ? '#E5E7EB' : '#9333EA';
+                  const target = e.target as HTMLElement;
+                  target.style.backgroundColor = isTodayComplete ? '#E5E7EB' : '#9333EA';
                 }}
                 onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = isTodayComplete ? '#F3F4F6' : '#A78BFA';
+                  const target = e.target as HTMLElement;
+                  target.style.backgroundColor = isTodayComplete ? '#F3F4F6' : '#A78BFA';
                 }}
               >
                 {isTodayComplete ? '✏️ Modifier' : '📝 Commencer'}
@@ -130,9 +154,9 @@ const CycleView = () => {
 
           {/* Résumé de la semaine */}
           <section>
-            <h2 className="text-xl font-semibold mb-4" style={{ color: '#1F2937' }}>📊 Cette semaine</h2>
+            <h2 className="text-base lg:text-xl font-semibold mb-3 lg:mb-4" style={{ color: '#1F2937' }}>📊 Cette semaine</h2>
 
-            {weeklyEntries.length === 0 ? (
+            {!weeklyEntries || weeklyEntries.length === 0 ? (
               <div className="bg-white rounded-xl p-6 text-center" style={{ boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)' }}>
                 <div className="text-4xl mb-3">📊</div>
                 <h3 className="font-medium mb-2" style={{ color: '#1F2937' }}>Commencez votre suivi</h3>
@@ -144,28 +168,28 @@ const CycleView = () => {
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <div className="bg-white rounded-xl p-4 text-center" style={{ boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)' }}>
                   <div className="text-2xl font-bold mb-1" style={{ color: '#A78BFA' }}>
-                    {weeklyEntries.length}
+                    {weeklyEntries?.length || 0}
                   </div>
                   <div className="text-sm" style={{ color: '#6B7280' }}>Jours renseignés</div>
                 </div>
 
                 <div className="bg-white rounded-xl p-4 text-center" style={{ boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)' }}>
                   <div className="text-2xl font-bold mb-1" style={{ color: '#FB7185' }}>
-                    {weeklyEntries.filter(e => e.period_flow && e.period_flow > 0).length}
+                    {weeklyEntries?.filter(e => e.period_flow && e.period_flow > 0).length || 0}
                   </div>
                   <div className="text-sm" style={{ color: '#6B7280' }}>Jours de règles</div>
                 </div>
 
                 <div className="bg-white rounded-xl p-4 text-center" style={{ boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)' }}>
                   <div className="text-2xl font-bold mb-1" style={{ color: '#93C5FD' }}>
-                    {calculateWeeklyAverage(weeklyEntries, 'fatigue_level')}
+                    {calculateWeeklyAverage(weeklyEntries || [], 'fatigue_level')}
                   </div>
                   <div className="text-sm" style={{ color: '#6B7280' }}>Fatigue moy. /10</div>
                 </div>
 
                 <div className="bg-white rounded-xl p-4 text-center" style={{ boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)' }}>
                   <div className="text-2xl font-bold mb-1" style={{ color: '#6EE7B7' }}>
-                    {calculateWeeklyAverage(weeklyEntries, 'mood_score')}
+                    {calculateWeeklyAverage(weeklyEntries || [], 'mood_score')}
                   </div>
                   <div className="text-sm" style={{ color: '#6B7280' }}>Humeur moy. /10</div>
                 </div>
@@ -174,11 +198,11 @@ const CycleView = () => {
           </section>
 
           {/* Historique récent */}
-          {weeklyEntries.length > 0 && (
+          {weeklyEntries && weeklyEntries.length > 0 && (
             <section>
               <h2 className="text-xl font-semibold mb-4" style={{ color: '#1F2937' }}>📋 Dernières entrées</h2>
               <div className="space-y-3">
-                {weeklyEntries.slice(0, 5).map((entry, index) => {
+                {weeklyEntries.slice(0, 5).map((entry) => {
                   const entryDate = new Date(entry.date);
                   const isToday = entry.date === new Date().toISOString().split('T')[0];
 
@@ -254,11 +278,11 @@ const CycleView = () => {
 };
 
 // Fonction utilitaire pour calculer la moyenne hebdomadaire
-function calculateWeeklyAverage(entries, field) {
+function calculateWeeklyAverage(entries: DailyEntry[], field: keyof Pick<DailyEntry, 'fatigue_level' | 'pain_level' | 'mood_score'>): string | number {
   const validEntries = entries.filter(e => e[field] !== null && e[field] !== undefined);
   if (validEntries.length === 0) return '--';
 
-  const sum = validEntries.reduce((acc, entry) => acc + entry[field], 0);
+  const sum = validEntries.reduce((acc, entry) => acc + (entry[field] || 0), 0);
   return Math.round((sum / validEntries.length) * 10) / 10;
 }
 

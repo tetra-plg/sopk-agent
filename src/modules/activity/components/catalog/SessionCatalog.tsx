@@ -41,8 +41,8 @@ const SessionCatalog = ({ onSessionSelect, onViewHistory }) => {
         setFilteredSessions(sessionsData);
         setRecommendations(recommendationsData);
         setUserStats(statsData);
-      } catch (error) {
-
+      } catch {
+        // Ignorer les erreurs de chargement
       } finally {
         setIsLoading(false);
       }
@@ -98,13 +98,13 @@ const SessionCatalog = ({ onSessionSelect, onViewHistory }) => {
     <div className="min-h-screen" style={{ backgroundColor: '#F9FAFB' }}>
       {/* Header */}
       <div className="bg-white shadow-sm" style={{ borderBottom: '1px solid #E5E7EB' }}>
-        <div className="max-w-4xl mx-auto px-4 py-6">
-          <div className="flex items-center justify-between mb-6">
+        <div className="max-w-4xl mx-auto px-3 lg:px-4 py-4 lg:py-6">
+          <div className="flex items-center justify-between mb-4 lg:mb-6">
             <div className="flex-1 text-center">
-              <h1 className="text-3xl font-bold mb-2" style={{ color: '#1F2937' }}>
+              <h1 className="text-lg lg:text-3xl font-bold mb-1 lg:mb-2" style={{ color: '#1F2937' }}>
                 🏃‍♀️ Activité Physique
               </h1>
-              <p style={{ color: '#6B7280' }}>
+              <p className="text-xs lg:text-base" style={{ color: '#6B7280' }}>
                 Séances adaptées au SOPK pour bouger en douceur et retrouver de l'énergie
               </p>
             </div>
@@ -114,7 +114,7 @@ const SessionCatalog = ({ onSessionSelect, onViewHistory }) => {
               <div className="flex-shrink-0">
                 <button
                   onClick={onViewHistory}
-                  className="px-4 py-2 rounded-lg font-medium text-sm transition-colors flex items-center gap-2"
+                  className="px-3 lg:px-4 py-1.5 lg:py-2 rounded-lg font-medium text-xs lg:text-sm transition-colors flex items-center gap-2"
                   style={{
                     backgroundColor: 'rgba(147, 197, 253, 0.1)',
                     color: '#93C5FD',
@@ -137,25 +137,25 @@ const SessionCatalog = ({ onSessionSelect, onViewHistory }) => {
 
           {/* Stats rapides */}
           {userStats && userStats.totalSessions > 0 && (
-            <div className="grid grid-cols-3 gap-4 mb-6">
-              <div className="text-center p-3 rounded-lg" style={{ backgroundColor: 'rgba(167, 139, 250, 0.1)' }}>
-                <div className="text-lg font-bold" style={{ color: '#A78BFA' }}>
+            <div className="grid grid-cols-3 gap-3 lg:gap-4 mb-4 lg:mb-6">
+              <div className="text-center p-2 lg:p-3 rounded-lg" style={{ backgroundColor: 'rgba(167, 139, 250, 0.1)' }}>
+                <div className="text-base lg:text-lg font-bold" style={{ color: '#A78BFA' }}>
                   {userStats.totalSessions}
                 </div>
                 <div className="text-xs" style={{ color: '#6B7280' }}>
                   Séances cette semaine
                 </div>
               </div>
-              <div className="text-center p-3 rounded-lg" style={{ backgroundColor: 'rgba(147, 197, 253, 0.1)' }}>
-                <div className="text-lg font-bold" style={{ color: '#93C5FD' }}>
+              <div className="text-center p-2 lg:p-3 rounded-lg" style={{ backgroundColor: 'rgba(147, 197, 253, 0.1)' }}>
+                <div className="text-base lg:text-lg font-bold" style={{ color: '#93C5FD' }}>
                   {Math.round(userStats.totalMinutes)}min
                 </div>
                 <div className="text-xs" style={{ color: '#6B7280' }}>
                   Temps d'activité
                 </div>
               </div>
-              <div className="text-center p-3 rounded-lg" style={{ backgroundColor: 'rgba(110, 231, 183, 0.1)' }}>
-                <div className="text-lg font-bold" style={{ color: '#6EE7B7' }}>
+              <div className="text-center p-2 lg:p-3 rounded-lg" style={{ backgroundColor: 'rgba(110, 231, 183, 0.1)' }}>
+                <div className="text-base lg:text-lg font-bold" style={{ color: '#6EE7B7' }}>
                   {userStats.avgEnergyImprovement > 0 ? '+' : ''}{userStats.avgEnergyImprovement.toFixed(1)}
                 </div>
                 <div className="text-xs" style={{ color: '#6B7280' }}>

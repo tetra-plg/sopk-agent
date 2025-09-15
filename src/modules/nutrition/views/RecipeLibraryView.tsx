@@ -170,7 +170,7 @@ const RecipeLibraryView = ({ onBack, onViewHistory }) => {
     onViewHistory && onViewHistory();
   };
 
-  const handleRateMeal = async (rating) => {
+  const handleRateMeal = async (_rating) => {
     if (trackedMeal) {
       // Ici on pourrait mettre à jour la note du repas
 
@@ -178,58 +178,63 @@ const RecipeLibraryView = ({ onBack, onViewHistory }) => {
   };
 
   return (
-    <div className="p-6 max-w-6xl mx-auto" style={{ backgroundColor: '#F9FAFB', minHeight: '100vh' }}>
+    <div className="p-3 lg:p-6 max-w-6xl mx-auto" style={{ backgroundColor: '#F9FAFB', minHeight: '100vh' }}>
       {/* En-tête */}
-      <header className="mb-8">
-        <div className="flex items-center gap-4 mb-4">
+      <header className="mb-4 lg:mb-8">
+        {/* Ligne 1: Bouton retour et titre */}
+        <div className="flex items-start justify-between mb-3">
           <button
             onClick={onBack}
-            className="p-2 rounded-lg bg-white border border-gray-200 hover:bg-gray-50 transition-colors"
+            className="p-2 rounded-lg bg-white border border-gray-200 hover:bg-gray-50 transition-colors flex-shrink-0"
           >
             ← Retour
           </button>
-          <div className="flex gap-2">
-            <button
-              onClick={() => setSelectionMode(!selectionMode)}
-              className={`px-4 py-2 rounded-lg transition-colors ${
-                selectionMode ? 'bg-blue-500 text-white' : 'bg-white border border-gray-200 hover:bg-gray-50'
-              }`}
-            >
-              {selectionMode ? '✓ Mode sélection' : '🛒 Sélectionner'}
-            </button>
-            {selectedRecipes.length > 0 && (
-              <>
-                <button
-                  onClick={handleGenerateGroceryList}
-                  className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
-                >
-                  📝 Liste courses ({selectedRecipes.length})
-                </button>
-                <button
-                  onClick={handleClearSelection}
-                  className="px-3 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
-                >
-                  ✖
-                </button>
-              </>
-            )}
-          </div>
-          <div>
-            <h1 className="text-3xl font-bold" style={{ color: '#1F2937' }}>
+          <div className="flex-1 min-w-0 px-2 lg:px-4">
+            <h1 className="text-lg lg:text-3xl font-bold truncate" style={{ color: '#1F2937' }}>
               📚 Catalogue Recettes IG Bas
             </h1>
-            <p style={{ color: '#6B7280' }}>
-              {filteredRecipes.length} recette{filteredRecipes.length !== 1 ? 's' : ''} spéciale{filteredRecipes.length !== 1 ? 's' : ''} SOPK • Toutes à index glycémique bas
+            <p className="text-xs lg:text-base" style={{ color: '#6B7280' }}>
+              {filteredRecipes.length} recette{filteredRecipes.length !== 1 ? 's' : ''} spéciale{filteredRecipes.length !== 1 ? 's' : ''} SOPK
             </p>
           </div>
+        </div>
+
+        {/* Ligne 2: Boutons d'action */}
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            onClick={() => setSelectionMode(!selectionMode)}
+            className={`px-3 py-2 text-sm lg:px-4 lg:py-2 lg:text-base rounded-lg transition-colors ${
+              selectionMode ? 'bg-blue-500 text-white' : 'bg-white border border-gray-200 hover:bg-gray-50'
+            }`}
+          >
+            <span className="lg:hidden">{selectionMode ? '✓' : '🛒'}</span>
+            <span className="hidden lg:inline">{selectionMode ? '✓ Mode sélection' : '🛒 Sélectionner'}</span>
+          </button>
+          {selectedRecipes.length > 0 && (
+            <>
+              <button
+                onClick={handleGenerateGroceryList}
+                className="px-3 py-2 text-sm lg:px-4 lg:py-2 lg:text-base bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+              >
+                <span className="lg:hidden">📝 ({selectedRecipes.length})</span>
+                <span className="hidden lg:inline">📝 Liste courses ({selectedRecipes.length})</span>
+              </button>
+              <button
+                onClick={handleClearSelection}
+                className="px-3 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+              >
+                ✖
+              </button>
+            </>
+          )}
         </div>
       </header>
 
       {/* Barre de recherche et filtres */}
-      <div className="bg-white rounded-xl p-6 mb-6" style={{ boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)' }}>
+      <div className="bg-white rounded-xl p-4 lg:p-6 mb-4 lg:mb-6" style={{ boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)' }}>
         {/* Recherche textuelle */}
-        <div className="mb-6">
-          <label htmlFor="search" className="block text-sm font-medium mb-2" style={{ color: '#1F2937' }}>
+        <div className="mb-4 lg:mb-6">
+          <label htmlFor="search" className="block text-xs lg:text-sm font-medium mb-1 lg:mb-2" style={{ color: '#1F2937' }}>
             🔍 Recherche
           </label>
           <input
@@ -238,22 +243,22 @@ const RecipeLibraryView = ({ onBack, onViewHistory }) => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Rechercher par nom, description, nutriments..."
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-400 focus:border-green-400 transition-colors"
+            className="w-full px-3 lg:px-4 py-2 text-sm lg:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-400 focus:border-green-400 transition-colors"
           />
         </div>
 
         {/* Filtres */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 lg:gap-4 mb-3 lg:mb-4">
           {/* Catégorie */}
           <div>
-            <label htmlFor="category" className="block text-sm font-medium mb-2" style={{ color: '#1F2937' }}>
+            <label htmlFor="category" className="block text-xs lg:text-sm font-medium mb-1 lg:mb-2" style={{ color: '#1F2937' }}>
               Catégorie
             </label>
             <select
               id="category"
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-400 focus:border-green-400"
+              className="w-full px-2 lg:px-3 py-1.5 lg:py-2 text-sm lg:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-400 focus:border-green-400"
             >
               {categories.map(category => (
                 <option key={category.value} value={category.value}>
@@ -265,14 +270,14 @@ const RecipeLibraryView = ({ onBack, onViewHistory }) => {
 
           {/* Difficulté */}
           <div>
-            <label htmlFor="difficulty" className="block text-sm font-medium mb-2" style={{ color: '#1F2937' }}>
+            <label htmlFor="difficulty" className="block text-xs lg:text-sm font-medium mb-1 lg:mb-2" style={{ color: '#1F2937' }}>
               Difficulté
             </label>
             <select
               id="difficulty"
               value={selectedDifficulty}
               onChange={(e) => setSelectedDifficulty(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-400 focus:border-green-400"
+              className="w-full px-2 lg:px-3 py-1.5 lg:py-2 text-sm lg:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-400 focus:border-green-400"
             >
               {difficulties.map(difficulty => (
                 <option key={difficulty.value} value={difficulty.value}>
@@ -284,7 +289,7 @@ const RecipeLibraryView = ({ onBack, onViewHistory }) => {
 
           {/* Temps de préparation */}
           <div>
-            <label htmlFor="prepTime" className="block text-sm font-medium mb-2" style={{ color: '#1F2937' }}>
+            <label htmlFor="prepTime" className="block text-xs lg:text-sm font-medium mb-1 lg:mb-2" style={{ color: '#1F2937' }}>
               Temps max (minutes)
             </label>
             <input
@@ -295,7 +300,7 @@ const RecipeLibraryView = ({ onBack, onViewHistory }) => {
               placeholder="Ex: 30"
               min="1"
               max="120"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-400 focus:border-green-400"
+              className="w-full px-2 lg:px-3 py-1.5 lg:py-2 text-sm lg:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-400 focus:border-green-400"
             />
           </div>
         </div>
@@ -343,7 +348,7 @@ const RecipeLibraryView = ({ onBack, onViewHistory }) => {
       )}
 
       {!loading && filteredRecipes.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-6">
           {filteredRecipes.map((recipe) => {
             const isSelected = selectedRecipes.some(r => r.id === recipe.id);
             return (

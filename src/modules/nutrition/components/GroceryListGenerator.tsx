@@ -180,7 +180,8 @@ const GroceryListGenerator = ({ selectedRecipes = [], onClose, onGenerate }) => 
           title: 'Ma Liste de Courses SOPK',
           text: `🛒 Liste de courses pour mes recettes SOPK:\n\n${text}`
         });
-      } catch (error) {
+      } catch {
+        // Erreur lors du partage
       }
     }
   };

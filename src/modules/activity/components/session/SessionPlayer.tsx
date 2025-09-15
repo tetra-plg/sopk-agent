@@ -12,7 +12,7 @@ import PreSessionForm from '../forms/PreSessionForm';
 import PostSessionForm from '../forms/PostSessionForm';
 import SessionControls from './SessionControls';
 import SessionProgress from './SessionProgress';
-import LoadingSpinner from '../../../../shared/components/ui/LoadingSpinner';
+// import LoadingSpinner from '../../../../shared/components/ui/LoadingSpinner';
 
 const SessionPlayer = ({ session, onBack, onComplete }) => {
   const { user } = useAuth();
@@ -39,15 +39,15 @@ const SessionPlayer = ({ session, onBack, onComplete }) => {
           ? session.instructions
           : JSON.parse(session.instructions);
         setSessionInstructions(instructions);
-      } catch (error) {
-
+      } catch {
+        // Erreur de parsing des instructions
         setSessionInstructions([]);
       }
     }
   }, [session]);
 
   // Gestionnaire de tick du timer
-  function handleTimerTick(elapsed, remaining) {
+  function handleTimerTick(elapsed) {
     // Calculer l'instruction actuelle basée sur le temps écoulé
     if (sessionInstructions.length > 0) {
       const totalDuration = session.duration_minutes * 60;
@@ -80,8 +80,7 @@ const SessionPlayer = ({ session, onBack, onComplete }) => {
       setPreSessionData(formData);
       setCurrentPhase('active');
       timer.start();
-    } catch (error) {
-
+    } catch {
       setError('Impossible de démarrer la session. Veuillez réessayer.');
     } finally {
       setIsLoading(false);
@@ -110,8 +109,7 @@ const SessionPlayer = ({ session, onBack, onComplete }) => {
           onComplete();
         }
       }, 3000);
-    } catch (error) {
-
+    } catch {
       setError('Impossible de sauvegarder votre session. Veuillez réessayer.');
     } finally {
       setIsLoading(false);
@@ -123,8 +121,8 @@ const SessionPlayer = ({ session, onBack, onComplete }) => {
     if (trackingId) {
       try {
         await activityService.abandonSession(trackingId, reason);
-      } catch (error) {
-
+      } catch {
+        // Erreur lors de l'abandon de session
       }
     }
 

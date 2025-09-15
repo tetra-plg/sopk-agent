@@ -1,5 +1,7 @@
 // Types spécifiques au module activité physique
 
+import { ActivitySession } from './database';
+
 // Types déjà disponibles via index.ts
 
 export interface ActivityFilters {

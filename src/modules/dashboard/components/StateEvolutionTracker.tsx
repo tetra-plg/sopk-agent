@@ -82,7 +82,7 @@ const StateEvolutionTracker = () => {
     return 'stable';
   };
 
-  const getTrendIcon = (trend) => {
+  const _getTrendIcon = (trend) => {
     switch (trend) {
       case 'up': return '📈';
       case 'down': return '📉';

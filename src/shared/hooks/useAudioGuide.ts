@@ -21,7 +21,7 @@ type NotificationType = 'soft' | 'gentle' | 'complete';
 
 export const useAudioGuide = () => {
   const [isEnabled, setIsEnabled] = useState(true);
-  const [isSupported, setIsSupported] = useState(typeof window !== 'undefined' && 'speechSynthesis' in window);
+  const [isSupported, _setIsSupported] = useState(typeof window !== 'undefined' && 'speechSynthesis' in window);
   const currentUtteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
 
   // Configuration de la voix
@@ -183,9 +183,8 @@ export const useAudioGuide = () => {
 
       oscillator.start(audioContext.currentTime);
       oscillator.stop(audioContext.currentTime + 0.3);
-    } catch (error) {
+    } catch (_error) {
       // Fallback silencieux si Web Audio API n'est pas supportée
-
     }
   }, [isEnabled]);
 

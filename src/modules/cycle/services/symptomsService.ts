@@ -84,7 +84,7 @@ export const symptomsService = {
       // Retourner la première (et seule) entrée trouvée
       return { data: data[0], error: null };
 
-    } catch (error) {
+    } catch {
 
       return {
         data: {

@@ -13,42 +13,36 @@ const activityService = {
    * Récupère toutes les sessions d'activité disponibles
    */
   async getSessions(filters = {}) {
-    try {
-      let query = supabase
-        .from('activity_sessions_complete')
-        .select('*')
-        .eq('is_active', true)
-        .order('created_at', { ascending: false });
+    let query = supabase
+      .from('activity_sessions_complete')
+      .select('*')
+      .eq('is_active', true)
+      .order('created_at', { ascending: false });
 
-      // Filtres optionnels
-      if (filters.category) {
-        query = query.eq('category', filters.category);
-      }
+    // Filtres optionnels
+    if (filters.category) {
+      query = query.eq('category', filters.category);
+    }
 
-      if (filters.difficulty_level) {
-        query = query.eq('difficulty_level', filters.difficulty_level);
-      }
+    if (filters.difficulty_level) {
+      query = query.eq('difficulty_level', filters.difficulty_level);
+    }
 
-      if (filters.max_duration) {
-        query = query.lte('duration_minutes', filters.max_duration);
-      }
+    if (filters.max_duration) {
+      query = query.lte('duration_minutes', filters.max_duration);
+    }
 
-      if (filters.sopk_symptoms && filters.sopk_symptoms.length > 0) {
-        query = query.overlaps('sopk_symptoms', filters.sopk_symptoms);
-      }
+    if (filters.sopk_symptoms && filters.sopk_symptoms.length > 0) {
+      query = query.overlaps('sopk_symptoms', filters.sopk_symptoms);
+    }
 
-      const { data, error } = await query;
+    const { data, error } = await query;
 
-      if (error) {
-
-        throw error;
-      }
-
-      return data || [];
-    } catch (error) {
-
+    if (error) {
       throw error;
     }
+
+    return data || [];
   },
 
   /**

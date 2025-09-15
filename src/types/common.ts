@@ -116,10 +116,10 @@ export interface AuthContextType {
   user: any | null;
   userProfile: any | null; // UserProfile sera typé plus tard
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<ApiResponse>;
-  signUp: (email: string, password: string, userData: any) => Promise<ApiResponse>;
+  signIn: (_email: string, _password: string) => Promise<ApiResponse>;
+  signUp: (_email: string, _password: string, _userData: any) => Promise<ApiResponse>;
   signOut: () => Promise<void>;
-  updateProfile: (updates: any) => Promise<ApiResponse>; // Partial<UserProfile> plus tard
+  updateProfile: (_updates: any) => Promise<ApiResponse>; // Partial<UserProfile> plus tard
 }
 
 export interface DashboardContextType {

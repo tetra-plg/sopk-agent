@@ -1,5 +1,7 @@
 // Types spécifiques au module stress et bien-être
 
+import { BreathingTechnique, SessionFeedback } from './database';
+
 // Types déjà disponibles via index.ts
 
 export interface StressMetrics {
