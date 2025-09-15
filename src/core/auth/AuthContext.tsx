@@ -127,7 +127,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         await supabase.auth.signOut({ scope: 'local' });
       } catch (supabaseError) {
         // Ignorer toutes les erreurs Supabase lors du logout
-        console.log('Session Supabase déjà expirée/invalide (normal)');
       }
 
       // Nettoyer l'état côté client

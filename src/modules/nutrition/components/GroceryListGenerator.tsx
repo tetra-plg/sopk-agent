@@ -181,7 +181,6 @@ const GroceryListGenerator = ({ selectedRecipes = [], onClose, onGenerate }) => 
           text: `🛒 Liste de courses pour mes recettes SOPK:\n\n${text}`
         });
       } catch (error) {
-        console.log('Partage annulé');
       }
     }
   };

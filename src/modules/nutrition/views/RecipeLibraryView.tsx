@@ -401,7 +401,6 @@ const RecipeLibraryView = ({ onBack }) => {
           selectedRecipes={selectedRecipes}
           onClose={() => setShowGroceryList(false)}
           onGenerate={(result) => {
-            console.log('Liste générée:', result);
             setShowGroceryList(false);
           }}
         />
@@ -414,7 +413,6 @@ const RecipeLibraryView = ({ onBack }) => {
             recipeId={cookingRecipe.id}
             onBack={() => setCookingRecipe(null)}
             onComplete={(result) => {
-              console.log('Cuisine terminée:', result);
               setCookingRecipe(null);
               // Optionnel: Afficher une notification de succès
             }}
