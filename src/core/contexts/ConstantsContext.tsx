@@ -1,4 +1,4 @@
-import { createContext, useContext } from 'react';
+import React, { createContext, useContext } from 'react';
 
 // Configuration globale de l'application
 const constants = {
@@ -30,7 +30,7 @@ const constants = {
 
 const ConstantsContext = createContext(constants);
 
-export const ConstantsProvider = ({ children }) => {
+export const ConstantsProvider = ({ children }: { children: React.ReactNode }) => {
   return (
     <ConstantsContext.Provider value={constants}>
       {children}

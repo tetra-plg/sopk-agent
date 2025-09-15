@@ -12,7 +12,7 @@ import SuggestionCard from '../components/SuggestionCard';
 import MealDetailModal from '../components/MealDetailModal';
 import RecipeLibraryView from './RecipeLibraryView';
 
-const MealSuggestionsView = ({ onBack }) => {
+const MealSuggestionsView = ({ onBack }: { onBack?: () => void }) => {
   const { user } = useAuth();
   const [currentView, setCurrentView] = useState('suggestions'); // 'suggestions' ou 'library'
 
