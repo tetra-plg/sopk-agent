@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import type { FC } from 'react';
 import { ConstantsProvider } from './core/contexts/ConstantsContext';
 import AppNavigation from './core/layouts/AppNavigation';
 import ProtectedRoute from './core/layouts/ProtectedRoute';
@@ -13,8 +14,8 @@ import StressView from './modules/stress/views/StressView';
 import ActivityView from './modules/activity/views/ActivityView';
 import ProfileEditView from './core/pages/ProfileEditView';
 
-function App() {
-  const [currentRoute, setCurrentRoute] = useState('/dashboard');
+const App: FC = () => {
+  const [currentRoute, setCurrentRoute] = useState<string>('/dashboard');
 
   // Simple routing pour le MVP - sera remplacé par React Router plus tard
   const renderCurrentView = () => {
@@ -53,6 +54,6 @@ function App() {
       </ProtectedRoute>
     </ConstantsProvider>
   );
-}
+};
 
 export default App;

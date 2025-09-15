@@ -7,13 +7,25 @@
 
 import { useCallback, useRef, useState } from 'react';
 
+// Types pour le hook useAudioGuide
+interface SpeechOptions {
+  rate?: number;
+  pitch?: number;
+  volume?: number;
+  onStart?: () => void;
+  onEnd?: () => void;
+}
+
+type BreathingPhase = 'inhale' | 'hold' | 'exhale' | 'pause';
+type NotificationType = 'soft' | 'gentle' | 'complete';
+
 export const useAudioGuide = () => {
   const [isEnabled, setIsEnabled] = useState(true);
   const [isSupported, setIsSupported] = useState(typeof window !== 'undefined' && 'speechSynthesis' in window);
-  const currentUtteranceRef = useRef(null);
+  const currentUtteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
 
   // Configuration de la voix
-  const getVoice = useCallback(() => {
+  const getVoice = useCallback((): SpeechSynthesisVoice | null => {
     if (!isSupported) return null;
 
     const voices = speechSynthesis.getVoices();
@@ -41,7 +53,7 @@ export const useAudioGuide = () => {
   }, [isSupported]);
 
   // Parler un texte avec des paramètres optimisés pour la méditation
-  const speak = useCallback((text, options = {}) => {
+  const speak = useCallback((text: string, options: SpeechOptions = {}) => {
     if (!isSupported || !isEnabled || !text.trim()) return;
 
     // Arrêter la parole en cours
@@ -72,7 +84,7 @@ export const useAudioGuide = () => {
   }, [isSupported, isEnabled, getVoice, stopSpeaking]);
 
   // Instructions spécifiques pour chaque phase
-  const announcePhase = useCallback((phase, duration, isFirstTime = false) => {
+  const announcePhase = useCallback((phase: BreathingPhase, duration?: number, isFirstTime = false) => {
     if (!isEnabled) return;
 
     const messages = {
@@ -87,7 +99,7 @@ export const useAudioGuide = () => {
   }, [speak, isEnabled]);
 
   // Son de début de session
-  const announceStart = useCallback((techniqueName) => {
+  const announceStart = useCallback((techniqueName: string) => {
     if (!isEnabled) return;
 
     speak(`Commençons l'exercice ${techniqueName}. Installez-vous confortablement et fermez les yeux si vous le souhaitez.`, {
@@ -102,7 +114,7 @@ export const useAudioGuide = () => {
   }, [speak, isEnabled]);
 
   // Compte à rebours pour fin de phase
-  const countDown = useCallback((secondsLeft) => {
+  const countDown = useCallback((secondsLeft: number) => {
     if (!isEnabled || secondsLeft > 3 || secondsLeft <= 0) return;
 
     // Seulement pour les 3 dernières secondes
@@ -129,12 +141,12 @@ export const useAudioGuide = () => {
   }, [speak, isEnabled]);
 
   // Annonce de fin de session
-  const announceCompletion = useCallback((stressReduction) => {
+  const announceCompletion = useCallback((stressReduction?: number) => {
     if (!isEnabled) return;
 
     let message = 'Bravo ! Votre session est terminée.';
 
-    if (stressReduction > 0) {
+    if (stressReduction && stressReduction > 0) {
       message += ` Vous avez réduit votre stress de ${stressReduction} points. Excellent travail !`;
     }
 
@@ -144,11 +156,11 @@ export const useAudioGuide = () => {
   }, [speak, isEnabled]);
 
   // Sons de notification subtils (utilisation de beep courts)
-  const playNotificationSound = useCallback((type = 'soft') => {
+  const playNotificationSound = useCallback((type: NotificationType = 'soft') => {
     if (!isEnabled) return;
 
     // Utiliser des tons doux pour les notifications
-    const frequencies = {
+    const frequencies: Record<NotificationType, number> = {
       soft: 220,      // La grave
       gentle: 330,    // Mi
       complete: 440   // La medium

@@ -7,7 +7,18 @@
 
 import { useState, useRef, useCallback, useEffect } from 'react';
 
-export const useTimer = (initialDuration = 0, options = {}) => {
+// Types pour le hook useTimer
+interface TimerOptions {
+  onTick?: (timeLeft: number, elapsed: number) => void;
+  onComplete?: () => void;
+  onStart?: () => void;
+  onPause?: () => void;
+  onReset?: () => void;
+  tickInterval?: number;
+  autoStart?: boolean;
+}
+
+export const useTimer = (initialDuration = 0, options: TimerOptions = {}) => {
   const {
     onTick = () => {},
     onComplete = () => {},
@@ -24,8 +35,8 @@ export const useTimer = (initialDuration = 0, options = {}) => {
   const [totalElapsed, setTotalElapsed] = useState(0);
   const [currentDuration, setCurrentDuration] = useState(initialDuration);
 
-  const intervalRef = useRef(null);
-  const startTimeRef = useRef(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const startTimeRef = useRef<number | null>(null);
   const pausedTimeRef = useRef(0);
 
   // Fonction de tick du timer
@@ -102,7 +113,7 @@ export const useTimer = (initialDuration = 0, options = {}) => {
   }, [initialDuration, stop, onReset]);
 
   // Définir une nouvelle durée
-  const setDuration = useCallback((newDuration) => {
+  const setDuration = useCallback((newDuration: number) => {
     const wasRunning = isRunning;
     stop();
     setTimeLeft(newDuration);
@@ -121,7 +132,7 @@ export const useTimer = (initialDuration = 0, options = {}) => {
   const progressPercent = Math.round(progress * 100);
 
   // Formater le temps
-  const formatTime = useCallback((seconds) => {
+  const formatTime = useCallback((seconds: number) => {
     const minutes = Math.floor(Math.abs(seconds) / 60);
     const secs = Math.floor(Math.abs(seconds) % 60);
     return `${minutes}:${secs.toString().padStart(2, '0')}`;

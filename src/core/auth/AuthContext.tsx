@@ -6,7 +6,9 @@
  */
 
 import { createContext, useContext, useEffect, useState } from 'react';
+import type { FC, ReactNode, User } from 'react';
 import { supabase } from '../../shared/services/supabase';
+import type { AuthContextType } from '@/types';
 
 // Créer le contexte
 export const AuthContext = createContext({
