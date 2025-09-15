@@ -247,6 +247,18 @@ const StateEvolutionTracker = () => {
           </div>
         ))}
       </div>
+
+      {/* Message si aucune donnée */}
+      {weekData.filter(d => d.journalEntry).length === 0 && (
+        <div className="text-center py-6 text-gray-500 mt-6">
+          <div className="text-4xl mb-2">📝</div>
+          <p className="text-sm">
+            Aucune donnée de journal pour le moment.
+            <br />
+            Remplis ton journal quotidien pour suivre ton évolution !
+          </p>
+        </div>
+      )}
     </div>
   );
 };

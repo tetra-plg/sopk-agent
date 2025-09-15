@@ -12,6 +12,10 @@ import StateEvolutionTracker from '../components/StateEvolutionTracker';
 import NutritionTracker from '../components/NutritionTracker';
 import StressManagementTracker from '../components/StressManagementTracker';
 import SwipeContainer from '../../../shared/components/SwipeContainer';
+import SymptomsCard from '../components/SymptomsCard';
+import NutritionCard from '../components/NutritionCard';
+import WellnessCard from '../components/WellnessCard';
+import type { Recipe } from '../../../types/database';
 
 const DashboardView = ({ onNavigate }) => {
   const { user } = useAuth();
@@ -20,7 +24,7 @@ const DashboardView = ({ onNavigate }) => {
   const [todaySymptoms, setTodaySymptoms] = useState(null);
   const [loadingSymptoms, setLoadingSymptoms] = useState(true);
   const [userProfile, setUserProfile] = useState(null);
-  const [_loadingProfile, _setLoadingProfile] = useState(true);
+  const [, _setLoadingProfile] = useState(true);
 
   // États pour les modales nutrition
   const [selectedMeal, setSelectedMeal] = useState(null);
@@ -54,7 +58,7 @@ const DashboardView = ({ onNavigate }) => {
       try {
         const { data } = await userProfileService.getUserProfile(user.id);
         setUserProfile(data);
-      } catch (error) {
+      } catch {
         // Profil optionnel, pas d'erreur bloquante
       } finally {
         _setLoadingProfile(false);
@@ -81,7 +85,7 @@ const DashboardView = ({ onNavigate }) => {
         } else {
           setTodaySymptoms(data);
         }
-      } catch (error) {
+      } catch {
         // Erreur non bloquante
       } finally {
         setLoadingSymptoms(false);
@@ -138,12 +142,12 @@ const DashboardView = ({ onNavigate }) => {
         setShowTrackingSuccess(true);
         setShowMealModal(false);
       }
-    } catch (error) {
-
+    } catch {
+      // Gestion d'erreur silencieuse
     }
   };
 
-  const handleQuickTrackMeal = async () => {
+  const _handleQuickTrackMeal = async () => {
     const quickSuggestion = mealSuggestions.getQuickSuggestion();
     if (quickSuggestion) {
       await handleTrackMeal(quickSuggestion.id, quickSuggestion.category);
@@ -155,7 +159,7 @@ const DashboardView = ({ onNavigate }) => {
   };
 
   // Obtenir la suggestion du jour
-  const todaySuggestion = mealSuggestions.getQuickSuggestion();
+  const todaySuggestion: Recipe | null = mealSuggestions.getQuickSuggestion();
 
   // Obtenir le nom d'affichage
   const getDisplayName = () => {
@@ -196,7 +200,7 @@ const DashboardView = ({ onNavigate }) => {
 
   return (
     <div className="p-3 md:p-6 lg:p-8">
-      <header className="mb-4 md:mb-8 lg:mb-10 text-center">
+      <header className="mb-4 md:mb-8 lg:mb-10 text-center mt-6">
         <h1 className="font-heading text-xl md:text-3xl lg:text-4xl font-bold mb-1 md:mb-3"
             style={{
               background: 'linear-gradient(135deg, var(--color-primary-lavande) 0%, var(--color-primary-bleu-ciel) 100%)',
@@ -211,172 +215,57 @@ const DashboardView = ({ onNavigate }) => {
         </p>
       </header>
 
-      {/* Grid responsive mobile-first */}
-      <div className="grid gap-3 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-        {/* Widget État du jour - Prend toute la largeur sur mobile */}
-        <div className="card-dashboard p-3 md:p-6 col-span-1 sm:col-span-2 lg:col-span-1 transform hover:scale-105 transition-transform duration-200 flex flex-col">
-          <h3 className="font-heading text-lg font-semibold mb-4 flex items-center gap-2"
-              style={{ color: 'var(--color-primary-lavande)' }}>
-            ✨ État du jour
-          </h3>
-
-          {loadingSymptoms ? (
-            <div className="space-y-3">
-              <div className="animate-pulse flex justify-between items-center">
-                <div className="h-4 bg-gray-200 rounded w-16"></div>
-                <div className="h-6 bg-gray-200 rounded w-20"></div>
-              </div>
-              <div className="animate-pulse flex justify-between items-center">
-                <div className="h-4 bg-gray-200 rounded w-16"></div>
-                <div className="h-6 bg-gray-200 rounded w-20"></div>
-              </div>
-              <div className="animate-pulse flex justify-between items-center">
-                <div className="h-4 bg-gray-200 rounded w-16"></div>
-                <div className="h-6 bg-gray-200 rounded w-20"></div>
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {/* Fatigue */}
-              <div className="flex justify-between items-center">
-                <span style={{ color: 'var(--color-text-secondaire)' }}>Fatigue</span>
-                <span className="font-medium badge-bleu-ciel">
-                  {todaySymptoms?.fatigue_level ? `${todaySymptoms.fatigue_level}/5 ${todaySymptoms.fatigue_level <= 2 ? '🌟' : todaySymptoms.fatigue_level <= 3 ? '😴' : '😵'}` : 'Non renseigné'}
-                </span>
-              </div>
-
-              {/* Douleurs */}
-              <div className="flex justify-between items-center">
-                <span style={{ color: 'var(--color-text-secondaire)' }}>Douleurs</span>
-                <span className="font-medium badge-vert-sauge">
-                  {todaySymptoms?.pain_level ? `${todaySymptoms.pain_level}/5 ${todaySymptoms.pain_level <= 2 ? '✨' : todaySymptoms.pain_level <= 3 ? '😐' : '😣'}` : 'Non renseigné'}
-                </span>
-              </div>
-
-              {/* Flux menstruel */}
-              <div className="flex justify-between items-center">
-                <span style={{ color: 'var(--color-text-secondaire)' }}>Règles</span>
-                <span className="font-medium badge-lavande">
-                  {todaySymptoms?.period_flow ? `${todaySymptoms.period_flow}/5 🩸` : 'Aucun flux'}
-                </span>
-              </div>
-            </div>
-          )}
-
-          <div className="flex-grow"></div>
-          <button
-            onClick={() => setCurrentView('journal')}
-            className="w-full mt-4 btn-primary"
-          >
-            📝 {todaySymptoms ? 'Modifier journal' : 'Compléter journal'}
-          </button>
+      <div className="mt-6 md:mt-8">
+        {/* Version mobile avec swipe */}
+        <div className="block lg:hidden">
+          <SwipeContainer>
+            <SymptomsCard
+              todaySymptoms={todaySymptoms}
+              loadingSymptoms={loadingSymptoms}
+              onEditJournal={() => setCurrentView('journal')}
+            />
+            <NutritionCard
+              todaySuggestion={todaySuggestion}
+              loading={mealSuggestions.loading}
+              onShowMealDetails={handleShowMealDetails}
+              onNavigate={onNavigate}
+            />
+            <WellnessCard
+              techniques={techniques}
+              onStartBreathingExercise={handleStartBreathingExercise}
+            />
+          </SwipeContainer>
         </div>
 
-        {/* Widget Nutrition */}
-        <div className="card-nutrition p-4 md:p-6 transform hover:scale-105 transition-transform duration-200 flex flex-col">
-          <h3 className="font-heading text-lg font-semibold mb-4 flex items-center gap-2"
-              style={{ color: 'var(--color-accent-vert-sauge)' }}>
-            🥗 Idée repas
-          </h3>
-
-          {mealSuggestions.loading ? (
-            <div className="space-y-3">
-              <div className="animate-pulse">
-                <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                <div className="flex gap-2">
-                  <div className="h-6 bg-gray-200 rounded w-16"></div>
-                  <div className="h-6 bg-gray-200 rounded w-16"></div>
-                </div>
-              </div>
-            </div>
-          ) : todaySuggestion ? (
-            <>
-              <div className="mb-4">
-                <h4 className="font-medium mb-2" style={{ color: 'var(--color-text-principal)' }}>
-                  {todaySuggestion.name}
-                </h4>
-                <div className="flex gap-2 text-sm">
-                  <span className="badge-vert-sauge">⏱️ {todaySuggestion.prep_time_minutes}min</span>
-                  {todaySuggestion.glycemic_index_category === 'low' && (
-                    <span className="badge-vert-sauge">🟢 IG bas</span>
-                  )}
-                </div>
-              </div>
-              <p className="text-sm font-emotional italic mb-4" style={{ color: 'var(--color-text-secondaire)' }}>
-                💚 {todaySuggestion.tips || 'Parfait pour votre bien-être'}
-              </p>
-              <div className="flex-grow"></div>
-              <div className="flex gap-2">
-                <button
-                  onClick={handleShowMealDetails}
-                  className="flex-1 btn-accent-vert text-sm"
-                >
-                  Voir recette
-                </button>
-                <button
-                  onClick={handleQuickTrackMeal}
-                  className="btn-accent-vert px-3"
-                  title="Marquer comme consommé"
-                >
-                  ✅
-                </button>
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="mb-4">
-                <h4 className="font-medium mb-2" style={{ color: 'var(--color-text-principal)' }}>
-                  Aucune suggestion
-                </h4>
-                <p className="text-sm" style={{ color: 'var(--color-text-secondaire)' }}>
-                  Complétez votre journal pour des suggestions personnalisées
-                </p>
-              </div>
-              <div className="flex-grow"></div>
-              <button
-                onClick={() => onNavigate ? onNavigate('/nutrition') : {}}
-                className="w-full btn-accent-vert text-sm"
-              >
-                Explorer les repas
-              </button>
-            </>
-          )}
-        </div>
-
-        {/* Widget Bien-être */}
-        <div className="card-stress p-4 md:p-6 transform hover:scale-105 transition-transform duration-200 flex flex-col">
-          <h3 className="font-heading text-lg font-semibold mb-4 flex items-center gap-2"
-              style={{ color: 'var(--color-primary-bleu-ciel)' }}>
-            🧘 Pause bien-être
-          </h3>
-          <div className="mb-4">
-            <div className="mb-3">
-              {techniques.length > 0 && (() => {
-                const quickTechnique = techniques.find(t => t.id === 'quick') || techniques[0];
-                return (
-                  <>
-                    <h4 className="font-medium mb-1" style={{ color: 'var(--color-text-principal)' }}>
-                      {quickTechnique.name}
-                    </h4>
-                    <p className="text-sm" style={{ color: 'var(--color-text-secondaire)' }}>
-                      {quickTechnique.description} • {Math.floor(quickTechnique.duration_seconds / 60)} min
-                    </p>
-                  </>
-                );
-              })()}
-            </div>
-            <div className="flex gap-2 text-xs">
-              <span className="badge-bleu-ciel">⚡ Express</span>
-              <span className="badge-bleu-ciel">🫁 Anti-stress</span>
-            </div>
+      
+        {/* Version desktop avec grid */}
+        <div className="hidden lg:grid gap-4 md:gap-6 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
+          <div className="col-span-1">
+            {/* Carte État du jour */}
+            <SymptomsCard
+              todaySymptoms={todaySymptoms}
+              loadingSymptoms={loadingSymptoms}
+              onEditJournal={() => setCurrentView('journal')}
+            />
           </div>
-          <div className="flex-grow"></div>
-          <button
-            onClick={handleStartBreathingExercise}
-            className="w-full btn-secondary"
-          >
-            {techniques.length > 0 && (techniques.find(t => t.id === 'quick') || techniques[0])?.icon} Commencer maintenant
-          </button>
+
+          <div className="col-span-1">
+            {/* Carte Nutrition */}
+            <NutritionCard
+              todaySuggestion={todaySuggestion}
+              loading={mealSuggestions.loading}
+              onShowMealDetails={handleShowMealDetails}
+              onNavigate={onNavigate}
+            />
+          </div>
+
+          <div className="col-span-1 lg:col-span-2 xl:col-span-1">
+            {/* Carte Bien-être */}
+            <WellnessCard
+              techniques={techniques}
+              onStartBreathingExercise={handleStartBreathingExercise}
+            />
+          </div>
         </div>
       </div>
 
@@ -451,8 +340,7 @@ const DashboardView = ({ onNavigate }) => {
             setShowTrackingSuccess(false);
             setTrackedMeal(null);
           }}
-          onRateMeal={(rating) => {
-
+          onRateMeal={() => {
             setShowTrackingSuccess(false);
             setTrackedMeal(null);
           }}

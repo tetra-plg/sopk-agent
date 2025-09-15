@@ -72,12 +72,7 @@ const NutritionTracker = () => {
               avgRating: Math.round(avgRating * 10) / 10
             });
           } catch {
-            // Si la méthode n'existe pas, utiliser des données simulées
-            weekData.push({
-              date: dateString,
-              mealsCount: Math.random() > 0.5 ? Math.floor(Math.random() * 4) + 1 : 0,
-              avgRating: Math.random() * 2 + 3
-            });
+            // Ne pas ajouter de données si erreur
           }
         }
         _setWeeklyData(weekData);
@@ -224,10 +219,12 @@ const NutritionTracker = () => {
       )}
 
       {/* Message d'encouragement si pas de données */}
-      {(!weeklyStats || weeklyStats.totalRecipesMade === 0) && recentMeals.length === 0 && (
+      {(!weeklyStats || weeklyStats.totalRecipesMade === 0) && recentMeals.length === 0 && _weeklyData.length === 0 && (
         <div className="text-center py-6 text-gray-500">
           <div className="text-4xl mb-2">🍽️</div>
           <p className="text-sm">
+            Aucune donnée nutritionnelle pour le moment.
+            <br />
             Commence à tracker tes repas pour voir tes habitudes !
           </p>
           <button className="mt-3 px-4 py-2 bg-green-500 text-white rounded-lg text-sm hover:bg-green-600 transition-colors">

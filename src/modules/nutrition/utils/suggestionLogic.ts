@@ -53,10 +53,10 @@ class SuggestionEngine {
    * Détecte le type de repas selon l'heure
    */
   static detectMealType(hour) {
-    if (hour < 10) return 'breakfast';
-    if (hour < 14) return 'lunch';
-    if (hour < 17) return 'snack';
-    return 'dinner';
+    if (hour >= 5 && hour < 11) return 'breakfast';  // 5h-11h : Petit-déjeuner
+    if (hour >= 11 && hour < 15) return 'lunch';     // 11h-15h : Déjeuner
+    if (hour >= 18 && hour < 22) return 'dinner';    // 18h-22h : Dîner
+    return 'snack'; // 15h-18h, 22h-5h : Collations (après-midi et soirée)
   }
 
   /**

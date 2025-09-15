@@ -10,11 +10,26 @@ import { useBreathingTechniques } from '../../stress/hooks/useBreathingTechnique
 import moodService from '../../stress/services/moodService';
 import MiniChart from '../../../shared/components/MiniChart';
 
+interface WeeklyStats {
+  totalSessions: number;
+  totalMinutes: number;
+  averageStressReduction: number;
+  streakDays: number;
+}
+
+interface Session {
+  technique_name: string;
+  duration: number;
+  created_at: string;
+  stress_before: number;
+  stress_after: number;
+}
+
 const StressManagementTracker = ({ onStartBreathing }) => {
   const { user } = useAuth();
   const { techniques, loading: techniquesLoading } = useBreathingTechniques();
-  const [recentSessions, setRecentSessions] = useState([]);
-  const [weeklyStats, setWeeklyStats] = useState(null);
+  const [recentSessions, setRecentSessions] = useState<Session[]>([]);
+  const [weeklyStats, setWeeklyStats] = useState<WeeklyStats | null>(null);
   const [_todayMood, _setTodayMood] = useState(null);
   const [loading, setLoading] = useState(true);
   const [moodWeekData, setMoodWeekData] = useState<Array<{date: string, mood: number, stress: number}>>([]);
@@ -40,17 +55,15 @@ const StressManagementTracker = ({ onStartBreathing }) => {
         const moodResult = await moodService.getMoodEntry(user.id, today);
         _setTodayMood(moodResult.data);
 
-        // Simuler des données pour le moment
-        setRecentSessions([
-          { technique_name: 'Respiration rapide', duration: 300, created_at: new Date().toISOString(), stress_before: 4, stress_after: 2 },
-          { technique_name: 'Méditation guidée', duration: 600, created_at: new Date(Date.now() - 86400000).toISOString(), stress_before: 3, stress_after: 1 }
-        ]);
+        // Charger les vraies données de sessions (pour l'instant vide)
+        setRecentSessions([]);
 
+        // Charger les vraies stats (pour l'instant vide)
         setWeeklyStats({
-          totalSessions: 5,
-          totalMinutes: 45,
-          averageStressReduction: 2.1,
-          streakDays: 3
+          totalSessions: 0,
+          totalMinutes: 0,
+          averageStressReduction: 0,
+          streakDays: 0
         });
 
         // Charger les données d'humeur pour les graphiques (7 derniers jours)
@@ -62,17 +75,15 @@ const StressManagementTracker = ({ onStartBreathing }) => {
 
           try {
             const moodResult = await moodService.getMoodEntry(user.id, dateString);
-            moodData.push({
-              date: dateString,
-              mood: moodResult.data?.mood_score || 0,
-              stress: Math.random() * 5 // Simulé pour l'instant
-            });
+            if (moodResult.data?.mood_score) {
+              moodData.push({
+                date: dateString,
+                mood: moodResult.data.mood_score,
+                stress: moodResult.data.stress_level || 0
+              });
+            }
           } catch {
-            moodData.push({
-              date: dateString,
-              mood: Math.random() * 5,
-              stress: Math.random() * 5
-            });
+            // Ne pas ajouter de données si erreur
           }
         }
         setMoodWeekData(moodData);
@@ -224,10 +235,12 @@ const StressManagementTracker = ({ onStartBreathing }) => {
       )}
 
       {/* Message d'encouragement si pas de données */}
-      {!weeklyStats && recentSessions.length === 0 && (
+      {(!weeklyStats || weeklyStats.totalSessions === 0) && recentSessions.length === 0 && (
         <div className="text-center py-6 text-gray-500">
           <div className="text-4xl mb-2">🧘‍♀️</div>
           <p className="text-sm mb-3">
+            Aucune donnée de gestion du stress pour le moment.
+            <br />
             Commence ta première session pour gérer ton stress !
           </p>
           {quickTechnique && (
