@@ -6,17 +6,20 @@
  */
 
 import { createContext, useContext, useEffect, useState } from 'react';
-import type { FC, ReactNode, User } from 'react';
+import type { ReactNode } from 'react';
+import type { User } from '@supabase/supabase-js';
 import { supabase } from '../../shared/services/supabase';
 import type { AuthContextType } from '@/types';
 
-// Créer le contexte
-export const AuthContext = createContext({
+// Créer le contexte avec le bon type
+export const AuthContext = createContext<AuthContextType>({
   user: null,
+  userProfile: null,
   loading: true,
-  signIn: () => {},
-  signOut: () => {},
-  signUp: () => {}
+  signIn: async () => ({ data: null, error: null, success: false }),
+  signOut: async () => {},
+  signUp: async () => ({ data: null, error: null, success: false }),
+  updateProfile: async () => ({ data: null, error: null, success: false })
 });
 
 // Hook personnalisé pour utiliser le contexte
@@ -29,8 +32,9 @@ export const useAuth = () => {
 };
 
 // Provider du contexte d'authentification
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [userProfile, setUserProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -66,7 +70,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   // Fonction de connexion
-  const signIn = async (email, password) => {
+  const signIn = async (email: string, password: string) => {
     try {
       setLoading(true);
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -85,7 +89,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Fonction d'inscription avec création automatique de profil
-  const signUp = async (email, password, metadata = {}) => {
+  const signUp = async (email: string, password: string, metadata: any = {}) => {
     try {
       setLoading(true);
       const { data, error } = await supabase.auth.signUp({
@@ -139,13 +143,20 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Méthode updateProfile manquante
+  const updateProfile = async (updates: any) => {
+    return { data: null, error: null, success: false };
+  };
+
   // Valeur du contexte
   const value = {
     user,
+    userProfile,
     loading,
     signIn,
     signOut,
-    signUp
+    signUp,
+    updateProfile
   };
 
   return (
