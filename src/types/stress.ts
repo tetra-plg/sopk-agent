@@ -1,6 +1,6 @@
 // Types spécifiques au module stress et bien-être
 
-import { BreathingTechnique, SessionFeedback } from './database';
+import { BreathingTechnique } from './database';
 
 // Types déjà disponibles via index.ts
 
@@ -63,7 +63,7 @@ export interface MeditationTechnique {
   benefits: string[];
 }
 
-export interface SessionFeedback {
+interface SessionFeedback {
   stressBefore: number;
   stressAfter: number;
   difficultyRating: number;

@@ -146,35 +146,6 @@ report := report || '   • Valider les interfaces JSON (ingredients, instructio
 RAISE NOTICE '%', report;
 
 END $$;
-
--- Créer une vue de vérification pour les développeurs
-CREATE OR REPLACE VIEW v_database_typescript_coherence AS
-SELECT
-  'user_profiles' as table_name,
-  array_agg(column_name ORDER BY ordinal_position) as columns_present
-FROM information_schema.columns
-WHERE table_name = 'user_profiles'
-UNION ALL
-SELECT
-  'recipes' as table_name,
-  array_agg(column_name ORDER BY ordinal_position) as columns_present
-FROM information_schema.columns
-WHERE table_name = 'recipes'
-UNION ALL
-SELECT
-  'activity_sessions' as table_name,
-  array_agg(column_name ORDER BY ordinal_position) as columns_present
-FROM information_schema.columns
-WHERE table_name = 'activity_sessions'
-UNION ALL
-SELECT
-  'user_activity_tracking' as table_name,
-  array_agg(column_name ORDER BY ordinal_position) as columns_present
-FROM information_schema.columns
-WHERE table_name = 'user_activity_tracking';
-
-COMMENT ON VIEW v_database_typescript_coherence IS 'Vue de vérification de la cohérence entre la BDD et les types TypeScript';
-
 -- Message final
 DO $$
 BEGIN

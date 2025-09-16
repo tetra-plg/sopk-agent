@@ -137,7 +137,7 @@ export interface Recipe {
   servings: number;
   difficulty: 'beginner' | 'easy' | 'medium' | 'advanced';
   glycemic_index_category: 'low' | 'medium' | 'high' | null;
-  nutritional_info: NutritionalInfo | null; // Contient les calories
+  nutritional_info: NutritionalInfo | null;
   sopk_benefits: string[];
   allergen_info: string[];
   ingredients: RecipeIngredient[];
@@ -174,13 +174,16 @@ export interface MoodEntry {
   id: string;
   user_id: string;
   date: string;
-  time: string;
-  mood_score: number;
+  time: string | null;
+  mood_emoji: string;
+  mood_score: number | null;
   energy_level: number | null;
   stress_level: number | null;
   notes: string | null;
   tags: string[];
+  context_triggers: string[] | null;
   created_at: string;
+  updated_at: string;
 }
 
 export interface BreathingSession {
@@ -194,7 +197,10 @@ export interface BreathingSession {
   satisfaction_rating: number | null;
   notes: string | null;
   completed: boolean;
+  interruption_reason: string | null;
+  feeling_after: string | null;
   created_at: string;
+  updated_at: string;
 }
 
 export interface BreathingTechnique {
@@ -203,9 +209,18 @@ export interface BreathingTechnique {
   description: string;
   instructions: BreathingInstructions;
   duration_minutes: number;
+  duration_seconds: number;
+  pattern: number[];
   difficulty_level: number;
+  difficulty: 'beginner' | 'intermediate' | 'advanced';
   benefits: string[];
+  icon: string;
+  color: string;
+  sopk_benefits: string;
+  display_order: number;
+  is_active: boolean;
   created_at: string;
+  updated_at: string;
 }
 
 export interface ActivitySession {
