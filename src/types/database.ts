@@ -163,7 +163,7 @@ export interface UserRecipeTracking {
   servings_made: number;
   difficulty_rating: number | null;
   taste_rating: number | null;
-  would_make_again: boolean | null;
+  will_cook_again: boolean | null;
   meal_type: 'breakfast' | 'lunch' | 'dinner' | 'snack' | null;
   preparation_time_actual: number | null;
   notes: string | null;

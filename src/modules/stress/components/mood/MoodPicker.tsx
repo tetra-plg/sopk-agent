@@ -22,7 +22,7 @@ const MoodPicker = ({
   const moodData = value || {
     mood_emoji: '',
     mood_score: 5,
-    mood_tags: [],
+    tags: [],
     notes: ''
   };
 
@@ -49,7 +49,7 @@ const MoodPicker = ({
   };
 
   const handleTagsChange = (tags) => {
-    updateMoodData('mood_tags', tags);
+    updateMoodData('tags', tags);
   };
 
   const handleNotesChange = (notes) => {
@@ -168,7 +168,7 @@ const MoodPicker = ({
       {moodData.mood_emoji && (
         <div className="mb-6">
           <MoodTags
-            selected={moodData.mood_tags}
+            selected={moodData.tags}
             onSelectionChange={handleTagsChange}
             disabled={disabled}
             size="normal"

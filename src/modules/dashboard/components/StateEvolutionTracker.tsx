@@ -30,7 +30,7 @@ const StateEvolutionTracker = () => {
           const dateString = date.toISOString().split('T')[0];
 
           const { data } = await symptomsService.getDailyEntry(user.id, dateString);
-          days.push({
+          if (data.id) days.push({
             date: dateString,
             day: date.toLocaleDateString('fr-FR', { weekday: 'short' }),
             journalEntry: data

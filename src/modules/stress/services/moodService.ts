@@ -19,7 +19,7 @@ const moodService = {
         date: typeof date === 'string' ? date : date.toISOString().split('T')[0],
         mood_emoji: moodData.mood_emoji,
         mood_score: moodData.mood_score,
-        mood_tags: moodData.mood_tags || [],
+        tags: moodData.tags || [],
         notes: moodData.notes || '',
         context_triggers: moodData.context_triggers || [],
         updated_at: new Date().toISOString()
@@ -81,7 +81,7 @@ const moodService = {
 
       const { data, error } = await client
         .from('mood_entries')
-        .select('date, mood_emoji, mood_score, mood_tags, context_triggers, created_at')
+        .select('date, mood_emoji, mood_score, tags, context_triggers, created_at')
         .eq('user_id', userId)
         .gte('created_at', startDate.toISOString())
         .order('date', { ascending: false });
@@ -195,7 +195,7 @@ const moodService = {
 
     // Pattern de stress récurrent
     const stressedDays = history.filter(entry =>
-      entry.mood_tags?.includes('stressed') ||
+      entry.tags?.includes('stressed') ||
       (entry.mood_score && entry.mood_score <= 3)
     );
 

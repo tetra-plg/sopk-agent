@@ -29,7 +29,6 @@ export const useMealSuggestions = (context = {}) => {
   const loadAllMeals = useCallback(async () => {
     try {
       const { data } = await nutritionService.getAllMealSuggestions();
-      console.log('🍽️ useMealSuggestions - Repas chargés:', data?.length || 0);
       setAllMeals(data || []);
     } catch (err) {
       console.error('❌ useMealSuggestions - Erreur chargement:', err);
@@ -71,13 +70,6 @@ export const useMealSuggestions = (context = {}) => {
 
       // Générer les suggestions avec l'algorithme
       const newSuggestions = SuggestionEngine.generateSuggestions(enrichedContext);
-      console.log('🎯 useMealSuggestions - Suggestions générées:', newSuggestions.length);
-      console.log('   Contexte:', {
-        mealsCount: allMeals.length,
-        timeOfDay: enrichedContext.timeOfDay,
-        symptoms: enrichedContext.symptoms,
-        preferences: enrichedContext.preferences
-      });
       setSuggestions(newSuggestions);
 
     } catch (err) {

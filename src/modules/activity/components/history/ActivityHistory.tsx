@@ -226,11 +226,11 @@ const ActivityHistory = ({ onBack }) => {
 
                       <div className="flex flex-wrap items-center gap-3 text-sm" style={{ color: '#6B7280' }}>
                         <span>
-                          📅 {new Date(entry.completed_at).toLocaleDateString('fr-FR', {
+                          📅 {new Date(entry.date_completed).toLocaleDateString('fr-FR', {
                             day: 'numeric',
                             month: 'short',
-                            hour: '2-digit',
-                            minute: '2-digit'
+                            // hour: '2-digit',
+                            // minute: '2-digit'
                           })}
                         </span>
                         <span>⏱️ {formatDuration(entry.duration_seconds || 0)}</span>

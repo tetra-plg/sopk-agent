@@ -217,11 +217,11 @@ const CycleView = () => {
                               month: 'short'
                             })}
                           </div>
-                          {entry.period_flow && entry.period_flow > 0 && (
+                          {entry.period_flow && entry.period_flow > 0 ? (
                             <span className="text-xs px-2 py-1 rounded" style={{ backgroundColor: 'rgba(251, 113, 133, 0.1)', color: '#FB7185' }}>
                               🔴 Règles
                             </span>
-                          )}
+                          ) : ''}
                         </div>
                         <div className="flex items-center gap-2 text-sm" style={{ color: '#6B7280' }}>
                           {entry.mood_score && (

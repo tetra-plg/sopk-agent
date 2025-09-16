@@ -50,7 +50,7 @@ const MoodJournalView = ({ onBack, onNavigateToBreathing }) => {
       });
     }
 
-    if (moodJournal.moodData.mood_tags?.includes('stressed')) {
+    if (moodJournal.moodData.tags?.includes('stressed')) {
       contextualSuggestions.push({
         type: 'stress_management',
         title: 'Tu sembles stressée',

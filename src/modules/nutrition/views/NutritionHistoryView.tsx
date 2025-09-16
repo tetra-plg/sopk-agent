@@ -74,7 +74,7 @@ const NutritionHistoryView = ({ onBack }) => {
       .reduce((sum, item) => sum + item.taste_rating, 0) /
       data.filter(item => item.taste_rating).length;
 
-    const favoriteCount = data.filter(item => item.would_make_again).length;
+    const favoriteCount = data.filter(item => item.will_cook_again).length;
     const lowGICount = data.filter(item =>
       item.recipes?.glycemic_index_category === 'low'
     ).length;
@@ -278,7 +278,7 @@ const NutritionHistoryView = ({ onBack }) => {
                         {getRatingEmoji(entry.taste_rating)}
                       </span>
                     )}
-                    {entry.would_make_again && (
+                    {entry.will_cook_again && (
                       <span className="text-green-600 text-sm">❤️ Favori</span>
                     )}
                     <button

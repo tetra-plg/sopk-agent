@@ -52,7 +52,7 @@ export const symptomsService = {
   async getDailyEntry(userId, date) {
     try {
       const client = getSupabaseClient();
-
+      
       // Utiliser une requête normale au lieu de .single() pour éviter l'erreur 406
       const { data, error } = await client
         .from('daily_symptoms')
@@ -60,7 +60,7 @@ export const symptomsService = {
         .eq('user_id', userId)
         .eq('date', date)
         .limit(1);
-
+        
       if (error) {
 
         throw error;

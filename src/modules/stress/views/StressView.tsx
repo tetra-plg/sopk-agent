@@ -162,13 +162,13 @@ const StressView = () => {
               )}
 
               {/* Tags émotionnels si présents */}
-              {moodData.mood_tags && moodData.mood_tags.length > 0 && (
+              {moodData.tags && moodData.tags.length > 0 && (
                 <div className="mb-4">
                   <h4 className="text-sm font-medium mb-2" style={{ color: '#1F2937' }}>
                     🏷️ Ressentis du moment
                   </h4>
                   <div className="flex flex-wrap gap-2">
-                    {moodData.mood_tags.map((tag, index) => (
+                    {moodData.tags.map((tag, index) => (
                       <span
                         key={index}
                         className="px-3 py-1 rounded-full text-xs font-medium"

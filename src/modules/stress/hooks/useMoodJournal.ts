@@ -13,7 +13,7 @@ export const useMoodJournal = (currentDate = new Date()) => {
   const [moodData, setMoodData] = useState({
     mood_emoji: '',
     mood_score: 5,
-    mood_tags: [],
+    tags: [],
     notes: ''
   });
 
@@ -38,7 +38,7 @@ export const useMoodJournal = (currentDate = new Date()) => {
         setMoodData({
           mood_emoji: data.mood_emoji || '',
           mood_score: data.mood_score || 5,
-          mood_tags: data.mood_tags || [],
+          tags: data.tags || [],
           notes: data.notes || ''
         });
         setLastSaved(new Date(data.updated_at));
@@ -47,7 +47,7 @@ export const useMoodJournal = (currentDate = new Date()) => {
         setMoodData({
           mood_emoji: '',
           mood_score: 5,
-          mood_tags: [],
+          tags: [],
           notes: ''
         });
         setLastSaved(null);
@@ -62,7 +62,7 @@ export const useMoodJournal = (currentDate = new Date()) => {
       setMoodData({
         mood_emoji: '',
         mood_score: 5,
-        mood_tags: [],
+        tags: [],
         notes: ''
       });
       setLastSaved(null);
@@ -124,7 +124,7 @@ export const useMoodJournal = (currentDate = new Date()) => {
     setMoodData({
       mood_emoji: '',
       mood_score: 5,
-      mood_tags: [],
+      tags: [],
       notes: ''
     });
     setHasChanges(false);
@@ -140,7 +140,7 @@ export const useMoodJournal = (currentDate = new Date()) => {
   // Vérifier si le formulaire est vide
   const isEmpty = !moodData.mood_emoji &&
                   moodData.mood_score === 5 &&
-                  moodData.mood_tags.length === 0 &&
+                  moodData.tags.length === 0 &&
                   !moodData.notes;
 
   return {

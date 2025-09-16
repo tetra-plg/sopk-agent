@@ -23,7 +23,6 @@ class SuggestionEngine {
 
     // 1. Déterminer le type de repas si automatique
     const detectedMealType = mealType === 'auto' ? this.detectMealType(timeOfDay) : mealType;
-    console.log('🔍 SuggestionEngine - Type de repas détecté:', detectedMealType, 'pour', timeOfDay, 'h');
 
     // 2. Filtrer les candidats de base
     let candidates = this.filterBasicCriteria(allMeals, {
@@ -31,7 +30,6 @@ class SuggestionEngine {
       maxPrepTime,
       preferences
     });
-    console.log('   Candidats après filtres de base:', candidates.length, '/', allMeals.length);
 
     // 3. Exclure les repas récents pour éviter la répétition
     candidates = this.excludeRecentMeals(candidates, recentMeals);
@@ -65,32 +63,19 @@ class SuggestionEngine {
    * Filtre selon les critères de base
    */
   static filterBasicCriteria(meals, { category, maxPrepTime, preferences }) {
-    console.log('   📋 Filtrage de base:', {
-      totalMeals: meals.length,
-      category,
-      maxPrepTime,
-      preferences: preferences?.preferred_meal_complexity
-    });
-
     let filtered = meals;
 
     // Filtrer par catégorie (avec fallback si pas assez de résultats)
     if (category) {
       const categoryFiltered = meals.filter(meal => meal.category === category);
-      console.log(`   📂 Filtrage catégorie ${category}: ${categoryFiltered.length} résultats`);
       // Si pas assez de résultats pour cette catégorie, inclure toutes les catégories
       filtered = categoryFiltered.length > 0 ? categoryFiltered : meals;
-      if (categoryFiltered.length === 0) {
-        console.log(`   ⚠️ Aucune recette pour ${category}, utilisation de toutes les recettes`);
-      }
     }
 
     // Filtrer par temps de préparation
     if (maxPrepTime) {
       const userMaxTime = Math.min(maxPrepTime, preferences?.max_prep_time_minutes || 30);
-      const beforeFilter = filtered.length;
       filtered = filtered.filter(meal => meal.prep_time_minutes <= userMaxTime);
-      console.log(`   ⏱️ Filtrage temps max ${userMaxTime}min: ${beforeFilter} → ${filtered.length}`);
     }
 
     // Filtrer par niveau de difficulté préféré
@@ -103,7 +88,6 @@ class SuggestionEngine {
         const mealComplexity = complexityOrder[meal.difficulty] || 3;
         return mealComplexity <= userMaxComplexity;
       });
-      console.log(`   🎯 Filtrage complexité ${preferences.preferred_meal_complexity}: ${beforeFilter} → ${filtered.length}`);
     }
 
     return filtered;

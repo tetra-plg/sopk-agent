@@ -25,7 +25,7 @@ const trackingService = {
         difficulty_rating: feedback.difficulty_felt === 'easier' ? 5 :
                          feedback.difficulty_felt === 'as_expected' ? 3 :
                          feedback.difficulty_felt === 'harder' ? 1 : null,
-        would_make_again: feedback.will_remake || null,
+        will_cook_again: feedback.will_remake || null,
         notes: feedback.notes || null
       })
       .select('*')
@@ -138,7 +138,7 @@ const trackingService = {
       .select(`
         taste_rating,
         difficulty_rating,
-        would_make_again,
+        will_cook_again,
         recipes(
           category,
           main_nutrients,
@@ -168,7 +168,7 @@ const trackingService = {
         difficulty_rating: feedback.difficulty_felt === 'easier' ? 5 :
                          feedback.difficulty_felt === 'as_expected' ? 3 :
                          feedback.difficulty_felt === 'harder' ? 1 : null,
-        would_make_again: feedback.will_remake
+        will_cook_again: feedback.will_remake
       })
       .eq('id', trackingId)
       .select('*')
@@ -199,7 +199,7 @@ const trackingService = {
   },
 
   /**
-   * Obtenir les repas favoris d'un utilisateur (basé sur would_make_again = true)
+   * Obtenir les repas favoris d'un utilisateur (basé sur will_cook_again = true)
    */
   async getFavoriteMeals(userId) {
     const client = getSupabaseClient();
@@ -216,11 +216,12 @@ const trackingService = {
           main_nutrients,
           description,
           sopk_benefits,
-          dietary_tags
+          dietary_tags,
+          is_simple_suggestion
         )
       `)
       .eq('user_id', userId)
-      .eq('would_make_again', true)
+      .eq('will_cook_again', true)
       .order('created_at', { ascending: false });
 
     if (error && error.code !== 'PGRST116') {
@@ -277,7 +278,7 @@ const trackingService = {
         .select(`
           difficulty_rating,
           taste_rating,
-          would_make_again,
+          will_cook_again,
           preparation_time_actual,
           meal_type,
           recipes(
@@ -319,7 +320,7 @@ const trackingService = {
       // Calculs des moyennes
       const tasteRatings = trackings.filter(t => t.taste_rating).map(t => t.taste_rating);
       const difficultyRatings = trackings.filter(t => t.difficulty_rating).map(t => t.difficulty_rating);
-      const favorites = trackings.filter(t => t.would_make_again === true);
+      const favorites = trackings.filter(t => t.will_cook_again === true);
 
       stats.averageTasteRating = tasteRatings.length > 0
         ? Math.round(tasteRatings.reduce((sum, r) => sum + r, 0) / tasteRatings.length * 10) / 10

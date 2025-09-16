@@ -190,7 +190,7 @@ const NutritionTracker = () => {
                   <span className="text-lg">{getMealTypeIcon(meal.meal_type)}</span>
                   <div>
                     <div className="font-medium text-sm truncate max-w-32">
-                      {meal.recipes?.name || 'Repas inconnu'}
+                      {meal.recipes?.title || 'Repas inconnu'}
                     </div>
                     <div className="text-xs text-gray-500">
                       {getMealTypeName(meal.meal_type)}
