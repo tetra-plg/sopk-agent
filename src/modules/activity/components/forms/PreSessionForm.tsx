@@ -94,8 +94,9 @@ const PreSessionForm = ({ session, onStart, onBack, isLoading, error }) => {
                 <span>🎯 {session.category}</span>
                 <span>•</span>
                 <span>
-                  {session.difficulty_level === 1 ? '🟢 Débutant' :
-                   session.difficulty_level === 2 ? '🟡 Intermédiaire' : '🔴 Avancé'}
+                  {session.difficulty === 'beginner' ? '🟢 Débutant' :
+                   session.difficulty === 'easy' ? '🟡 Facile' :
+                   session.difficulty === 'medium' ? '🟠 Intermédiaire' : '🔴 Avancé'}
                 </span>
               </div>
             </div>

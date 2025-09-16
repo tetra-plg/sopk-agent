@@ -63,14 +63,3 @@ CREATE POLICY "Users can insert own breathing sessions" ON breathing_sessions
 
 CREATE POLICY "Users can update own breathing sessions" ON breathing_sessions
     FOR UPDATE USING (auth.uid() = user_id);
-
--- =====================================================
--- DONNÉES DE TEST (optionnel)
--- =====================================================
-
--- Insérer quelques sessions de test (remplacez user-uuid par un vrai UUID)
--- INSERT INTO breathing_sessions (user_id, technique, duration_seconds, completed, stress_before, stress_after, feeling_after)
--- VALUES
--- ('auth-user-uuid', 'coherence', 300, true, 8, 4, 'calmer'),
--- ('auth-user-uuid', 'box', 180, true, 7, 3, 'better'),
--- ('auth-user-uuid', 'quick', 120, false, 6, null, null);

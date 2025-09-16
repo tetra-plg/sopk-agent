@@ -6,6 +6,7 @@ import MealDetailModal from '../components/MealDetailModal';
 import TrackingSuccess from '../components/TrackingSuccess';
 import RecipeLibraryView from './RecipeLibraryView';
 import NutritionHistoryView from './NutritionHistoryView';
+import CookingModeView from './CookingModeView';
 import trackingService from '../services/trackingService';
 
 const NutritionView = () => {
@@ -17,6 +18,7 @@ const NutritionView = () => {
   const [showTrackingSuccess, setShowTrackingSuccess] = useState(false);
   const [todayMeals, setTodayMeals] = useState([]);
   const [loadingTodayMeals, setLoadingTodayMeals] = useState(false);
+  const [cookingRecipe, setCookingRecipe] = useState(null);
 
   // Contexte utilisateur stable (mémorisé pour éviter les re-renders)
   const userContext = useMemo(() => ({
@@ -35,6 +37,7 @@ const NutritionView = () => {
   } = useMealSuggestions(userContext);
 
   const primarySuggestion = suggestions[0];
+  const topSuggestions = suggestions.slice(0, 3);
 
   // Logique pour déterminer le prochain type de repas
   const getNextMealType = () => {
@@ -137,6 +140,10 @@ const NutritionView = () => {
       // Ici on pourrait mettre à jour la note du repas
 
     }
+  };
+
+  const handleStartCooking = (recipe) => {
+    setCookingRecipe(recipe);
   };
 
   // Vue bibliothèque de recettes
@@ -313,29 +320,47 @@ const NutritionView = () => {
 
           </section>
 
-          {/* Suggestion principale */}
-          {isReady && primarySuggestion && (
+          {/* Suggestions personnalisées */}
+          {isReady && topSuggestions.length > 0 && (
             <section>
               {/* Badge discret */}
-              <div className="text-center mb-4">
+              <div className="text-center mb-6">
                 <span className="inline-block px-4 py-2 rounded-full text-sm font-medium"
                       style={{ backgroundColor: '#6EE7B7', color: '#1F2937' }}>
                   ✨ {getSmartMessage()}
                 </span>
               </div>
 
-              {/* Carte suggestion avec couleurs SOPK */}
-              <div className="bg-white rounded-xl p-4 lg:p-6" style={{
-                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)',
-                border: '2px solid #6EE7B7'
-              }}>
-                <SuggestionCard
-                  meal={primarySuggestion}
-                  onViewDetails={handleViewMealDetails}
-                  onTrackMeal={handleTrackMeal}
-                  compact={false}
-                  className="border-0 shadow-none bg-transparent"
-                />
+              {/* Header section */}
+              <div className="text-center mb-6">
+                <h2 className="text-xl font-semibold mb-2" style={{ color: '#1F2937' }}>
+                  🍽️ Tes suggestions du moment
+                </h2>
+                <p className="text-sm" style={{ color: '#6B7280' }}>
+                  {topSuggestions.length} recette{topSuggestions.length > 1 ? 's' : ''} adaptée{topSuggestions.length > 1 ? 's' : ''} à tes besoins • Choisis celle qui te fait envie
+                </p>
+              </div>
+
+              {/* Grid de suggestions - même format que la librairie */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-6">
+                {topSuggestions.map((suggestion) => (
+                  <SuggestionCard
+                    key={suggestion.id}
+                    meal={suggestion}
+                    onViewDetails={handleViewMealDetails}
+                    onTrackMeal={handleTrackMeal}
+                    onStartCooking={handleStartCooking}
+                    compact={true}
+                    showCookingButton={false}
+                  />
+                ))}
+              </div>
+
+              {/* Encouragement discret */}
+              <div className="text-center mt-6">
+                <p className="text-sm" style={{ color: '#6B7280' }}>
+                  💡 Chaque recette est pensée pour t'aider avec le SOPK
+                </p>
               </div>
             </section>
           )}
@@ -396,8 +421,8 @@ const NutritionView = () => {
               backgroundColor: '#6EE7B7',
               color: '#1F2937'
             }}
-            onMouseEnter={(e) => e.target.style.backgroundColor = '#34D399'}
-            onMouseLeave={(e) => e.target.style.backgroundColor = '#6EE7B7'}
+            onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = '#34D399'}
+            onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = '#6EE7B7'}
           >
             📚 Découvrir nos recettes IG bas →
           </button>
@@ -409,10 +434,10 @@ const NutritionView = () => {
               color: '#1F2937'
             }}
             onMouseEnter={(e) => {
-              e.target.style.backgroundColor = '#6EE7B7';
+              (e.target as HTMLElement).style.backgroundColor = '#6EE7B7';
             }}
             onMouseLeave={(e) => {
-              e.target.style.backgroundColor = 'transparent';
+              (e.target as HTMLElement).style.backgroundColor = 'transparent';
             }}
           >
             📊 Voir mon historique
@@ -451,6 +476,7 @@ const NutritionView = () => {
         isOpen={showModal}
         onClose={() => setShowModal(false)}
         onTrackMeal={handleTrackMeal}
+        onStartCooking={handleStartCooking}
       />
 
       {/* Notification tracking success */}
@@ -464,6 +490,19 @@ const NutritionView = () => {
         onViewHistory={handleViewHistory}
         onRateMeal={handleRateMeal}
       />
+
+      {/* Mode cuisine guidé */}
+      {cookingRecipe && (
+        <div className="fixed inset-0 z-50">
+          <CookingModeView
+            recipeId={cookingRecipe.id}
+            onBack={() => setCookingRecipe(null)}
+            onComplete={() => {
+              setCookingRecipe(null);
+            }}
+          />
+        </div>
+      )}
     </>
   );
 };

@@ -53,8 +53,7 @@ const trackingService = {
           title,
           category,
           main_nutrients,
-          difficulty,
-          is_simple_suggestion
+          difficulty
         )
       `)
       .eq('user_id', userId)
@@ -85,8 +84,7 @@ const trackingService = {
           category,
           main_nutrients,
           difficulty,
-          prep_time_minutes,
-          is_simple_suggestion
+          prep_time_minutes
         )
       `)
       .eq('user_id', userId)
@@ -115,8 +113,7 @@ const trackingService = {
           category,
           main_nutrients,
           difficulty,
-          prep_time_minutes,
-          is_simple_suggestion
+          prep_time_minutes
         )
       `)
       .eq('user_id', userId)
@@ -146,8 +143,7 @@ const trackingService = {
           category,
           main_nutrients,
           difficulty,
-          glycemic_index_category,
-          is_simple_suggestion
+          glycemic_index_category
         )
       `)
       .eq('user_id', userId)
@@ -220,8 +216,7 @@ const trackingService = {
           main_nutrients,
           description,
           sopk_benefits,
-          dietary_tags,
-          is_simple_suggestion
+          dietary_tags
         )
       `)
       .eq('user_id', userId)

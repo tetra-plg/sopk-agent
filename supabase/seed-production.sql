@@ -201,7 +201,7 @@ INSERT INTO recipes (
 -- 🏃 SÉANCES D'ACTIVITÉ COMPLÈTES
 -- =====================================================
 
-INSERT INTO activity_sessions_complete (
+INSERT INTO activity_sessions (
   title, description, category,
   duration_minutes, difficulty, intensity_level,
   sopk_benefits, symptom_targets, contraindications,
@@ -372,7 +372,7 @@ INSERT INTO activity_sessions_complete (
 -- Commentaires pour clarifier l'usage
 COMMENT ON TABLE meal_suggestions IS 'Suggestions de repas validées nutritionnellement pour SOPK - PRODUCTION READY';
 COMMENT ON TABLE recipes IS 'Recettes détaillées avec mode cuisine guidé - CONTENU MÉTIER UNIQUEMENT';
-COMMENT ON TABLE activity_sessions_complete IS 'Séances d''activité complètes adaptées SOPK - PRODUCTION READY';
+COMMENT ON TABLE activity_sessions IS 'Séances d''activité complètes adaptées SOPK - PRODUCTION READY';
 
 -- Message de fin
 DO $$

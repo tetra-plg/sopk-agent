@@ -164,6 +164,57 @@ INSERT INTO daily_symptoms (
 ('550e8400-e29b-41d4-a716-446655440002', CURRENT_DATE - INTERVAL '2 days', 0, 2, 1, 'Retour à la normale');
 
 -- =====================================================
+-- Données de base - Techniques de respiration
+-- =====================================================
+
+INSERT INTO breathing_techniques (
+  id, name, duration_seconds, pattern, description, benefits,
+  icon, color, difficulty, sopk_benefits, display_order
+) VALUES
+  (
+    'coherence',
+    'Cohérence cardiaque',
+    300,
+    ARRAY[5, 0, 5, 0],
+    'Rythme 5 secondes inspire / 5 secondes expire pour équilibrer le système nerveux',
+    ARRAY['Réduit le cortisol', 'Équilibre hormonal', 'Apaise le stress'],
+    '🔵',
+    '#4FC3F7',
+    'beginner',
+    'Idéal pour réguler les hormones et réduire l''inflammation',
+    1
+  ),
+  (
+    'box',
+    'Respiration carrée',
+    180,
+    ARRAY[4, 4, 4, 4],
+    'Technique 4-4-4-4 (inspire-retiens-expire-pause) pour la concentration',
+    ARRAY['Améliore la concentration', 'Calme l''esprit', 'Réduit l''anxiété'],
+    '⏹️',
+    '#81C784',
+    'intermediate',
+    'Parfait pour gérer l''anxiété liée aux symptômes',
+    2
+  ),
+  (
+    'quick',
+    'Respiration rapide',
+    120,
+    ARRAY[4, 2, 6, 1],
+    'Technique express pour apaiser rapidement en situation de stress',
+    ARRAY['Soulagement immédiat', 'Détente rapide', 'Calme instantané'],
+    '⚡',
+    '#FFB74D',
+    'beginner',
+    'Solution rapide pour les pics de stress hormonal',
+    3
+  );
+
+-- Les techniques de respiration sont publiques (pas de RLS nécessaire)
+-- Toutes les utilisatrices peuvent les consulter
+
+-- =====================================================
 -- 🧘 SESSIONS DE RESPIRATION
 -- =====================================================
 
@@ -255,15 +306,15 @@ INSERT INTO user_recipe_tracking (
 ) VALUES
 -- Sarah a testé plusieurs suggestions
 ('550e8400-e29b-41d4-a716-446655440000',
- (SELECT id FROM recipes WHERE title = 'Bowl Quinoa-Avocat Protéiné' AND is_simple_suggestion = true LIMIT 1),
+ (SELECT id FROM recipes WHERE title = 'Bowl Quinoa-Avocat Protéiné' LIMIT 1),
  CURRENT_DATE - INTERVAL '3 days', 'lunch', 1, 5, true),
 
 ('550e8400-e29b-41d4-a716-446655440000',
- (SELECT id FROM recipes WHERE title = 'Omelette aux Épinards' AND is_simple_suggestion = true LIMIT 1),
+ (SELECT id FROM recipes WHERE title = 'Omelette aux Épinards' LIMIT 1),
  CURRENT_DATE - INTERVAL '2 days', 'breakfast', 1, 4, true),
 
 ('550e8400-e29b-41d4-a716-446655440000',
- (SELECT id FROM recipes WHERE title = 'Smoothie Vert Protéiné' AND is_simple_suggestion = true LIMIT 1),
+ (SELECT id FROM recipes WHERE title = 'Smoothie Vert Protéiné' LIMIT 1),
  CURRENT_DATE - INTERVAL '1 day', 'snack', 1, 5, true);
 
 -- =====================================================
@@ -279,18 +330,15 @@ INSERT INTO user_recipe_tracking (
 
 -- Ajouter plus de recettes pour enrichir les données
 INSERT INTO recipes (
-  title, category, difficulty, prep_time_minutes,
-  glycemic_index_category, main_nutrients, estimated_calories,
-  sopk_benefits, symptom_targets, cycle_phases,
-  ingredients_simple, ingredients, instructions, tips,
-  dietary_tags, mood_boosting, is_simple_suggestion
+  title, category, difficulty, prep_time_minutes, cook_time_minutes, servings,
+  glycemic_index_category, nutritional_info, calories, sopk_benefits, allergen_info,
+  ingredients, instructions, equipment_needed,
+  storage_tips, season, dietary_tags
 ) VALUES
 -- Compléter avec plus de variété
 ('Toast Avocat Complet',
- 'breakfast', 'very_easy', 5,
- 'low', ARRAY['healthy_fats', 'fiber'], 280,
- ARRAY['sustained_energy'], ARRAY['fatigue', 'cravings'], ARRAY['any'],
- 'Pain complet (2 tranches), avocat (1), citron, sel, poivre',
+ 'breakfast', 'very_easy', 5, 0, 1,
+ 'low', '{"calories": 280, "protein": 8, "carbs": 20, "fat": 18, "fiber": 12}', 280, ARRAY['sustained_energy'], ARRAY['gluten'],
  JSONB_BUILD_ARRAY(
    JSONB_BUILD_OBJECT('name', 'Pain complet', 'quantity', '2 tranches'),
    JSONB_BUILD_OBJECT('name', 'Avocat', 'quantity', '1'),
@@ -303,14 +351,14 @@ INSERT INTO recipes (
    JSONB_BUILD_OBJECT('step', 2, 'instruction', 'Écraser l''avocat avec citron'),
    JSONB_BUILD_OBJECT('step', 3, 'instruction', 'Étaler et assaisonner')
  ),
- 'Parfait quand on n''a pas le temps !',
- ARRAY['vegetarian'], true, true),
+ ARRAY['grille-pain'],
+ 'Se conserve 1 jour au réfrigérateur une fois préparé',
+ ARRAY['spring', 'summer', 'autumn', 'winter'],
+ ARRAY['vegetarian']),
 
 ('Soupe Lentilles Épices',
- 'lunch', 'easy', 20,
- 'low', ARRAY['protein', 'fiber'], 320,
- ARRAY['inflammation_reduction'], ARRAY['digestive_issues', 'period_pain'], ARRAY['any'],
- 'Lentilles corail (100g), légumes variés, épices douces, lait de coco',
+ 'lunch', 'easy', 10, 15, 4,
+ 'low', '{"calories": 320, "protein": 18, "carbs": 45, "fat": 8, "fiber": 15}', 320, ARRAY['inflammation_reduction'], ARRAY[],
  JSONB_BUILD_ARRAY(
    JSONB_BUILD_OBJECT('name', 'Lentilles corail', 'quantity', '100g'),
    JSONB_BUILD_OBJECT('name', 'Légumes variés', 'quantity', '200g'),
@@ -322,14 +370,14 @@ INSERT INTO recipes (
    JSONB_BUILD_OBJECT('step', 2, 'instruction', 'Ajouter lentilles et épices'),
    JSONB_BUILD_OBJECT('step', 3, 'instruction', 'Mijoter 15 min')
  ),
- 'Les épices douces apaisent l''inflammation',
- ARRAY['vegan'], true, true),
+ ARRAY['casserole'],
+ 'Se conserve 3 jours au réfrigérateur',
+ ARRAY['autumn', 'winter'],
+ ARRAY['vegan', 'gluten_free']),
 
 ('Collation Amandes-Dattes',
- 'snack', 'very_easy', 2,
- 'low', ARRAY['healthy_fats', 'natural_sugars'], 180,
- ARRAY['energy_boost'], ARRAY['cravings', 'fatigue'], ARRAY['any'],
- 'Amandes (15), dattes Medjool (2), cannelle',
+ 'snack', 'very_easy', 2, 0, 1,
+ 'low', '{"calories": 180, "protein": 6, "carbs": 20, "fat": 10, "fiber": 4}', 180, ARRAY['energy_boost'], ARRAY['nuts'],
  JSONB_BUILD_ARRAY(
    JSONB_BUILD_OBJECT('name', 'Amandes', 'quantity', '15'),
    JSONB_BUILD_OBJECT('name', 'Dattes Medjool', 'quantity', '2'),
@@ -341,150 +389,133 @@ INSERT INTO recipes (
    JSONB_BUILD_OBJECT('step', 3, 'instruction', 'Saupoudrer cannelle')
  ),
  'Alternative saine aux sucreries',
- ARRAY['vegan'], true, true);
+ ARRAY[],
+ 'Se conserve quelques heures à température ambiante',
+ ARRAY['spring', 'summer', 'autumn', 'winter'],
+ ARRAY['vegan', 'raw']);
 
 -- =====================================================
--- 🏃 SESSIONS D'ACTIVITÉ COMPLÈTES (avec nouvelles colonnes)
+-- 🏃 SESSIONS D'ACTIVITÉ COMPLÈTES
 -- =====================================================
 
--- Sessions d'activité complètes pour l'application SOPK
-INSERT INTO activity_sessions_complete (
-  title, description, category, duration_minutes, instructions,
-  is_active, difficulty, difficulty_level, thumbnail_url, sopk_symptoms
+INSERT INTO activity_sessions (
+  title, description, category, duration_minutes,
+  difficulty, intensity_level, estimated_calories_burned,
+  instructions,
+  video_preview_url, audio_guide_url,
+  symptom_targets, sopk_benefits, contraindications,
+  equipment_needed, easy_modifications, advanced_variations,
+  is_active
 ) VALUES
--- YOGA & MINDFULNESS
+
+-- YOGA & DÉTENTE
 ('Yoga Flow Débutant SOPK',
  'Flow doux spécialement adapté pour les débutantes avec SOPK, focus sur la détente hormonale',
- 'yoga', 15,
+ 'yoga', 15, 'beginner', 2, 60,
  JSONB_BUILD_ARRAY(
-   'Respiration consciente en position assise - 3 min',
-   'Salutation au soleil modifiée x3 - 5 min',
-   'Postures d''ouverture des hanches - 4 min',
-   'Relaxation finale - 3 min'
+   JSONB_BUILD_OBJECT('phase', 'warmup', 'description', 'Respiration consciente en position assise', 'duration', 3),
+   JSONB_BUILD_OBJECT('phase', 'main', 'description', 'Salutation au soleil modifiée x3', 'duration', 5),
+   JSONB_BUILD_OBJECT('phase', 'stretch', 'description', 'Postures d''ouverture des hanches', 'duration', 4),
+   JSONB_BUILD_OBJECT('phase', 'cooldown', 'description', 'Relaxation finale', 'duration', 3)
  ),
- true, 'beginner', 1, 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=300&h=200&fit=crop',
- ARRAY['stress', 'anxiety', 'hormonal_imbalance']),
+ NULL, NULL,
+ ARRAY['stress', 'anxiety', 'hormonal_imbalance'],
+ ARRAY['stress_reduction', 'hormonal_balance', 'improved_circulation'],
+ ARRAY['acute_back_pain', 'first_trimester_pregnancy'],
+ ARRAY['tapis', 'coussin'],
+ ARRAY['Utilisez des coussins pour plus de confort', 'Restez dans votre zone de confort'],
+ ARRAY['Tenir les postures plus longtemps', 'Ajouter des variations'],
+ true),
 
-('Yoga Restaurateur SOPK',
- 'Séance de yoga doux spécialement conçue pour apaiser les symptômes SOPK et réguler le système nerveux',
- 'yoga', 25,
+('Étirements Matinaux SOPK',
+ 'Routine douce pour réveiller le corps et activer la circulation',
+ 'etirements', 8, 'beginner', 1, 32,
  JSONB_BUILD_ARRAY(
-   'Commencer en position allongée, respiration profonde 2 min',
-   'Posture de l''enfant modifiée avec coussin - 3 min',
-   'Torsions douces allongées - 2x2 min chaque côté',
-   'Jambes contre le mur - 5 min',
-   'Position du cadavre avec focus sur relâchement hormonal - 10 min'
+   JSONB_BUILD_OBJECT('phase', 'warmup', 'description', 'Réveil articulaire', 'duration', 2),
+   JSONB_BUILD_OBJECT('phase', 'main', 'description', 'Étirements progressifs', 'duration', 4),
+   JSONB_BUILD_OBJECT('phase', 'cooldown', 'description', 'Respiration profonde', 'duration', 2)
  ),
- true, 'beginner', 1, 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=300&h=200&fit=crop',
- ARRAY['stress', 'hormonal_imbalance', 'anxiety', 'sleep_issues']),
-
-('Yoga Flow Intermédiaire',
- 'Enchaînements fluides pour renforcer le corps et apaiser l''esprit',
- 'yoga', 30,
- JSONB_BUILD_ARRAY(
-   'Échauffement et centrage - 5 min',
-   'Vinyasa flow x5 séries - 15 min',
-   'Postures d''équilibre - 5 min',
-   'Savasana - 5 min'
- ),
- true, 'medium', 3, 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=300&h=200&fit=crop',
- ARRAY['stress', 'muscle_tension', 'mood_swings']),
+ NULL, NULL,
+ ARRAY['fatigue', 'raideurs_matinales'],
+ ARRAY['ameliore_mobilite', 'boost_energie'],
+ ARRAY[],
+ ARRAY[],
+ ARRAY['Faites les mouvements plus petits', 'Asseyez-vous si nécessaire'],
+ ARRAY['Ajoutez des répétitions', 'Tenez plus longtemps'],
+ true),
 
 -- CARDIO LÉGER
-('Marche Consciente Anti-Stress',
- 'Marche guidée avec techniques de respiration pour réduire le cortisol',
- 'cardio', 20,
+('Marche Énergisante SOPK',
+ 'Marche guidée pour stimuler le métabolisme sans épuiser',
+ 'cardio_leger', 20, 'easy', 3, 100,
  JSONB_BUILD_ARRAY(
-   'Échauffement articulaire sur place - 3 min',
-   'Marche rythmée avec respiration 4-7-8 - 12 min',
-   'Étirements et relaxation debout - 5 min'
+   JSONB_BUILD_OBJECT('phase', 'warmup', 'description', 'Marche lente', 'duration', 3),
+   JSONB_BUILD_OBJECT('phase', 'main', 'description', 'Marche rythmée', 'duration', 12),
+   JSONB_BUILD_OBJECT('phase', 'intervals', 'description', 'Intervalles légers', 'duration', 3),
+   JSONB_BUILD_OBJECT('phase', 'cooldown', 'description', 'Retour au calme', 'duration', 2)
  ),
- true, 'easy', 2, 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=200&fit=crop',
- ARRAY['stress', 'anxiety', 'fatigue', 'mood_swings']),
-
-('Cardio Doux SOPK',
- 'Exercices cardiovasculaires adaptés pour améliorer la circulation sans stress excessif',
- 'cardio', 25,
- JSONB_BUILD_ARRAY(
-   'Échauffement dynamique - 5 min',
-   'Alternance marche rapide/normale - 15 min',
-   'Récupération avec respiration - 5 min'
- ),
- true, 'easy', 2, 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=200&fit=crop',
- ARRAY['insulin_resistance', 'fatigue', 'weight_management']),
+ NULL, NULL,
+ ARRAY['resistance_insuline', 'prise_poids', 'fatigue'],
+ ARRAY['ameliore_metabolisme', 'sante_cardiovasculaire', 'boost_humeur'],
+ ARRAY['fatigue_severe', 'douleurs_articulaires'],
+ ARRAY['chaussures_sport'],
+ ARRAY['Réduisez la durée', 'Marchez plus lentement'],
+ ARRAY['Ajoutez des côtes', 'Augmentez la durée'],
+ true),
 
 -- RENFORCEMENT
-('Circuit Résistance à l''Insuline',
- 'Entraînement par intervalles conçu pour améliorer la sensibilité à l''insuline',
- 'strength', 20,
- JSONB_BUILD_ARRAY(
-   'Échauffement dynamique - 3 min',
-   '4 rounds de: Squats (45s), repos (15s), Pompes adaptées (45s), repos (15s)',
-   '3 rounds de: Fentes (30s), repos (30s), Planche (30s), repos (30s)',
-   'Retour au calme avec étirements - 3 min'
- ),
- true, 'medium', 3, 'https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=300&h=200&fit=crop',
- ARRAY['insulin_resistance', 'weight_management', 'metabolic_health']),
-
 ('Renforcement Core SOPK',
- 'Exercices spécifiques pour renforcer le centre du corps et améliorer la posture',
- 'strength', 15,
+ 'Exercices de renforcement adaptés pour les femmes avec SOPK',
+ 'renforcement', 12, 'easy', 2, 48,
  JSONB_BUILD_ARRAY(
-   'Activation du plancher pelvien - 3 min',
-   'Série gainage dynamique - 8 min',
-   'Étirements du dos et abdominaux - 4 min'
+   JSONB_BUILD_OBJECT('phase', 'warmup', 'description', 'Activation du centre', 'duration', 2),
+   JSONB_BUILD_OBJECT('phase', 'main', 'description', 'Exercices core', 'duration', 8),
+   JSONB_BUILD_OBJECT('phase', 'cooldown', 'description', 'Étirements', 'duration', 2)
  ),
- true, 'easy', 2, 'https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=300&h=200&fit=crop',
- ARRAY['abdominal_discomfort', 'posture_issues', 'pelvic_pain']),
+ NULL, NULL,
+ ARRAY['faiblesse_core', 'mal_dos', 'mauvaise_posture'],
+ ARRAY['renforce_centre', 'ameliore_posture', 'reduit_mal_dos'],
+ ARRAY['diastase', 'chirurgie_recente'],
+ ARRAY['tapis'],
+ ARRAY['Faites les exercices au sol', 'Réduisez les répétitions'],
+ ARRAY['Ajoutez de la résistance', 'Augmentez les répétitions'],
+ true),
 
--- MOBILITÉ & ÉTIREMENTS
-('Mobilité Bassin et Hanches',
- 'Séquence douce pour libérer les tensions du bassin, zone clé pour les femmes avec SOPK',
- 'flexibility', 18,
+-- DÉTENTE
+('Yoga du Soir SOPK',
+ 'Séance relaxante pour préparer au sommeil',
+ 'yoga_doux', 12, 'beginner', 1, 36,
  JSONB_BUILD_ARRAY(
-   'Échauffement articulaire - 3 min',
-   'Étirements progressifs des hanches - 8 min',
-   'Mobilisation du bassin - 5 min',
-   'Relaxation finale - 2 min'
+   JSONB_BUILD_OBJECT('phase', 'transition', 'description', 'Transition douce', 'duration', 2),
+   JSONB_BUILD_OBJECT('phase', 'main', 'description', 'Postures apaisantes', 'duration', 8),
+   JSONB_BUILD_OBJECT('phase', 'meditation', 'description', 'Méditation guidée', 'duration', 2)
  ),
- true, 'beginner', 1, 'https://images.unsplash.com/photo-1506629905138-712e1d50a9f9?w=300&h=200&fit=crop',
- ARRAY['pelvic_pain', 'muscle_tension', 'period_pain']),
+ NULL, NULL,
+ ARRAY['troubles_sommeil', 'stress', 'tensions'],
+ ARRAY['ameliore_sommeil', 'reduit_stress', 'detend_systeme_nerveux'],
+ ARRAY[],
+ ARRAY['tapis', 'coussin', 'couverture'],
+ ARRAY['Utilisez plus de supports', 'Respirez normalement'],
+ ARRAY['Tenez les postures plus longtemps', 'Méditez sans guide'],
+ true),
 
-('Étirements Anti-Fatigue',
- 'Routine énergisante pour lutter contre la fatigue chronique du SOPK',
- 'flexibility', 12,
+-- MOBILITÉ
+('Mobilité Bassin SOPK',
+ 'Exercices pour améliorer la mobilité pelvienne et soulager les tensions',
+ 'etirements', 10, 'beginner', 2, 40,
  JSONB_BUILD_ARRAY(
-   'Réveil articulaire - 2 min',
-   'Étirements dynamiques - 6 min',
-   'Postures d''ouverture thoracique - 4 min'
+   JSONB_BUILD_OBJECT('phase', 'warmup', 'description', 'Rotations douces', 'duration', 2),
+   JSONB_BUILD_OBJECT('phase', 'main', 'description', 'Exercices de mobilité', 'duration', 6),
+   JSONB_BUILD_OBJECT('phase', 'cooldown', 'description', 'Relaxation', 'duration', 2)
  ),
- true, 'beginner', 1, 'https://images.unsplash.com/photo-1506629905138-712e1d50a9f9?w=300&h=200&fit=crop',
- ARRAY['fatigue', 'low_energy', 'muscle_tension']),
-
--- SPÉCIALISÉES SOPK
-('Routine Hormones Équilibrées',
- 'Séquence complète d''exercices spécialement conçus pour l''équilibre hormonal',
- 'yoga', 35,
- JSONB_BUILD_ARRAY(
-   'Méditation et respiration hormonale - 5 min',
-   'Yoga flow pour les glandes endocrines - 15 min',
-   'Torsions détoxifiantes - 8 min',
-   'Relaxation profonde - 7 min'
- ),
- true, 'easy', 2, 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=300&h=200&fit=crop',
- ARRAY['hormonal_imbalance', 'irregular_cycles', 'mood_swings']),
-
-('Session Anti-Inflammatoire',
- 'Mouvements doux pour réduire l''inflammation chronique liée au SOPK',
- 'flexibility', 22,
- JSONB_BUILD_ARRAY(
-   'Respiration anti-inflammatoire - 4 min',
-   'Mouvements fluides et étirements - 14 min',
-   'Relaxation avec visualisation - 4 min'
- ),
- true, 'beginner', 1, 'https://images.unsplash.com/photo-1506629905138-712e1d50a9f9?w=300&h=200&fit=crop',
- ARRAY['inflammation', 'joint_pain', 'digestive_issues']);
-
+ NULL, NULL,
+ ARRAY['douleurs_pelviennes', 'regles_douloureuses'],
+ ARRAY['soulage_douleurs', 'ameliore_mobilite', 'detend_bassin'],
+ ARRAY['douleur_pelvienne_aigue'],
+ ARRAY['tapis'],
+ ARRAY['Réduisez l''amplitude', 'Faites des pauses'],
+ ARRAY['Augmentez l''amplitude', 'Ajoutez des répétitions'],
+ true);
 -- =====================================================
 -- 🏃 SUIVI D'ACTIVITÉ PHYSIQUE (SCHÉMA ALIGNÉ)
 -- =====================================================
@@ -497,58 +528,58 @@ INSERT INTO user_activity_tracking (
 ) VALUES
 -- Sarah : Utilisatrice régulière d'activité
 ('550e8400-e29b-41d4-a716-446655440000',
- (SELECT id FROM activity_sessions_complete WHERE title = 'Yoga Flow Débutant SOPK' LIMIT 1),
+ (SELECT id FROM activity_sessions WHERE title = 'Yoga Flow Débutant SOPK' LIMIT 1),
  CURRENT_DATE - INTERVAL '7 days', 960, 100, 3, 7, 2, 1, 4, 7, 'just_right', 4, 'Parfait pour décompresser après le boulot'),
 
 ('550e8400-e29b-41d4-a716-446655440000',
- (SELECT id FROM activity_sessions_complete WHERE title = 'Renforcement Core SOPK' LIMIT 1),
+ (SELECT id FROM activity_sessions WHERE title = 'Renforcement Core SOPK' LIMIT 1),
  CURRENT_DATE - INTERVAL '5 days', 900, 100, 2, 6, 3, 2, 5, 7, 'just_right', 3, 'Un peu difficile mais efficace pour le dos'),
 
 ('550e8400-e29b-41d4-a716-446655440000',
- (SELECT id FROM activity_sessions_complete WHERE title = 'Marche Consciente Anti-Stress' LIMIT 1),
+ (SELECT id FROM activity_sessions WHERE title = 'Marche Consciente Anti-Stress' LIMIT 1),
  CURRENT_DATE - INTERVAL '3 days', 1320, 100, 4, 8, 1, 1, 6, 8, 'too_easy', 5, 'Super pour se vider la tête, très relaxant'),
 
 ('550e8400-e29b-41d4-a716-446655440000',
- (SELECT id FROM activity_sessions_complete WHERE title = 'Yoga Flow Intermédiaire' LIMIT 1),
+ (SELECT id FROM activity_sessions WHERE title = 'Yoga Flow Intermédiaire' LIMIT 1),
  CURRENT_DATE - INTERVAL '1 day', 1800, 95, 3, 7, 2, 1, 5, 8, 'challenging', 4, 'Plus intense mais j''ai adoré le défi'),
 
 -- Claire : Focus sur la gestion de la douleur
 ('550e8400-e29b-41d4-a716-446655440002',
- (SELECT id FROM activity_sessions_complete WHERE title = 'Mobilité Bassin et Hanches' LIMIT 1),
+ (SELECT id FROM activity_sessions WHERE title = 'Mobilité Bassin et Hanches' LIMIT 1),
  CURRENT_DATE - INTERVAL '8 days', 1080, 100, 2, 5, 6, 3, 3, 6, 'just_right', 4, 'Soulage vraiment les tensions du bassin'),
 
 ('550e8400-e29b-41d4-a716-446655440002',
- (SELECT id FROM activity_sessions_complete WHERE title = 'Circuit Résistance à l''Insuline' LIMIT 1),
+ (SELECT id FROM activity_sessions WHERE title = 'Circuit Résistance à l''Insuline' LIMIT 1),
  CURRENT_DATE - INTERVAL '6 days', 1080, 90, 3, 6, 4, 2, 4, 7, 'challenging', 3, 'Dur mais je me sens mieux après, plus énergique'),
 
 ('550e8400-e29b-41d4-a716-446655440002',
- (SELECT id FROM activity_sessions_complete WHERE title = 'Session Anti-Inflammatoire' LIMIT 1),
+ (SELECT id FROM activity_sessions WHERE title = 'Session Anti-Inflammatoire' LIMIT 1),
  CURRENT_DATE - INTERVAL '4 days', 1320, 100, 2, 6, 5, 2, 3, 7, 'just_right', 5, 'Exactement ce dont j''avais besoin pour mes articulations'),
 
 ('550e8400-e29b-41d4-a716-446655440002',
- (SELECT id FROM activity_sessions_complete WHERE title = 'Routine Hormones Équilibrées' LIMIT 1),
+ (SELECT id FROM activity_sessions WHERE title = 'Routine Hormones Équilibrées' LIMIT 1),
  CURRENT_DATE - INTERVAL '2 days', 2100, 100, 3, 7, 3, 1, 4, 8, 'challenging', 4, 'Session complète, très relaxante à la fin'),
 
 -- Emma : Commence doucement
 ('550e8400-e29b-41d4-a716-446655440001',
- (SELECT id FROM activity_sessions_complete WHERE title = 'Étirements Anti-Fatigue' LIMIT 1),
+ (SELECT id FROM activity_sessions WHERE title = 'Étirements Anti-Fatigue' LIMIT 1),
  CURRENT_DATE - INTERVAL '3 days', 720, 100, 2, 5, 1, 1, 3, 6, 'too_easy', 4, 'Bien pour commencer, pas trop intense'),
 
 ('550e8400-e29b-41d4-a716-446655440001',
- (SELECT id FROM activity_sessions_complete WHERE title = 'Yoga Restaurateur SOPK' LIMIT 1),
+ (SELECT id FROM activity_sessions WHERE title = 'Yoga Restaurateur SOPK' LIMIT 1),
  CURRENT_DATE - INTERVAL '1 day', 1500, 100, 3, 7, 2, 1, 4, 7, 'just_right', 5, 'J''ai adoré, très apaisant pour découvrir le yoga'),
 
 -- Ajout de sessions supplémentaires pour enrichir les données
 ('550e8400-e29b-41d4-a716-446655440000',
- (SELECT id FROM activity_sessions_complete WHERE title = 'Session Anti-Inflammatoire' LIMIT 1),
+ (SELECT id FROM activity_sessions WHERE title = 'Session Anti-Inflammatoire' LIMIT 1),
  CURRENT_DATE - INTERVAL '10 days', 1200, 100, 4, 7, 3, 1, 6, 8, 'just_right', 5, 'Parfait pour récupérer après une longue journée'),
 
 ('550e8400-e29b-41d4-a716-446655440001',
- (SELECT id FROM activity_sessions_complete WHERE title = 'Marche Consciente Anti-Stress' LIMIT 1),
+ (SELECT id FROM activity_sessions WHERE title = 'Marche Consciente Anti-Stress' LIMIT 1),
  CURRENT_DATE - INTERVAL '5 days', 1200, 80, 3, 6, 2, 2, 4, 6, 'just_right', 3, 'J''ai arrêté un peu avant la fin mais c''était bien'),
 
 ('550e8400-e29b-41d4-a716-446655440002',
- (SELECT id FROM activity_sessions_complete WHERE title = 'Étirements Anti-Fatigue' LIMIT 1),
+ (SELECT id FROM activity_sessions WHERE title = 'Étirements Anti-Fatigue' LIMIT 1),
  CURRENT_DATE - INTERVAL '1 day', 720, 100, 1, 4, 4, 2, 3, 6, 'too_easy', 4, 'Facile mais efficace pour les jours de fatigue');
 
 -- =====================================================
@@ -963,7 +994,7 @@ BEGIN
   RAISE NOTICE '✅ user_nutrition_preferences - Préférences nutrition';
   RAISE NOTICE '✅ recipes - 4 recettes détaillées avec instructions';
   RAISE NOTICE '✅ user_recipe_tracking - 12 trackings recettes détaillés';
-  RAISE NOTICE '✅ activity_sessions_complete - 12 sessions activités';
+  RAISE NOTICE '✅ activity_sessions - 12 sessions activités';
   RAISE NOTICE '✅ user_activity_tracking - 13 sessions utilisateur (schéma aligné)';
   RAISE NOTICE '';
   RAISE NOTICE 'Services alignés avec BDD:';

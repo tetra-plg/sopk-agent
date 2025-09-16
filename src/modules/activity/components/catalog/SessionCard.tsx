@@ -42,7 +42,18 @@ const SessionCard = ({ session, isRecommended = false, onClick }) => {
     return benefits.slice(0, 2);
   };
 
-  const difficulty = getDifficultyText(session.difficulty_level);
+  // Convertir difficulty string en niveau pour compatibilité
+  const getDifficultyLevel = (difficulty) => {
+    const levelMap = {
+      'beginner': 1,
+      'easy': 2,
+      'medium': 3,
+      'advanced': 3
+    };
+    return levelMap[difficulty] || 1;
+  };
+
+  const difficulty = getDifficultyText(getDifficultyLevel(session.difficulty));
 
   return (
     <div
@@ -71,9 +82,9 @@ const SessionCard = ({ session, isRecommended = false, onClick }) => {
       {/* En-tête avec thumbnail */}
       <div className="flex items-start gap-3 mb-3">
         <div className="flex-shrink-0">
-          {session.thumbnail_url ? (
+          {session.video_preview_url ? (
             <img
-              src={session.thumbnail_url}
+              src={session.video_preview_url}
               alt={session.title}
               className="w-12 h-12 rounded-lg object-cover"
               style={{ backgroundColor: '#F3F4F6' }}
@@ -125,9 +136,9 @@ const SessionCard = ({ session, isRecommended = false, onClick }) => {
         </div>
 
         {/* Bénéfices principaux */}
-        {session.benefits && session.benefits.length > 0 && (
+        {session.sopk_benefits && session.sopk_benefits.length > 0 && (
           <div className="flex flex-wrap gap-1">
-            {getMainBenefits(session.benefits).map((benefit, index) => (
+            {getMainBenefits(session.sopk_benefits).map((benefit, index) => (
               <span
                 key={index}
                 className="text-xs px-2 py-1 rounded-full"

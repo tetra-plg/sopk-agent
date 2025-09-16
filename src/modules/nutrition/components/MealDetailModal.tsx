@@ -15,7 +15,8 @@ const MealDetailModal = ({
   meal,
   isOpen,
   onClose,
-  onTrackMeal
+  onTrackMeal,
+  onStartCooking
 }) => {
   const [selectedMealType, setSelectedMealType] = useState(meal?.category || 'lunch');
 
@@ -39,6 +40,11 @@ const MealDetailModal = ({
     onClose();
   };
 
+  const handleStartCooking = () => {
+    onStartCooking && onStartCooking(meal);
+    onClose();
+  };
+
   const mealTypes = [
     { value: 'breakfast', label: '🌅 Petit-déjeuner' },
     { value: 'lunch', label: '🍽️ Déjeuner' },
@@ -46,10 +52,6 @@ const MealDetailModal = ({
     { value: 'snack', label: '🥨 Collation' }
   ];
 
-  const formatPreparationSteps = (steps) => {
-    if (!steps) return [];
-    return steps.split('\n').filter(step => step.trim() !== '');
-  };
 
   return (
     <div
@@ -114,11 +116,7 @@ const MealDetailModal = ({
               🛒 Ingrédients
             </h3>
             <div className="bg-gray-50 p-4 rounded-lg">
-              {meal.ingredients_simple ? (
-                <p className="text-gray-700 leading-relaxed">
-                  {meal.ingredients_simple}
-                </p>
-              ) : meal.ingredients && Array.isArray(meal.ingredients) ? (
+              {meal.ingredients && Array.isArray(meal.ingredients) ? (
                 <ul className="space-y-2">
                   {meal.ingredients.map((ingredient, index) => {
                     // Gérer les ingrédients qui peuvent être des objets ou des strings
@@ -159,20 +157,7 @@ const MealDetailModal = ({
             <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
               👩‍🍳 Préparation
             </h3>
-            {meal.preparation_steps_simple ? (
-              <div className="space-y-3">
-                {formatPreparationSteps(meal.preparation_steps_simple).map((step, index) => (
-                  <div key={index} className="flex gap-3">
-                    <div className="bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-semibold shrink-0 mt-0.5">
-                      {index + 1}
-                    </div>
-                    <p className="text-gray-700 leading-relaxed">
-                      {step.trim()}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            ) : meal.instructions && Array.isArray(meal.instructions) ? (
+            {meal.instructions && Array.isArray(meal.instructions) ? (
               <div className="space-y-3">
                 {meal.instructions.map((instruction, index) => {
                   // Gérer les instructions qui peuvent être des objets ou des strings
@@ -208,7 +193,7 @@ const MealDetailModal = ({
           </div>
 
           {/* Informations générales */}
-          {(meal.servings || meal.estimated_calories) && (
+          {(meal.servings || meal.nutritional_info?.calories) && (
             <div className="mb-6">
               <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
                 📊 Informations générales
@@ -221,10 +206,10 @@ const MealDetailModal = ({
                       <span className="font-semibold ml-2">{meal.servings}</span>
                     </div>
                   )}
-                  {meal.estimated_calories && (
+                  {meal.nutritional_info?.calories && (
                     <div>
                       <span className="text-gray-600">Calories :</span>
-                      <span className="font-semibold ml-2">~{meal.estimated_calories} kcal</span>
+                      <span className="font-semibold ml-2">~{meal.nutritional_info.calories} kcal</span>
                     </div>
                   )}
                 </div>
@@ -270,16 +255,28 @@ const MealDetailModal = ({
 
           {/* Actions */}
           <div className="border-t border-gray-200 pt-6">
-            <div className="flex gap-3">
-              <button
-                onClick={handleTrackMeal}
-                className="flex-1 bg-green-500 text-white py-3 px-6 rounded-lg font-semibold hover:bg-green-600 transition-colors"
-              >
-                ✅ J'ai mangé ce repas
-              </button>
+            <div className="flex flex-col gap-3">
+              {/* Ligne 1: Actions principales */}
+              <div className="flex gap-3">
+                <button
+                  onClick={handleTrackMeal}
+                  className="flex-1 bg-green-500 text-white py-3 px-6 rounded-lg font-semibold hover:bg-green-600 transition-colors"
+                >
+                  ✅ J'ai mangé ce repas
+                </button>
+                {onStartCooking && (
+                  <button
+                    onClick={handleStartCooking}
+                    className="flex-1 bg-purple-500 text-white py-3 px-6 rounded-lg font-semibold hover:bg-purple-600 transition-colors"
+                  >
+                    👩‍🍳 Mode cuisine guidé
+                  </button>
+                )}
+              </div>
+              {/* Ligne 2: Bouton fermer */}
               <button
                 onClick={onClose}
-                className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+                className="w-full py-3 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors"
               >
                 Fermer
               </button>

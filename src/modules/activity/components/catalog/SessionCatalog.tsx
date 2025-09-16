@@ -60,7 +60,15 @@ const SessionCatalog = ({ onSessionSelect, onViewHistory }) => {
     }
 
     if (filters.difficulty !== 'all') {
-      filtered = filtered.filter(session => session.difficulty_level === parseInt(filters.difficulty));
+      // Mapper les valeurs de difficulté
+      const difficultyMap = {
+        '1': 'beginner',
+        '2': 'easy',
+        '3': 'medium',
+        '4': 'advanced'
+      };
+      const targetDifficulty = difficultyMap[filters.difficulty] || filters.difficulty;
+      filtered = filtered.filter(session => session.difficulty === targetDifficulty);
     }
 
     if (filters.maxDuration !== 'all') {

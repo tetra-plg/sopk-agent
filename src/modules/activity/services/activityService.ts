@@ -14,7 +14,7 @@ const activityService = {
    */
   async getSessions(filters = {}) {
     let query = supabase
-      .from('activity_sessions_complete')
+      .from('activity_sessions')
       .select('*')
       .eq('is_active', true)
       .order('created_at', { ascending: false });
@@ -24,16 +24,16 @@ const activityService = {
       query = query.eq('category', filters.category);
     }
 
-    if (filters.difficulty_level) {
-      query = query.eq('difficulty_level', filters.difficulty_level);
+    if (filters.difficulty) {
+      query = query.eq('difficulty', filters.difficulty);
     }
 
     if (filters.max_duration) {
       query = query.lte('duration_minutes', filters.max_duration);
     }
 
-    if (filters.sopk_symptoms && filters.sopk_symptoms.length > 0) {
-      query = query.overlaps('sopk_symptoms', filters.sopk_symptoms);
+    if (filters.symptom_targets && filters.symptom_targets.length > 0) {
+      query = query.overlaps('symptom_targets', filters.symptom_targets);
     }
 
     const { data, error } = await query;
@@ -51,7 +51,7 @@ const activityService = {
   async getSessionById(sessionId) {
     try {
       const { data, error } = await supabase
-        .from('activity_sessions_complete')
+        .from('activity_sessions')
         .select('*')
         .eq('id', sessionId)
         .eq('is_active', true)
@@ -185,11 +185,11 @@ const activityService = {
         .from('user_activity_tracking')
         .select(`
           *,
-          activity_sessions_complete (
+          activity_sessions (
             title,
             category,
             duration_minutes,
-            thumbnail_url
+            video_preview_url
           )
         `)
         .eq('user_id', userId)
@@ -317,14 +317,14 @@ const activityService = {
       if (recentHistory.length === 0) {
         // Utilisateur nouveau - recommandations par défaut
         const beginnerSessions = await this.getSessions({
-          difficulty_level: 1,
+          difficulty: 'beginner',
           max_duration: 15
         });
 
         recommendations.push(...beginnerSessions.slice(0, 3));
       } else {
         // Recommandations basées sur les préférences
-        const completedCategories = [...new Set(recentHistory.map(h => h.activity_sessions_complete?.category).filter(Boolean))];
+        const completedCategories = [...new Set(recentHistory.map(h => h.activity_sessions?.category).filter(Boolean))];
 
         for (const category of completedCategories) {
           const sessions = await this.getSessionsByCategory(category);

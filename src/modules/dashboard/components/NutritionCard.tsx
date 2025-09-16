@@ -44,8 +44,8 @@ const NutritionCard = ({ todaySuggestion, loading, onShowMealDetails, onNavigate
               {todaySuggestion.glycemic_index_category === 'low' && (
                 <span className="badge-vert-sauge">🟢 IG bas</span>
               )}
-              {todaySuggestion.estimated_calories && (
-                <span className="badge-vert-sauge">🔥 ~{todaySuggestion.estimated_calories}kcal</span>
+              {todaySuggestion.nutritional_info?.calories && (
+                <span className="badge-vert-sauge">🔥 ~{todaySuggestion.nutritional_info.calories}kcal</span>
               )}
             </div>
             {todaySuggestion.sopk_benefits && todaySuggestion.sopk_benefits.length > 0 && (
