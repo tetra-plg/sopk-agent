@@ -18,6 +18,12 @@ const App: FC = () => {
 
   // Simple routing pour le MVP - sera remplacé par React Router plus tard
   const renderCurrentView = () => {
+    // Gestion des routes avec paramètres pour l'activité
+    if (currentRoute.startsWith('/activity/session/')) {
+      const sessionId = currentRoute.split('/activity/session/')[1];
+      return <ActivityView initialSessionId={sessionId} onNavigate={setCurrentRoute} />;
+    }
+
     switch (currentRoute) {
       case '/dashboard':
         return <DashboardView onNavigate={setCurrentRoute} />;
@@ -30,7 +36,7 @@ const App: FC = () => {
       case '/stress':
         return <StressView />;
       case '/activity':
-        return <ActivityView />;
+        return <ActivityView onNavigate={setCurrentRoute} />;
       case '/profile':
         return <ProfileEditView onNavigate={setCurrentRoute} />;
       default:

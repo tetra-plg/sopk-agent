@@ -16,6 +16,7 @@ import SwipeContainer from '../../../shared/components/SwipeContainer';
 import SymptomsCard from '../components/SymptomsCard';
 import NutritionCard from '../components/NutritionCard';
 import WellnessCard from '../components/WellnessCard';
+import ActivityCard from '../components/ActivityCard';
 import type { Recipe } from '../../../types/database';
 
 const DashboardView = ({ onNavigate }) => {
@@ -240,12 +241,15 @@ const DashboardView = ({ onNavigate }) => {
               techniques={techniques}
               onStartBreathingExercise={handleStartBreathingExercise}
             />
+            <ActivityCard
+              onNavigate={onNavigate}
+            />
           </SwipeContainer>
         </div>
 
       
         {/* Version desktop avec grid */}
-        <div className="hidden lg:grid gap-4 md:gap-6 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 items-stretch">
+        <div className="hidden lg:grid gap-4 md:gap-6 grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 items-stretch">
           <div className="col-span-1">
             {/* Carte État du jour */}
             <SymptomsCard
@@ -265,11 +269,18 @@ const DashboardView = ({ onNavigate }) => {
             />
           </div>
 
-          <div className="col-span-1 lg:col-span-2 xl:col-span-1">
+          <div className="col-span-1">
             {/* Carte Bien-être */}
             <WellnessCard
               techniques={techniques}
               onStartBreathingExercise={handleStartBreathingExercise}
+            />
+          </div>
+
+          <div className="col-span-1">
+            {/* Carte Activité */}
+            <ActivityCard
+              onNavigate={onNavigate}
             />
           </div>
         </div>
