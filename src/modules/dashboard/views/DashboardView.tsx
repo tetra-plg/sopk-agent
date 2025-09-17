@@ -12,6 +12,7 @@ import DailyJournalView from '../../cycle/views/DailyJournalView';
 import StateEvolutionTracker from '../components/StateEvolutionTracker';
 import NutritionTracker from '../components/NutritionTracker';
 import StressManagementTracker from '../components/StressManagementTracker';
+import ActivityTracker from '../components/ActivityTracker';
 import SwipeContainer from '../../../shared/components/SwipeContainer';
 import SymptomsCard from '../components/SymptomsCard';
 import NutritionCard from '../components/NutritionCard';
@@ -299,11 +300,12 @@ const DashboardView = ({ onNavigate }) => {
             <StateEvolutionTracker />
             <NutritionTracker />
             <StressManagementTracker onStartBreathing={handleStartBreathingExercise} />
+            <ActivityTracker onStartActivity={() => onNavigate('/activity')} />
           </SwipeContainer>
         </div>
 
         {/* Version desktop avec grid */}
-        <div className="hidden lg:grid gap-4 md:gap-6 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 items-stretch">
+        <div className="hidden lg:grid gap-4 md:gap-6 grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 items-stretch">
           <div className="col-span-1">
             <StateEvolutionTracker />
           </div>
@@ -312,8 +314,12 @@ const DashboardView = ({ onNavigate }) => {
             <NutritionTracker />
           </div>
 
-          <div className="col-span-1 lg:col-span-2 xl:col-span-1">
+          <div className="col-span-1">
             <StressManagementTracker onStartBreathing={handleStartBreathingExercise} />
+          </div>
+
+          <div className="col-span-1">
+            <ActivityTracker onStartActivity={() => onNavigate('/activity')} />
           </div>
         </div>
       </div>
