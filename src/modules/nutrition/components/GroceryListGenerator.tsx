@@ -43,12 +43,14 @@ const GroceryListGenerator = ({ selectedRecipes = [], onClose, onGenerate }) => 
           ingredientMap.set(key, {
             ...existing,
             quantity: combineQuantities(existing.quantity, adjustedQuantity),
+            unit: existing.unit,
             recipes: [...existing.recipes, recipe.title]
           });
         } else {
           ingredientMap.set(key, {
             name: ingredient.name,
             quantity: adjustedQuantity,
+            unit: ingredient.unit,
             category: ingredient.category || 'other',
             recipes: [recipe.title],
             notes: ingredient.notes || ''
@@ -115,6 +117,7 @@ const GroceryListGenerator = ({ selectedRecipes = [], onClose, onGenerate }) => 
         return acc;
       }, {})
     : { 'Tous les ingrédients': groceryList };
+  console.log(groupedList)
 
   const categoryLabels = {
     proteins: '🥩 Protéines',
@@ -141,7 +144,8 @@ const GroceryListGenerator = ({ selectedRecipes = [], onClose, onGenerate }) => 
           content += '─'.repeat(20) + '\n';
           items.forEach(item => {
             const checkbox = checkedItems[item.name] ? '☑️' : '⬜';
-            content += `${checkbox} ${item.quantity} ${item.name}\n`;
+            const unitDisplay = item.unit ? ` ${item.unit}` : '';
+            content += `${checkbox} ${item.quantity}${unitDisplay} — ${item.name}\n`;
             if (item.notes) content += `   💡 ${item.notes}\n`;
           });
           content += '\n';
@@ -171,9 +175,10 @@ const GroceryListGenerator = ({ selectedRecipes = [], onClose, onGenerate }) => 
 
   const shareList = async () => {
     if (navigator.share) {
-      const text = groceryList.map(item =>
-        `${item.quantity} ${item.name}`
-      ).join('\n');
+      const text = groceryList.map(item => {
+        const unitDisplay = item.unit ? ` ${item.unit}` : '';
+        return `${item.quantity}${unitDisplay} — ${item.name}`;
+      }).join('\n');
 
       try {
         await navigator.share({
@@ -298,7 +303,17 @@ const GroceryListGenerator = ({ selectedRecipes = [], onClose, onGenerate }) => 
                     />
                     <div className="flex-1">
                       <div className={`font-medium ${checkedItems[item.name] ? 'line-through text-gray-500' : ''}`}>
-                        {item.quantity} {item.name}
+                        <div className="flex items-baseline gap-2">
+                          <span className="font-bold text-green-600">
+                            {item.quantity}
+                          </span>
+                          <span className="text-sm text-gray-500 font-medium">
+                            {item.unit}
+                          </span>
+                          <span className="text-gray-800">
+                            {item.name}
+                          </span>
+                        </div>
                       </div>
                       {item.notes && (
                         <div className="text-xs text-gray-500 italic mt-1">

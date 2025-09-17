@@ -8,7 +8,7 @@ const AppNavigation = ({ children, currentRoute = '/dashboard', onRouteChange })
   const { user, signOut } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userProfile, setUserProfile] = useState(null);
-  const version = "1.0"
+  const version = "1.1"
 
   useEffect(() => {
     const loadUserProfile = async () => {

@@ -15,6 +15,8 @@ const ActivityHistory = ({ onBack }) => {
   const [stats, setStats] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState('all'); // 'all', 'week', 'month'
+  const [deletingId, setDeletingId] = useState(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
 
   // Charger l'historique et les statistiques
   useEffect(() => {
@@ -91,6 +93,31 @@ const ActivityHistory = ({ onBack }) => {
       'renforcement': '#FB7185'
     };
     return colorMap[category] || '#6B7280';
+  };
+
+  // Fonction pour supprimer une entrée
+  const handleDelete = async (entryId) => {
+    if (!user?.id || deletingId) return;
+
+    setDeletingId(entryId);
+
+    try {
+      await activityService.deleteActivityEntry(entryId, user.id);
+
+      // Mettre à jour la liste locale
+      setHistory(prev => prev.filter(entry => entry.id !== entryId));
+
+      // Recharger les stats
+      const statsData = await activityService.getUserStats(user.id, filter === 'all' ? 'month' : filter);
+      setStats(statsData);
+
+      setConfirmDeleteId(null);
+    } catch (error) {
+      console.error('Erreur lors de la suppression:', error);
+      alert('Impossible de supprimer cette activité. Veuillez réessayer.');
+    } finally {
+      setDeletingId(null);
+    }
   };
 
   if (isLoading) {
@@ -241,6 +268,57 @@ const ActivityHistory = ({ onBack }) => {
                           </span>
                         )}
                       </div>
+                    </div>
+
+                    {/* Bouton de suppression */}
+                    <div className="flex-shrink-0">
+                      {confirmDeleteId === entry.id ? (
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => handleDelete(entry.id)}
+                            disabled={deletingId === entry.id}
+                            className="px-3 py-1.5 text-sm rounded-lg font-medium transition-colors disabled:opacity-50"
+                            style={{
+                              backgroundColor: '#EF4444',
+                              color: 'white'
+                            }}
+                          >
+                            {deletingId === entry.id ? '...' : 'Confirmer'}
+                          </button>
+                          <button
+                            onClick={() => setConfirmDeleteId(null)}
+                            className="px-3 py-1.5 text-sm rounded-lg font-medium transition-colors"
+                            style={{
+                              backgroundColor: '#E5E7EB',
+                              color: '#6B7280'
+                            }}
+                          >
+                            Annuler
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => setConfirmDeleteId(entry.id)}
+                          className="p-2 rounded-lg transition-all hover:bg-red-50"
+                          style={{ color: '#EF4444' }}
+                          title="Supprimer cette activité"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-5 w-5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            strokeWidth={2}
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                            />
+                          </svg>
+                        </button>
+                      )}
                     </div>
                   </div>
 

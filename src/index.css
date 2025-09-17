@@ -11,6 +11,20 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
+
+  /* Support pour les safe areas sur iOS */
+  .safe-area-inset-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+
+  .safe-area-inset-top {
+    padding-top: env(safe-area-inset-top, 0);
+  }
+
+  /* Padding bottom safe pour mobile */
+  .pb-safe {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom, 0));
+  }
 }
 
 @layer base {

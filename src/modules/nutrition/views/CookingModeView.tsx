@@ -19,6 +19,12 @@ const CookingModeView = ({ recipeId, onBack, onComplete }) => {
   const [totalCookingTime, setTotalCookingTime] = useState(0);
   const [servingAdjustment, setServingAdjustment] = useState(1);
   const [startTime] = useState(Date.now());
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [feedbackData, setFeedbackData] = useState({
+    hasEaten: null,
+    enjoymentRating: null,
+    willCookAgain: null
+  });
 
   // Timer states
   const [remainingTime, setRemainingTime] = useState(0);
@@ -117,16 +123,22 @@ const CookingModeView = ({ recipeId, onBack, onComplete }) => {
     }
   };
 
-  const finishCooking = async () => {
+  const finishCooking = () => {
     const totalTime = Math.round((Date.now() - startTime) / 60000); // en minutes
     setTotalCookingTime(totalTime);
+    setShowFeedback(true);
+  };
 
-    // Enregistrer le tracking de la recette
-    if (user?.id) {
+  const submitFeedback = async () => {
+    // Enregistrer le tracking de la recette avec feedback
+    if (user?.id && recipe) {
       try {
         await trackingService.trackMealConsumption(user.id, recipe.id, null, {
           servings_made: Math.round(recipe.servings * servingAdjustment),
-          preparation_time_actual: totalTime
+          preparation_time_actual: totalCookingTime,
+          has_eaten: feedbackData.hasEaten,
+          enjoyment_rating: feedbackData.enjoymentRating,
+          will_cook_again: feedbackData.willCookAgain
         });
       } catch (error) {
         console.error('Erreur lors de l\'enregistrement:', error);
@@ -134,8 +146,9 @@ const CookingModeView = ({ recipeId, onBack, onComplete }) => {
     }
 
     onComplete && onComplete({
-      totalTime,
-      servingsMade: Math.round(recipe.servings * servingAdjustment)
+      totalTime: totalCookingTime,
+      servingsMade: Math.round(recipe?.servings * servingAdjustment),
+      feedback: feedbackData
     });
   };
 
@@ -187,10 +200,173 @@ const CookingModeView = ({ recipeId, onBack, onComplete }) => {
   const currentInstruction = recipe.instructions[currentStep];
   const progress = ((currentStep + 1) / recipe.instructions.length) * 100;
 
+  // Écran de feedback après cuisine
+  if (showFeedback) {
+    return (
+      <div className="h-screen bg-gray-50 flex flex-col overflow-hidden">
+        {/* Header feedback */}
+        <div className="flex-shrink-0 bg-white shadow-sm z-10 p-4">
+          <div className="max-w-2xl mx-auto text-center">
+            <h1 className="text-2xl font-bold text-gray-800 mb-2">
+              🎉 Recette terminée !
+            </h1>
+            <p className="text-gray-600">
+              Comment s'est passée votre expérience culinaire ?
+            </p>
+          </div>
+        </div>
+
+        {/* Contenu feedback scrollable */}
+        <div className="flex-1 overflow-y-auto">
+          <div className="max-w-2xl mx-auto p-4 space-y-6">
+            {/* Résumé de la session */}
+            <div className="bg-white rounded-xl p-6 shadow-sm">
+              <h2 className="text-lg font-semibold text-gray-800 mb-4">
+                📊 Résumé de votre session
+              </h2>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-green-600">
+                    {totalCookingTime} min
+                  </div>
+                  <div className="text-sm text-gray-500">Temps de cuisine</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-blue-600">
+                    {Math.round(recipe?.servings * servingAdjustment)}
+                  </div>
+                  <div className="text-sm text-gray-500">Portions préparées</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Question 1: As-tu mangé ? */}
+            <div className="bg-white rounded-xl p-6 shadow-sm">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                🍽️ Avez-vous mangé ce plat ?
+              </h3>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  onClick={() => setFeedbackData({...feedbackData, hasEaten: true})}
+                  className={`p-4 rounded-lg border-2 transition-all ${
+                    feedbackData.hasEaten === true
+                      ? 'border-green-500 bg-green-50 text-green-700'
+                      : 'border-gray-200 hover:border-green-300'
+                  }`}
+                >
+                  <div className="text-2xl mb-2">✅</div>
+                  <div className="font-medium">Oui, j'ai mangé</div>
+                </button>
+                <button
+                  onClick={() => setFeedbackData({...feedbackData, hasEaten: false})}
+                  className={`p-4 rounded-lg border-2 transition-all ${
+                    feedbackData.hasEaten === false
+                      ? 'border-orange-500 bg-orange-50 text-orange-700'
+                      : 'border-gray-200 hover:border-orange-300'
+                  }`}
+                >
+                  <div className="text-2xl mb-2">⏰</div>
+                  <div className="font-medium">Pas encore</div>
+                </button>
+              </div>
+            </div>
+
+            {/* Question 2: Appréciation (si mangé) */}
+            {feedbackData.hasEaten === true && (
+              <div className="bg-white rounded-xl p-6 shadow-sm">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                  😋 Comment avez-vous trouvé ce plat ?
+                </h3>
+                <div className="grid grid-cols-5 gap-2">
+                  {[1, 2, 3, 4, 5].map((rating) => (
+                    <button
+                      key={rating}
+                      onClick={() => setFeedbackData({...feedbackData, enjoymentRating: rating})}
+                      className={`p-3 rounded-lg border-2 transition-all text-center ${
+                        feedbackData.enjoymentRating === rating
+                          ? 'border-yellow-500 bg-yellow-50'
+                          : 'border-gray-200 hover:border-yellow-300'
+                      }`}
+                    >
+                      <div className="text-2xl">
+                        {rating === 1 ? '😞' :
+                         rating === 2 ? '😐' :
+                         rating === 3 ? '🙂' :
+                         rating === 4 ? '😊' : '🤤'}
+                      </div>
+                      <div className="text-xs text-gray-600 mt-1">
+                        {rating === 1 ? 'Bof' :
+                         rating === 2 ? 'Moyen' :
+                         rating === 3 ? 'Bien' :
+                         rating === 4 ? 'Très bon' : 'Excellent'}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Question 3: Refaire la recette */}
+            <div className="bg-white rounded-xl p-6 shadow-sm">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                🔄 Referiez-vous cette recette ?
+              </h3>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  onClick={() => setFeedbackData({...feedbackData, willCookAgain: true})}
+                  className={`p-4 rounded-lg border-2 transition-all ${
+                    feedbackData.willCookAgain === true
+                      ? 'border-green-500 bg-green-50 text-green-700'
+                      : 'border-gray-200 hover:border-green-300'
+                  }`}
+                >
+                  <div className="text-2xl mb-2">👍</div>
+                  <div className="font-medium">Oui, sans hésiter</div>
+                </button>
+                <button
+                  onClick={() => setFeedbackData({...feedbackData, willCookAgain: false})}
+                  className={`p-4 rounded-lg border-2 transition-all ${
+                    feedbackData.willCookAgain === false
+                      ? 'border-red-500 bg-red-50 text-red-700'
+                      : 'border-gray-200 hover:border-red-300'
+                  }`}
+                >
+                  <div className="text-2xl mb-2">👎</div>
+                  <div className="font-medium">Probablement pas</div>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Navigation feedback */}
+        <div className="flex-shrink-0 bg-white border-t border-gray-200 p-4 pb-safe safe-area-inset-bottom">
+          <div className="max-w-2xl mx-auto flex items-center justify-between">
+            <button
+              onClick={() => setShowFeedback(false)}
+              className="flex items-center gap-2 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+            >
+              <span>←</span>
+              <span>Retour</span>
+            </button>
+
+            <button
+              onClick={submitFeedback}
+              className="flex items-center gap-2 px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors font-semibold"
+            >
+              <span>✅</span>
+              <span>Terminer</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header sticky */}
-      <div className="sticky top-0 bg-white shadow-sm z-10 p-4">
+    <div className="h-screen bg-gray-50 flex flex-col overflow-hidden">
+      {/* Header fixed au lieu de sticky */}
+      <div className="flex-shrink-0 bg-white shadow-sm z-10 p-4">
         <div className="max-w-2xl mx-auto">
           <div className="flex items-center justify-between mb-3">
             <button
@@ -228,8 +404,9 @@ const CookingModeView = ({ recipeId, onBack, onComplete }) => {
         </div>
       </div>
 
-      {/* Contenu principal */}
-      <div className="max-w-2xl mx-auto p-4 pb-24">
+      {/* Contenu principal scrollable */}
+      <div className="flex-1 overflow-y-auto">
+        <div className="max-w-2xl mx-auto p-4 pb-4">
         {/* Ajustement portions */}
         {currentStep === 0 && (
           <div className="bg-blue-50 rounded-xl p-4 mb-6">
@@ -345,10 +522,11 @@ const CookingModeView = ({ recipeId, onBack, onComplete }) => {
             </div>
           </div>
         )}
+        </div>
       </div>
 
-      {/* Navigation bottom sticky */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4">
+      {/* Navigation bottom - maintenant en flex-shrink-0 au lieu de fixed */}
+      <div className="flex-shrink-0 bg-white border-t border-gray-200 p-4 pb-safe safe-area-inset-bottom">
         <div className="max-w-2xl mx-auto flex items-center justify-between">
           <button
             onClick={prevStep}

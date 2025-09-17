@@ -223,6 +223,29 @@ const activityService = {
   },
 
   /**
+   * Supprime une entrée d'historique d'activité
+   */
+  async deleteActivityEntry(entryId, userId) {
+    try {
+      const { error } = await supabase
+        .from('user_activity_tracking')
+        .delete()
+        .eq('id', entryId)
+        .eq('user_id', userId); // Sécurité : vérifier que l'entrée appartient à l'utilisateur
+
+      if (error) {
+        console.error('Erreur lors de la suppression:', error);
+        throw error;
+      }
+
+      return { success: true };
+    } catch (error) {
+      console.error('Erreur lors de la suppression de l\'activité:', error);
+      throw error;
+    }
+  },
+
+  /**
    * Récupère les statistiques d'activité d'un utilisateur
    */
   async getUserStats(userId, period = 'week') {

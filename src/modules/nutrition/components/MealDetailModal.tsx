@@ -138,7 +138,7 @@ const MealDetailModal = ({
                             }
                           </span>
                           {ingredient.quantity && (
-                            <span className="text-sm text-gray-500 font-medium">{ingredient.quantity}</span>
+                            <span className="text-sm text-green-500 font-medium">{ingredient.quantity} <span className="text-sm text-gray-500 font-medium">{ingredient.unit}</span></span>
                           )}
                         </li>
                       );

@@ -75,31 +75,156 @@ const PreSessionForm = ({ session, onStart, onBack, isLoading, error }) => {
             </button>
           </div>
 
-          <div className="text-center">
+          <div>
             <h1 className="text-2xl font-bold mb-2" style={{ color: '#1F2937' }}>
               🏃‍♀️ Prête à commencer ?
             </h1>
-            <p className="mb-4" style={{ color: '#6B7280' }}>
+            <p className="mb-6" style={{ color: '#6B7280' }}>
               Dis-nous comment tu te sens pour personnaliser ta séance
             </p>
 
-            {/* Info sur la session */}
-            <div className="bg-gradient-to-r from-violet-50 to-blue-50 rounded-xl p-4 mb-6">
-              <h2 className="text-lg font-semibold mb-2" style={{ color: '#1F2937' }}>
+            {/* Info détaillées sur la session */}
+            <div className="bg-white rounded-xl p-6 mb-6" style={{ boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)' }}>
+              {/* Titre et description */}
+              <h2 className="text-xl font-bold mb-2" style={{ color: '#1F2937' }}>
                 {session.title}
               </h2>
-              <div className="flex items-center justify-center gap-4 text-sm" style={{ color: '#6B7280' }}>
-                <span>⏱️ {session.duration_minutes} min</span>
-                <span>•</span>
-                <span>🎯 {session.category}</span>
-                <span>•</span>
-                <span>
-                  {session.difficulty === 'beginner' ? '🟢 Débutant' :
-                   session.difficulty === 'easy' ? '🟡 Facile' :
-                   session.difficulty === 'medium' ? '🟠 Intermédiaire' : '🔴 Avancé'}
-                </span>
+              {session.description && (
+                <p className="text-sm mb-4" style={{ color: '#6B7280' }}>
+                  {session.description}
+                </p>
+              )}
+
+              {/* Grille d'informations */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                {/* Catégorie */}
+                <div className="text-center">
+                  <div className="text-2xl mb-1">
+                    {session.category === 'cardio modéré' ? '🏃‍♀️' :
+                     session.category === 'yoga' ? '🧘‍♀️' :
+                     session.category === 'renforcement musculaire' ? '💪' :
+                     session.category === 'pilates' ? '🤸‍♀️' : '🏋️‍♀️'}
+                  </div>
+                  <p className="text-xs" style={{ color: '#9CA3AF' }}>Catégorie</p>
+                  <p className="text-sm font-medium capitalize" style={{ color: '#4B5563' }}>
+                    {session.category}
+                  </p>
+                </div>
+
+                {/* Durée */}
+                <div className="text-center">
+                  <div className="text-2xl mb-1">⏱️</div>
+                  <p className="text-xs" style={{ color: '#9CA3AF' }}>Durée</p>
+                  <p className="text-sm font-medium" style={{ color: '#4B5563' }}>
+                    {session.duration_minutes} min
+                  </p>
+                </div>
+
+                {/* Difficulté */}
+                <div className="text-center">
+                  <div className="text-2xl mb-1">
+                    {session.difficulty === 'beginner' ? '🌱' :
+                     session.difficulty === 'intermediate' ? '🌿' : '🌳'}
+                  </div>
+                  <p className="text-xs" style={{ color: '#9CA3AF' }}>Difficulté</p>
+                  <p className="text-sm font-medium" style={{ color: '#4B5563' }}>
+                    {session.difficulty === 'beginner' ? 'Débutant' :
+                     session.difficulty === 'intermediate' ? 'Intermédiaire' : 'Avancé'}
+                  </p>
+                </div>
+
+                {/* Intensité */}
+                <div className="text-center">
+                  <div className="text-2xl mb-1">⚡</div>
+                  <p className="text-xs" style={{ color: '#9CA3AF' }}>Intensité</p>
+                  <div className="flex items-center justify-center gap-1">
+                    {[...Array(10)].map((_, i) => (
+                      <div
+                        key={i}
+                        className="h-1.5 w-1.5 rounded-full"
+                        style={{
+                          backgroundColor: i < session.intensity_level
+                            ? (session.intensity_level <= 3 ? '#10B981' :
+                               session.intensity_level <= 6 ? '#F59E0B' : '#EF4444')
+                            : '#E5E7EB'
+                        }}
+                      />
+                    ))}
+                  </div>
+                  <p className="text-xs mt-1" style={{ color: '#4B5563' }}>
+                    {session.intensity_level}/10
+                  </p>
+                </div>
+              </div>
+
+              {/* Bénéfices et calories */}
+              <div className="pt-4 border-t space-y-2" style={{ borderColor: '#F3F4F6' }}>
+                {/* Calories */}
+                {session.estimated_calories_burned && (
+                  <div className="flex items-center gap-2">
+                    <span>🔥</span>
+                    <span className="text-sm" style={{ color: '#6B7280' }}>
+                      Calories estimées: <strong>{session.estimated_calories_burned} kcal</strong>
+                    </span>
+                  </div>
+                )}
+
+                {/* Bénéfices SOPK */}
+                {session.sopk_benefits && session.sopk_benefits.length > 0 && (
+                  <div className="flex items-start gap-2">
+                    <span>✨</span>
+                    <div className="text-sm" style={{ color: '#A78BFA' }}>
+                      <strong>Bénéfices SOPK:</strong> {session.sopk_benefits.join(' • ')}
+                    </div>
+                  </div>
+                )}
+
+                {/* Symptômes ciblés */}
+                {session.symptom_targets && session.symptom_targets.length > 0 && (
+                  <div className="flex items-start gap-2">
+                    <span>🎯</span>
+                    <div className="text-sm" style={{ color: '#10B981' }}>
+                      <strong>Cible:</strong> {session.symptom_targets.join(', ')}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
+
+            {/* Équipement nécessaire */}
+            {session.equipment_needed && session.equipment_needed.length > 0 && (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-4">
+                <div className="flex items-start gap-3">
+                  <span className="text-xl">🎒</span>
+                  <div className="flex-1">
+                    <h4 className="font-medium mb-1" style={{ color: '#92400E' }}>
+                      Équipement nécessaire
+                    </h4>
+                    <p className="text-sm" style={{ color: '#B45309' }}>
+                      {session.equipment_needed.join(' • ')}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Contre-indications */}
+            {session.contraindications && session.contraindications.length > 0 &&
+             session.contraindications[0] !== 'aucune spécifique' && (
+              <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-4">
+                <div className="flex items-start gap-3">
+                  <span className="text-xl">⚠️</span>
+                  <div className="flex-1">
+                    <h4 className="font-medium mb-1" style={{ color: '#991B1B' }}>
+                      Attention
+                    </h4>
+                    <p className="text-sm" style={{ color: '#DC2626' }}>
+                      {session.contraindications.join(' • ')}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

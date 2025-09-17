@@ -4,6 +4,9 @@
  * Script pour insérer les données JSON dans la base de développement
  * Lit les fichiers sopk_activity_sessions.json et sopk_recipes.json
  * et les insère dans Supabase
+ *
+ * IMPORTANT: Pour la production, utilisez insert_json_data_production.js
+ * qui offre plus de sécurité et de fonctionnalités (dry-run, transactions, etc.)
  */
 
 const fs = require('fs');

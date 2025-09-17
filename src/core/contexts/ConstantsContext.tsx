@@ -4,7 +4,7 @@ import React, { createContext, useContext } from 'react';
 const constants = {
   app: {
     name: 'SOPK Agent',
-    version: '1.0.0',
+    version: '1.1.0',
     description: 'Application compagnon pour le syndrome des ovaires polykystiques'
   },
   api: {
