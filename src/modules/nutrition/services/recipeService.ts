@@ -61,6 +61,7 @@ const recipeService = {
     }
   },
 
+
   /**
    * Récupérer une recette par ID
    */
@@ -221,20 +222,37 @@ const recipeService = {
           variations: recipeData.variations || [],
           storage_tips: recipeData.storage_tips || '',
           season: recipeData.season || ['spring', 'summer', 'autumn', 'winter'],
-          dietary_tags: recipeData.dietary_tags || []
+          dietary_tags: recipeData.dietary_tags || [],
+          cycle_phases: recipeData.cycle_phases || [],
+          symptom_targets: recipeData.symptom_targets || [],
+          main_nutrients: recipeData.main_nutrients || [],
+          mood_boosting: recipeData.mood_boosting || false,
+          tips: recipeData.tips || ''
         })
         .select()
         .single();
 
       if (error) {
-
-        throw error;
+        console.error('Erreur lors de la création de la recette:', error);
+        return {
+          success: false,
+          error: 'Erreur lors de la sauvegarde de la recette',
+          data: null
+        };
       }
 
-      return { data };
+      return {
+        success: true,
+        data,
+        error: null
+      };
     } catch (error) {
-
-      throw error;
+      console.error('Erreur lors de la création de la recette:', error);
+      return {
+        success: false,
+        error: error.message || 'Erreur lors de la sauvegarde de la recette',
+        data: null
+      };
     }
   },
 

@@ -149,6 +149,7 @@ export interface Recipe {
   dietary_tags: string[];
   symptom_targets?: string[];
   cycle_phases?: string[];
+  cycle_phases?: string[];
   main_nutrients?: string[];
   mood_boosting?: boolean;
   tips?: string;

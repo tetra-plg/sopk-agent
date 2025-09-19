@@ -7,11 +7,12 @@ import TrackingSuccess from '../components/TrackingSuccess';
 import RecipeLibraryView from './RecipeLibraryView';
 import NutritionHistoryView from './NutritionHistoryView';
 import CookingModeView from './CookingModeView';
+import AddRecipeView from './AddRecipeView';
 import trackingService from '../services/trackingService';
 
 const NutritionView = () => {
   const { user } = useAuth();
-  const [currentView, setCurrentView] = useState('overview'); // 'overview', 'library', 'history'
+  const [currentView, setCurrentView] = useState('overview'); // 'overview', 'library', 'history', 'add-recipe'
   const [selectedMeal, setSelectedMeal] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [trackedMeal, setTrackedMeal] = useState(null);
@@ -146,6 +147,21 @@ const NutritionView = () => {
     setCookingRecipe(recipe);
   };
 
+  const handleRecipeAdded = (recipe) => {
+    // Retourner à la vue bibliothèque après ajout
+    setCurrentView('library');
+  };
+
+  // Vue ajout de recette
+  if (currentView === 'add-recipe') {
+    return (
+      <AddRecipeView
+        onBack={() => setCurrentView('library')}
+        onRecipeAdded={handleRecipeAdded}
+      />
+    );
+  }
+
   // Vue bibliothèque de recettes
   if (currentView === 'library') {
     return (
@@ -153,6 +169,7 @@ const NutritionView = () => {
         <RecipeLibraryView
           onBack={() => setCurrentView('overview')}
           onViewHistory={handleViewHistory}
+          onAddRecipe={() => setCurrentView('add-recipe')}
         />
         {/* Notification tracking success globale */}
         <TrackingSuccess
@@ -426,6 +443,18 @@ const NutritionView = () => {
           >
             📚 Découvrir nos recettes IG bas →
           </button>
+
+          <button
+            onClick={() => setCurrentView('add-recipe')}
+            className="px-6 sm:px-8 py-3 rounded-xl font-medium transition-colors text-sm sm:text-base"
+            style={{
+              backgroundColor: 'var(--color-primary-bleu-ciel)',
+              color: 'white'
+            }}
+          >
+            📝 Ajouter ma recette
+          </button>
+
           <button
             onClick={() => setCurrentView('history')}
             className="px-6 sm:px-8 py-3 rounded-xl font-medium transition-colors border-2 text-sm sm:text-base"

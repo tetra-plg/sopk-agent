@@ -15,7 +15,7 @@ import TrackingSuccess from '../components/TrackingSuccess';
 import GroceryListGenerator from '../components/GroceryListGenerator';
 import CookingModeView from './CookingModeView';
 
-const RecipeLibraryView = ({ onBack, onViewHistory }) => {
+const RecipeLibraryView = ({ onBack, onViewHistory, onAddRecipe }) => {
   const { user } = useAuth();
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -201,6 +201,15 @@ const RecipeLibraryView = ({ onBack, onViewHistory }) => {
 
         {/* Ligne 2: Boutons d'action */}
         <div className="flex flex-wrap items-center gap-2">
+          <button
+            onClick={onAddRecipe}
+            className="px-3 py-2 text-sm lg:px-4 lg:py-2 lg:text-base rounded-lg text-white transition-colors"
+            style={{ backgroundColor: 'var(--color-primary-bleu-ciel)' }}
+          >
+            <span className="lg:hidden">📝</span>
+            <span className="hidden lg:inline">📝 Ajouter une recette</span>
+          </button>
+
           <button
             onClick={() => setSelectionMode(!selectionMode)}
             className={`px-3 py-2 text-sm lg:px-4 lg:py-2 lg:text-base rounded-lg transition-colors ${
